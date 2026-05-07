@@ -856,7 +856,7 @@ Reasons to NOT keep adding features:
 
 ---
 
-## Owner addendum (2026-05-06)
+## Owner addendum (2026-05-06, last updated 2026-05-07)
 
 A few small items that needed to be captured outside the V5/V5.1 text. None of these change the spec's intent; they reconcile concrete implementation choices.
 
@@ -904,3 +904,24 @@ Neither decision blocks Phase 0 file scaffolding (this commit) or the dependency
 ### A.6 — Repo layout
 
 The project lives directly in the existing `CFBapp/` workspace root rather than a `cfb-edge-journal/` subdirectory. The user's git repo at `C:\Users\Alexander\Documents\CFB\CFBapp` is the project root.
+
+### A.7 — Rating-source addendum (2026-05-07): pre-game Elo replaces SP+/FPI
+
+V5's bullet "Team strength as continuous variables (FPI / SP+) — not team identity" and the V5 schema comments on `trigger_events.fav_pregame_rating` and `dog_pregame_rating` ("FPI or SP+ (continuous strength)") were written assuming CFBD v2 exposed weekly SP+/FPI ratings. It does not. `/ratings/sp` and `/ratings/fpi` accept `year` and `team` only and return season-end values; using either as a feature for any past season is the exact lookahead leak that V5.1 rule 14 was written to prevent.
+
+**Resolution adopted by the project owner:**
+
+- The continuous-strength signal in `feature_set_v1` is `homePregameElo` / `awayPregameElo` from `GET /games`. These values are by-construction the team's Elo immediately before that specific kickoff and are lookahead-safe across all seasons CFBD covers.
+- `trigger_events.fav_pregame_rating` and `dog_pregame_rating` are populated from pre-game Elo. Schema column types (REAL) and field names are unchanged; only the source-of-truth comment is updated. `rating_gap` continues to mean `fav_pregame_rating - dog_pregame_rating` regardless of source.
+- SP+ and FPI are excluded from `feature_set_v1` and listed in `validated_filters.json` `rejected_features` with the reason "CFBD v2 returns season-end values only; rule 14 lookahead leak."
+
+**Coverage threshold (analogous to rule 16):**
+
+- Notebook 00 must report per (season, season_type) pct of FBS-vs-FBS games with both `homePregameElo` and `awayPregameElo` populated, in a section titled "Pre-game Elo coverage by (season, season_type)" inside `data_quality_report.md`.
+- (season, season_type) pairs with <80% coverage are excluded from training rather than partially reconstructed. Regular and postseason are evaluated independently — a season may pass the threshold for regular and fail for postseason, in which case only its postseason games are excluded. The exclusion list is recorded in the same report.
+
+**.cursorrules treatment:**
+
+Rule 14 retains its V5.1 verbatim text. An "Owner clarification 2026-05-07" NOTE block is added immediately after the rule pointing at this A.7 addendum. Rule 14's intent (no end-of-season information leaking into pre-game features) is fully honored — pre-game Elo is computed from games strictly prior to kickoff, which is exactly the property rule 14 demands.
+
+This is a substitution of source, not a relaxation of intent.

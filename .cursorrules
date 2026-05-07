@@ -68,6 +68,37 @@ V5.1 PATCH ADDITIONS:
     ratings from those seasons rather than leak. Document the exclusion in
     research_findings.md.
 
+[Owner clarification 2026-05-07 — applies to rule 14]
+Supersedes the '/ratings/sp?year=Y&week=W' reference in rule 14. See full clarification below.
+
+The CFBD v2 API does not implement weekly SP+ or FPI. Both `/ratings/sp` and
+`/ratings/fpi` accept `year` and `team` only; the responses (TeamSP /
+TeamFPI schemas) have no week field and return end-of-season values for any
+past season. The reference in rule 14 to "/ratings/sp?year=Y&week=W" is not
+implementable on the current API.
+
+Substitute pre-game Elo from GET /games:
+
+- `homePregameElo` and `awayPregameElo` are by-construction each team's Elo
+  immediately before that specific kickoff. They are lookahead-safe.
+- Use these as the continuous strength signal in feature_set_v1 in place of
+  any FPI/SP+ references in BUILD_SPEC.md. See BUILD_SPEC.md addendum A.7
+  for the schema and feature-set implications.
+
+Coverage requirement (analogous to rule 16):
+
+- Notebook 00 must report per (season, season_type) pct of FBS-vs-FBS games
+  with both pre-game Elo fields populated.
+- (season, season_type) pairs with <80% coverage are excluded from training
+  rather than partially reconstructed. Regular and postseason are evaluated
+  independently.
+
+SP+ / FPI go to validated_filters.json `rejected_features` with the reason
+"CFBD v2 returns season-end values only; rule 14 lookahead leak."
+
+Rule 14's intent (no end-of-season information leaking into pre-game
+features) is fully honored by this substitution.
+
 15. NO OVERTIME IN PHASE 0:
     Trigger events that occur in overtime are excluded from Phase 0 research.
     OT in college football has fundamentally different dynamics (each team gets
