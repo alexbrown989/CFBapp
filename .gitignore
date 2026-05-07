@@ -45,6 +45,9 @@ pip-wheel-metadata/
 
 # --- Jupyter -----------------------------------------------------------------
 .ipynb_checkpoints/
+# Executed notebook copies are regenerable artifacts with diff noise; the
+# unexecuted source notebook stays in version control as the reviewable form.
+research/notebooks/*.executed.ipynb
 
 # --- Frontend (Phase 3+) -----------------------------------------------------
 node_modules/
