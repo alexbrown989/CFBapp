@@ -1,0 +1,162 @@
+You are working on CFB Live Edge Journal — a personal betting research and live-edge web app.
+
+This file pins the build agent's behavior. Re-read it at the start of every response and state which rules apply to the current task.
+
+Rules 1-13 are the V5 spec from the project CTO. Rules 14-20 are the V5.1 patch. Rules 21-22 are operational guardrails added by the project owner.
+
+ABSOLUTE RULES (never violate):
+
+1. NEVER write app code (FastAPI routes, React components, database migrations) before Phase 0 (research notebooks) produces a research_findings.md showing positive CLV-equivalent edge AND acceptable calibration on a held-out test season AND a validated_filters.json file. If asked to skip ahead, refuse and explain why.
+
+2. NEVER use lookahead data in any backtest feature. Specifically:
+   - Do not use plays after the trigger play to compute features at the trigger.
+   - Do not use final scores, post-game grades, or closing lines as model features (closing line is allowed only for CLV measurement, never as model input).
+   - Do not optimize filter thresholds or hyperparameters on the test set.
+   - When in doubt, ask: "Could this value have been computed in real time at the moment of the bet?" If no, it leaks. Add an assertion test.
+
+3. NEVER hard-code domain assumptions. Every feature group is a hypothesis. State it, test it on training seasons, validate on held-out seasons.
+
+4. PRIMARY METRICS:
+   - CLV (closing line value) — must be positive median across test seasons
+   - Calibration (ECE — Expected Calibration Error) — must be < 0.05 on test seasons
+   Brier and log-loss are secondary diagnostics. A well-ranking model with bad calibration is useless for betting because the predicted probabilities feed directly into stake sizing.
+
+5. WALK-FORWARD VALIDATION ONLY. Three rolling windows produce three test seasons. Never train and test on overlapping seasons.
+
+6. STABILITY RULE (anti-overfitting):
+   A feature is "validated" only if it shows positive held-out improvement on >=2 of 3 walk-forward test seasons. Features that work on exactly one test season are flagged unstable and excluded from validated_filters.json unless the user provides a clear football-mechanism reason and accepts the risk.
+
+7. OVERFITTING GUARDRAILS:
+   - L1-regularized logistic regression OR gradient boosting (max_depth <= 4, min_samples_leaf >= 30).
+   - Feature selection happens on the validation set only, never on test.
+   - n_events >= 30 x n_features in any bucket the model acts on.
+   - If a (deficit, quarter) bucket has < 30 trigger events in training, the model refuses to produce a BET signal there at runtime.
+
+8. CALIBRATION GATE: After fitting, compute reliability diagram with 10 bins. Test-season ECE must be < 0.05 (5%). If the model ranks well but is poorly calibrated, apply Platt scaling or isotonic regression — refit calibration parameters on the validation set, evaluate on test. Document calibration metrics in research_findings.md.
+
+9. BE HONEST ABOUT DATA LIMITATIONS:
+   - The Odds API historical: every 10 min before Sept 2022, every 5 min after. Not true live granularity.
+   - CFBD has play-by-play + EPA + drives + lines + ratings (FPI, SP+). CFBD does NOT have PFF charting.
+   - True historical live moneyline data is largely unavailable for free.
+
+10. THIS IS A WEB APP. Stack is locked: FastAPI backend + React/Vite/Tailwind frontend + SQLite (dev) / Postgres (prod). No mobile, no native, no Next.js.
+
+11. THREE-TABLE MODEL ARCHITECTURE:
+    - trigger_events: what happened (immutable, one row per first-occurrence-of-deficit per game)
+    - trigger_features: what the model saw (versioned by feature_set_version)
+    - model_predictions: what the model thought (versioned by model_version, multiple per trigger over live snapshots)
+
+12. PYTHON STYLE: black, type hints, Pydantic v2, pytest, Alembic.
+
+13. SECRETS: Never commit .env. All API keys via os.getenv. Frontend never sees CFBD or Odds API keys.
+
+WHEN UNCERTAIN: Ask. Do not invent assumptions about which filters work or which thresholds matter.
+
+
+V5.1 PATCH ADDITIONS:
+
+14. RATING TIMING (lookahead trap):
+    FPI / SP+ / any team ratings used as features MUST be the version available
+    BEFORE kickoff of that specific game. End-of-season ratings include the very
+    games being predicted — using them is a silent lookahead leak that inflates
+    backtest performance and breaks live.
+
+    CFBD provides weekly ratings via /ratings/sp?year=Y&week=W. Always pull the
+    rating from week W-1 (or earlier) for a game in week W.
+
+    If only end-of-season ratings are available for some seasons, EXCLUDE
+    ratings from those seasons rather than leak. Document the exclusion in
+    research_findings.md.
+
+15. NO OVERTIME IN PHASE 0:
+    Trigger events that occur in overtime are excluded from Phase 0 research.
+    OT in college football has fundamentally different dynamics (each team gets
+    a possession from the 25, no clock, sudden-elimination rules). Modeling OT
+    is a separate research question and goes in future_features.md.
+
+    The seconds_remaining field is "regulation seconds remaining" — for any
+    play in OT, mark the trigger event with quarter = NULL and exclude from
+    feature_set_v1 training data.
+
+16. MARKET MOVEMENT REQUIRES BOTH ENDPOINTS:
+    The spread_movement feature requires both opening_spread and closing_spread
+    to have been recorded BEFORE kickoff. If a season's CFBD lines data is
+    missing one or the other, EXCLUDE market movement features for that season
+    rather than reconstruct.
+
+    Closing spread is allowed as a model feature because it was known before
+    kickoff. It is NOT lookahead. Closing live moneyline IS lookahead at
+    training time and is forbidden — that one is reserved for CLV measurement
+    only.
+
+17. ABSTENTION IS SUCCESS:
+    A model that produces few BET signals but high CLV and calibration is
+    BETTER than one that produces many signals with marginal edge. Do not
+    "tune for more action." If the model returns AVOID 95% of the time and
+    BET 5% with strong CLV on the BETs, that is the correct outcome. Do not
+    lower thresholds to increase volume.
+
+18. OBSERVED EDGE != EXECUTABLE EDGE:
+    Live odds are polled every 60 seconds. The model sees what was true at
+    that poll, not the absolute best price ever offered. Paper bets must be
+    timestamped and measured against the best book price visible at that
+    exact poll. Do not allow paper bets to retroactively claim better odds
+    than what was actually queryable.
+
+19. PHASE 0 OUTPUT MUST INCLUDE REJECTED FILTERS:
+    research_findings.md must list both validated AND rejected feature groups,
+    with the reason each one failed (e.g., "EPA divergence: improved Brier on
+    2017-2020 train but regressed on 2021 val", "Wind: only 1 of 3 test seasons
+    showed improvement, failed stability rule").
+
+    Listing rejections prevents future "wait, did we try X?" cycles and keeps
+    the research honest.
+
+20. DATA QUALITY AUDIT IS PART OF NOTEBOOK 00:
+    Before any feature engineering, the data audit must detect and document:
+    - Duplicate game_id rows in CFBD games endpoint
+    - Games with missing spreads (cannot identify favorite — exclude)
+    - Games with incomplete play-by-play (< 100 plays — flag for review)
+    - Neutral-site games (flag for review, may have different home/away dynamics)
+    - Canceled or shortened games (exclude)
+    - FCS opponents (exclude — different competitive level)
+    - OT games (flagged, OT plays excluded per rule 15)
+
+    Output: research/data/data_quality_report.md with counts and exclusion list.
+
+
+PROJECT-OWNER ADDITIONS (R21-R22):
+
+21. VERIFY EXTERNAL FACTS BEFORE CODING:
+    Do not trust training data on:
+    - External APIs (CollegeFootballData v2, The Odds API v4, Open-Meteo) — always
+      fetch current swagger / docs before writing client code. Endpoints, auth
+      schemes, rate limits, and field names change.
+    - Python / JS package versions — check PyPI / npm for current stable releases
+      before pinning. Don't pin from memory.
+    - Sports-betting math — verify formulas (devigging, Kelly, ECE) against
+      authoritative sources before implementing. Easy to get a sign wrong from
+      memory.
+    - Sports facts and current events — football rules, team identities, season
+      schedules change. Search before stating.
+    - CFBD field schemas — pull a sample response and inspect actual field names
+      before writing parsers.
+
+    DO trust training data for: standard library Python/JS, common SQL syntax,
+    FastAPI/React patterns, math fundamentals.
+
+22. STOP AT EVERY PHASE BOUNDARY:
+    Don't speed-run multiple phases or notebooks in one session. After each
+    deliverable, stop and let the user review before continuing.
+
+    Mandatory stop points:
+    - End of Notebook 00 (data audit complete)
+    - End of each 02x feature-group notebook
+    - End of Notebook 03 (calibration gate result known)
+    - End of Notebook 04 (CLV simulation result known)
+    - Phase 0 -> Phase 1 transition (all four hard gates evaluated)
+    - Phase 3 -> Phase 4 transition (paper-mode UI ready)
+    - Phase 4 -> Phase 5 transition (live validation thresholds evaluated)
+
+    At each stop, produce a short status note: what was just done, what's next,
+    any blockers or open questions.

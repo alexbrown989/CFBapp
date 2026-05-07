@@ -1,0 +1,60 @@
+# --- Research artifacts (local-only by convention) ---------------------------
+research/data/
+
+# --- Python ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# --- Virtualenvs -------------------------------------------------------------
+.venv/
+venv/
+env/
+ENV/
+
+# --- Build / packaging -------------------------------------------------------
+build/
+dist/
+*.egg-info/
+*.egg
+pip-wheel-metadata/
+
+# --- Databases (dev SQLite) --------------------------------------------------
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# --- Model artifacts (always retrain via Alembic-tracked metadata) ----------
+*.pkl
+*.joblib
+
+# --- Secrets -----------------------------------------------------------------
+.env
+.env.*
+!.env.example
+
+# --- Jupyter -----------------------------------------------------------------
+.ipynb_checkpoints/
+
+# --- Frontend (Phase 3+) -----------------------------------------------------
+node_modules/
+dist/
+.vite/
+
+# --- IDE / OS ----------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
