@@ -1,0 +1,199 @@
+{
+  "score_state_convention": "MIXED_BY_PLAY_TYPE_VERIFIED",
+  "subtypes": {
+    "blocked field goal": {
+      "n_samples": 20,
+      "post_share": 1.0,
+      "verdict": "POST_PLAY",
+      "verified_post": 20,
+      "verified_pre": 0
+    },
+    "blocked field goal touchdown": {
+      "n_samples": 32,
+      "post_share": 1.0,
+      "verdict": "POST_PLAY",
+      "verified_post": 32,
+      "verified_pre": 0
+    },
+    "blocked punt": {
+      "n_samples": 170,
+      "post_share": 1.0,
+      "verdict": "POST_PLAY",
+      "verified_post": 170,
+      "verified_pre": 0
+    },
+    "blocked punt touchdown": {
+      "n_samples": 77,
+      "post_share": 1.0,
+      "verdict": "POST_PLAY",
+      "verified_post": 77,
+      "verified_pre": 0
+    },
+    "field goal good": {
+      "n_samples": 18802,
+      "post_share": 1.0,
+      "verdict": "POST_PLAY",
+      "verified_post": 18802,
+      "verified_pre": 0
+    },
+    "fumble recovery (opponent)": {
+      "n_samples": 246,
+      "post_share": 1.0,
+      "verdict": "POST_PLAY",
+      "verified_post": 246,
+      "verified_pre": 0
+    },
+    "fumble recovery (own)": {
+      "n_samples": 33,
+      "post_share": 1.0,
+      "verdict": "POST_PLAY",
+      "verified_post": 33,
+      "verified_pre": 0
+    },
+    "fumble return touchdown": {
+      "n_samples": 325,
+      "post_share": 1.0,
+      "verdict": "POST_PLAY",
+      "verified_post": 325,
+      "verified_pre": 0
+    },
+    "interception": {
+      "n_samples": 25,
+      "post_share": 1.0,
+      "verdict": "POST_PLAY",
+      "verified_post": 25,
+      "verified_pre": 0
+    },
+    "interception return touchdown": {
+      "n_samples": 1397,
+      "post_share": 1.0,
+      "verdict": "POST_PLAY",
+      "verified_post": 1397,
+      "verified_pre": 0
+    },
+    "kickoff": {
+      "n_samples": 98,
+      "post_share": 1.0,
+      "verdict": "POST_PLAY",
+      "verified_post": 98,
+      "verified_pre": 0
+    },
+    "kickoff return (offense)": {
+      "n_samples": 6,
+      "post_share": 1.0,
+      "verdict": "BEST_EFFORT_LOW_N",
+      "verified_post": 6,
+      "verified_pre": 0
+    },
+    "kickoff return touchdown": {
+      "n_samples": 300,
+      "post_share": 1.0,
+      "verdict": "POST_BEST_EFFORT",
+      "verified_post": 300,
+      "verified_pre": 0
+    },
+    "missed field goal return touchdown": {
+      "n_samples": 4,
+      "post_share": 1.0,
+      "verdict": "BEST_EFFORT_LOW_N",
+      "verified_post": 4,
+      "verified_pre": 0
+    },
+    "pass incompletion": {
+      "n_samples": 2,
+      "post_share": 1.0,
+      "verdict": "BEST_EFFORT_LOW_N",
+      "verified_post": 2,
+      "verified_pre": 0
+    },
+    "pass interception return": {
+      "n_samples": 2,
+      "post_share": 1.0,
+      "verdict": "BEST_EFFORT_LOW_N",
+      "verified_post": 2,
+      "verified_pre": 0
+    },
+    "pass reception": {
+      "n_samples": 8,
+      "post_share": 1.0,
+      "verdict": "BEST_EFFORT_LOW_N",
+      "verified_post": 8,
+      "verified_pre": 0
+    },
+    "passing touchdown": {
+      "n_samples": 25741,
+      "post_share": 1.0,
+      "verdict": "POST_PLAY",
+      "verified_post": 25741,
+      "verified_pre": 0
+    },
+    "penalty": {
+      "n_samples": 3,
+      "post_share": 1.0,
+      "verdict": "BEST_EFFORT_LOW_N",
+      "verified_post": 3,
+      "verified_pre": 0
+    },
+    "punt": {
+      "n_samples": 301,
+      "post_share": 1.0,
+      "verdict": "POST_PLAY",
+      "verified_post": 301,
+      "verified_pre": 0
+    },
+    "punt return touchdown": {
+      "n_samples": 87,
+      "post_share": 1.0,
+      "verdict": "POST_PLAY",
+      "verified_post": 87,
+      "verified_pre": 0
+    },
+    "rush": {
+      "n_samples": 8,
+      "post_share": 1.0,
+      "verdict": "BEST_EFFORT_LOW_N",
+      "verified_post": 8,
+      "verified_pre": 0
+    },
+    "rushing touchdown": {
+      "n_samples": 26950,
+      "post_share": 1.0,
+      "verdict": "POST_PLAY",
+      "verified_post": 26950,
+      "verified_pre": 0
+    },
+    "sack": {
+      "n_samples": 142,
+      "post_share": 1.0,
+      "verdict": "POST_PLAY",
+      "verified_post": 142,
+      "verified_pre": 0
+    },
+    "safety": {
+      "n_samples": 444,
+      "post_share": 1.0,
+      "verdict": "POST_PLAY",
+      "verified_post": 444,
+      "verified_pre": 0
+    },
+    "timeout": {
+      "n_samples": 1,
+      "post_share": 1.0,
+      "verdict": "BEST_EFFORT_LOW_N",
+      "verified_post": 1,
+      "verified_pre": 0
+    },
+    "uncategorized": {
+      "n_samples": 4,
+      "post_share": 1.0,
+      "verdict": "BEST_EFFORT_LOW_N",
+      "verified_post": 4,
+      "verified_pre": 0
+    }
+  },
+  "thresholds": {
+    "ko_return_td": 0.65,
+    "min_samples": 20,
+    "verified_post": 0.95
+  }
+}
