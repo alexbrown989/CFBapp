@@ -6,8 +6,10 @@ current notebook from producing valid deliverables. Each item is logged
 with location(s), symptom, severity, and a fix path so a single sweep can
 clear them before downstream work.
 
-The two items below were identified during the 02a follow-up review of
-commit `9822cfc`. Add new items here as discovered.
+Items 1 and 2 were identified during the 02a follow-up review of commit
+`9822cfc`. Item 3 was identified during 02b notebook authoring (commit
+`bfddc16`) when introducing sentinel-delimited splicing for the schema
+sidecar. Add new items here as discovered.
 
 ---
 
@@ -68,6 +70,54 @@ CalibratedClassifierCV(FrozenEstimator(est), method="isotonic")
 in the shared `fit_calibrate_evaluate` helper. Single point of edit per
 notebook. Phase 0 finishes well before sklearn 1.8 is the system default,
 but the fix is cheap and should land before 02b duplicates the helper.
+
+---
+
+## 3. 02a's `feature_validation.schema.md` writer clobbers 02b-g sections
+
+**Location:**
+
+- `research/notebooks/02a_baseline_features.ipynb`, cell `c02a0014` (the
+  schema-write cell)
+
+**Symptom:** 02a regenerates `feature_validation.schema.md` from scratch
+on every run via `FEATURE_VALIDATION_SCHEMA.write_text(text, ...)`,
+where `text` is a hard-coded f-string template containing only 02a's
+content. Re-running 02a after 02b (or any 02c-g) has spliced its
+section will overwrite the file and silently drop 02b-g's sentinel-
+delimited sections. 02b's writer (added in commit `bfddc16`) uses
+sentinel-delimited splicing
+(`<!-- BEGIN: 02b opening_drive_shock --> ... <!-- END: ... -->`); 02a
+does not.
+
+**Severity:** Recoverable but silent. The CSV (`feature_validation.csv`)
+is append-safe via the defensive `(feature, train_window, test_season)`
+key drop, so data is fine. Only the schema-side documentation gets
+clobbered; recovery is to re-run the affected 02b-g notebook(s). Risk
+window: any 02a re-run between 02b's first execution and N03 silently
+breaks the documentation invariant.
+
+**Fix path:**
+
+1. Convert 02a's writer to the same sentinel-delimited splicing pattern
+   02b uses. Delimit 02a's content with
+   `<!-- BEGIN: 02a baseline_efficiency --> ... <!-- END: 02a baseline_efficiency -->`.
+   On write, read the existing sidecar, splice 02a's section in place
+   (or append if markers absent), preserve everything else verbatim.
+2. **Defensive assertion (do this first; cheap):** add a precondition
+   to 02a's sidecar-write cell -- before overwriting, scan the existing
+   sidecar for any `<!-- BEGIN: ... -->` sentinel whose tag is NOT
+   `02a baseline_efficiency`; refuse to write and emit migration
+   instructions (e.g., `found <!-- BEGIN: 02b opening_drive_shock -->;
+   this 02a run would clobber 02b's section -- switch 02a to splicing
+   mode per commit bfddc16 before re-running`). Prevents silent clobber
+   of 02b-g sections if 02a re-runs during the 02b-g window before the
+   full splicing migration lands.
+
+Sweep before N03 in the same commit as items 1 and 2. The defensive
+assertion is a ~5-line addition that buys forward safety even before
+the full splicing migration is done; land it as soon as 02b's first
+execution writes a `<!-- BEGIN: 02b ... -->` marker into the sidecar.
 
 ---
 
