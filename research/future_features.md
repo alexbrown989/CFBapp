@@ -43,6 +43,26 @@ consideration:
   say about post-explosive-play next-drive outcomes in CFB? To research
   before 02c plan write-up.
 
+### Home-field advantage and neutral-site effects
+
+- **Proposed by:** project owner (alexbrown989)
+- **Proposed on:** 2026-05-12
+- **Mechanism:** Home crowd noise affects offensive communication (snap
+  counts, audibles) and visiting defensive coordination; neutral sites
+  eliminate both, sometimes creating a third regime distinct from
+  either home/away. Effect on comeback equity is direction-uncertain:
+  home favorites may have more comeback capacity (crowd energy, no
+  travel fatigue) but home underdogs may also be harder to put away.
+- **Testable form:** at trigger time, two binary features:
+  - fav_is_home (1 if favorite is playing at home, else 0)
+  - is_neutral_site (1 if neutral-site venue, else 0)
+- **Target notebook:** 02g (context — week, weather). Will be
+  incorporated alongside the V5 DDL block-7 features.
+- **Open research question for 02g plan:** does CFBD `/games`
+  `neutralSite` flag and home/away team assignment carry enough info
+  to derive both features reliably, or do older seasons have coverage
+  gaps? To verify at 02g plan time from N00 audit data.
+
 ---
 
 ## Deferred / not currently scheduled

@@ -343,3 +343,196 @@ per-feature isolation test.
 - Of which independent (per the "Redundancy discoveries" section): 4; duplicates tagged via `redundant_with`: 2
 - Total rows written to `feature_validation.csv` from 02a: 18
 - Fresh CFBD calls this notebook: 0 (asserted)
+
+<!-- BEGIN: 02b opening_drive_shock -->
+
+## 02b -- Opening-drive shock features
+
+**Section last writer:** `research/notebooks/02b_opening_drive_shock.ipynb`
+**Last writer commit:** `ffa5c91691bc276c37490e680c91ba333bc55b5d`
+**Last writer generation timestamp:** 2026-05-12 09:30:41 Pacific Daylight Time
+**Feature set version:** `v1_opening_drive_shock`
+**Source DDL:** `BUILD_SPEC.md` `trigger_features` opening-drive-shock block (V5 lines 169-179)
+
+### Candidate features (10)
+
+Drive-1 metadata flags / scalars (D4 NULLs when `drive_number_in_game <= 1`,
+i.e., the trigger play is in drive 1 and the drive is not yet complete --
+reading drive-summary fields would be lookahead-unsafe per R3):
+
+- `dog_received_opening_kickoff` (lone exception to D4: drive-1 offense is
+  fixed at drive-1 start, not at drive-1 end, so safe to read whenever
+  drive 1 has at least started)
+- `dog_scored_on_opening_drive`
+- `opening_drive_was_td` (D3(i) generic: any team's TD, not dog-only)
+- `opening_drive_was_explosive_td`
+- `opening_drive_yards`
+- `opening_drive_plays`
+- `opening_drive_seconds`
+
+Drive-1 EPA features (computed strictly from the lookahead-safe `plays_before`
+slice; R3-safe by construction; null when the eligible play subset is empty):
+
+- `fav_def_epa_first_drive`
+- `fav_def_epa_after_first_drive`
+
+Derived flag (deterministic function of the two EPA features):
+
+- `defense_stabilized_flag` -- D2(i): `int(fav_def_epa_after_first_drive < fav_def_epa_first_drive)`; null when either input is null.
+
+### D1: explosive-play thresholds (type-specific)
+
+```python
+EXPLOSIVE_PASS_YARDS = 20
+EXPLOSIVE_RUSH_YARDS = 12
+EXPLOSIVE_PASS_PLAY_TYPES = ['Pass Reception', 'Passing Touchdown']
+EXPLOSIVE_RUSH_PLAY_TYPES = ['Rush', 'Rushing Touchdown']
+```
+
+PFF / SP+ convention: a 20-yard rush is a different football event from a
+20-yard pass (rare and breakdown-driven vs schemable), so they get distinct
+thresholds. `Sack` and `Pass Incompletion` are pass attempts but never have
+`yardsGained >= 20` (sacks are negative; incompletions are 0), so they're
+excluded for clarity. `Pass Interception Return` is excluded -- the play
+was a pass but `yardsGained` reflects defensive return yards, not an
+offensive explosive play. All non-pass / non-rush playTypes (penalty,
+timeout, kickoff, punt, field goal, etc.) are excluded from explosive
+consideration per D1.
+
+If N03 results suggest the thresholds need tuning, log to
+`research/tech_debt.md` rather than mid-flight patch (per the 02b plan-
+approval decision on D1).
+
+### D4: null policy for drive-1 triggers
+
+The 1,860 triggers (16.3% of in-scope) where `drive_number_in_game == 1`
+have drive-summary features set to NULL by the extractor. Rationale: at
+trigger time, drive 1 is in progress (the trigger play is part of drive
+1); reading drive 1's `driveResult` / `yards` / `plays` / `elapsed` /
+`scoring` fields from the CFBD `/drives` record would include plays
+AFTER the trigger play, which is a R3 lookahead violation. The
+per-feature null policy (decision B from 02a, carried forward) means
+these rows are dropped from each drive-summary feature's per-feature
+evaluation, not globally.
+
+EPA-based features (`fav_def_epa_first_drive`,
+`fav_def_epa_after_first_drive`, `defense_stabilized_flag`) remain
+computable from the lookahead-safe `plays_before` slice and are
+not affected by D4. They null out only when the eligible play subset
+is empty.
+
+`dog_received_opening_kickoff` is exempt from D4: drive 1's offense team
+is fixed at drive-1 start (not drive-1 end), so it's lookahead-safe to
+read once drive 1 has at least started.
+
+### Per-feature null counts (this run)
+
+In-scope triggers (post NaN `final_fav_won` drop): 11,416.
+Drive-1 trigger count (D4 null floor for drive-summary features): 1,860.
+
+| Feature | Null rows | % of in-scope |
+|---|---:|---:|
+| `dog_received_opening_kickoff` | 0 | 0.00% |
+| `dog_scored_on_opening_drive` | 1,860 | 16.29% (D4 drive-summary) |
+| `opening_drive_was_td` | 1,860 | 16.29% (D4 drive-summary) |
+| `opening_drive_was_explosive_td` | 1,860 | 16.29% (D4 drive-summary) |
+| `opening_drive_yards` | 1,860 | 16.29% (D4 drive-summary) |
+| `opening_drive_plays` | 1,860 | 16.29% (D4 drive-summary) |
+| `opening_drive_seconds` | 1,860 | 16.29% (D4 drive-summary) |
+| `fav_def_epa_first_drive` | 5,887 | 51.57% |
+| `fav_def_epa_after_first_drive` | 604 | 5.29% |
+| `defense_stabilized_flag` | 5,887 | 51.57% |
+
+**Per-feature evaluation N for D4-affected drive-summary features (6 of 10):** 9,556 evaluable, 1,860 NULL'd by D4 (`drive_number_in_game <= 1`). Saves N03 the back-derivation. The remaining 4 candidates -- `dog_received_opening_kickoff` (D4 exception) and the three EPA-derived features (`fav_def_epa_first_drive`, `fav_def_epa_after_first_drive`, `defense_stabilized_flag`) -- use per-feature N from the null-counts table above.
+
+### Per-feature x per-test-season results (this run, v1_opening_drive_shock)
+
+| Feature | Window -> Test | Brier improvement | ECE improvement | Stability |
+|---|---|---:|---:|---|
+| `dog_received_opening_kickoff` | 2015-2020 -> test 2022 | -0.00242 | -0.01584 | **PASS** |
+| `dog_received_opening_kickoff` | 2015-2021 -> test 2023 | +0.00224 | +0.02838 | **PASS** |
+| `dog_received_opening_kickoff` | 2015-2022 -> test 2024 | +0.00183 | +0.00028 | **PASS** |
+| `dog_scored_on_opening_drive` | 2015-2020 -> test 2022 | +0.00113 | +0.00898 | **PASS** |
+| `dog_scored_on_opening_drive` | 2015-2021 -> test 2023 | -0.00205 | +0.00218 | **PASS** |
+| `dog_scored_on_opening_drive` | 2015-2022 -> test 2024 | +0.00097 | -0.01246 | **PASS** |
+| `opening_drive_was_td` | 2015-2020 -> test 2022 | +0.00335 | -0.00016 | **PASS** |
+| `opening_drive_was_td` | 2015-2021 -> test 2023 | -0.00058 | +0.00745 | **PASS** |
+| `opening_drive_was_td` | 2015-2022 -> test 2024 | +0.00186 | +0.00068 | **PASS** |
+| `opening_drive_was_explosive_td` | 2015-2020 -> test 2022 | +0.00095 | +0.00484 | **PASS** |
+| `opening_drive_was_explosive_td` | 2015-2021 -> test 2023 | +0.00147 | +0.00554 | **PASS** |
+| `opening_drive_was_explosive_td` | 2015-2022 -> test 2024 | +0.00073 | -0.00553 | **PASS** |
+| `opening_drive_yards` | 2015-2020 -> test 2022 | +0.00155 | -0.00008 | FAIL |
+| `opening_drive_yards` | 2015-2021 -> test 2023 | -0.00088 | +0.00544 | FAIL |
+| `opening_drive_yards` | 2015-2022 -> test 2024 | -0.00178 | -0.02399 | FAIL |
+| `opening_drive_plays` | 2015-2020 -> test 2022 | -0.00521 | -0.00316 | FAIL |
+| `opening_drive_plays` | 2015-2021 -> test 2023 | -0.00200 | -0.01955 | FAIL |
+| `opening_drive_plays` | 2015-2022 -> test 2024 | -0.00021 | -0.00970 | FAIL |
+| `opening_drive_seconds` | 2015-2020 -> test 2022 | -0.00080 | -0.00072 | FAIL |
+| `opening_drive_seconds` | 2015-2021 -> test 2023 | -0.00002 | -0.01244 | FAIL |
+| `opening_drive_seconds` | 2015-2022 -> test 2024 | -0.00073 | -0.00799 | FAIL |
+| `fav_def_epa_first_drive` | 2015-2020 -> test 2022 | +0.00000 | +0.00000 | **PASS** |
+| `fav_def_epa_first_drive` | 2015-2021 -> test 2023 | +0.00340 | +0.02584 | **PASS** |
+| `fav_def_epa_first_drive` | 2015-2022 -> test 2024 | +0.00094 | +0.01046 | **PASS** |
+| `fav_def_epa_after_first_drive` | 2015-2020 -> test 2022 | +0.01514 | -0.00081 | **PASS** |
+| `fav_def_epa_after_first_drive` | 2015-2021 -> test 2023 | +0.00454 | +0.03917 | **PASS** |
+| `fav_def_epa_after_first_drive` | 2015-2022 -> test 2024 | +0.00599 | +0.00139 | **PASS** |
+| `defense_stabilized_flag` | 2015-2020 -> test 2022 | +0.00398 | +0.00263 | **PASS** |
+| `defense_stabilized_flag` | 2015-2021 -> test 2023 | +0.00784 | +0.01869 | **PASS** |
+| `defense_stabilized_flag` | 2015-2022 -> test 2024 | -0.01267 | -0.00777 | **PASS** |
+
+Sign convention: positive = candidate beat baseline. `**PASS**` means
+`sum(brier_improvement > 0) >= 2` across the 3 test seasons.
+
+### Redundancy discoveries (02b plan-time audit + this run)
+
+Plan-time audit verdict: **zero structural duplicates among 02b's 10
+candidates.** `REDUNDANT_WITH = {}` for this feature set version. All
+30 rows have `redundant_with == ""`.
+
+Two **conditional identities** were flagged at plan time. Distinct from
+the bit-identical `redundant_with` tags from 02a (where the identity
+held across the FULL trigger corpus), these are identities that hold
+only on a SUBSET of triggers:
+
+1. `fav_def_epa_after_first_drive == fav_def_epa_per_play` on triggers
+   where `dog_received_opening_kickoff == 0` (fav was on defense only
+   after drive 1; no fav-defense plays exist in drive 1 on that subset).
+   On the complement (fav was on defense in drive 1),
+   `fav_def_epa_after_first_drive` is a strict play-subset average of
+   `fav_def_epa_per_play`, not identity.
+
+2. Within drive 1, the offense-vs-defense per-row identity from 02a's
+   redundancy discovery still holds (`offense == fav` iff `defense == dog`
+   on drive 1's plays), so `fav_def_epa_first_drive ==` (a not-emitted
+   feature) `dog_off_epa_first_drive` restricted to drive 1. We do not
+   emit dog-side drive-1 EPA features, so there's no actual duplicate
+   in 02b's CSV; the identity is documented as a forward note for
+   02c-g and N03 in case the dog-side drive-1 mirrors come up.
+
+Neither warrants a `redundant_with` tag because the identities hold only
+on subsets of triggers, not bit-identically across the full corpus.
+N03's production-feature assembly should still filter `redundant_with ==
+""` (this drops only 02a's two duplicates; 02b's 10 rows all stay).
+
+### Candidate-vs-trigger-fields deducibility (plan-time audit)
+
+On the 9,556 drive-2+ triggers (where drive-summary features are
+evaluated), **none of the 02b candidates are materially deducible from
+`trigger_events.csv` fields alone** -- the drives JSON is required to
+reconstruct drive-1 outcomes. On the 1,860 drive-1 triggers,
+`dog_received_opening_kickoff` is partially deducible from
+`(possession_team == dog_team)` (1,749 of 1,860 = 94% match), but those
+rows are the same ones where the other drive-summary features are
+NULL per D4.
+
+Interpretation: if a 02b candidate passes stability and N03 finds it
+useful, the marginal information is in the drive-1 vs drive-2+ split,
+not in the candidate alone.
+
+### Section provenance
+
+- Last writer: this 02b run (timestamp + commit above).
+- Splicing strategy: sentinel-delimited; re-running 02b refreshes only
+  this section. Re-running 02a in its current form WILL clobber this
+  section -- known issue tracked in `research/tech_debt.md`.
+<!-- END: 02b opening_drive_shock -->
