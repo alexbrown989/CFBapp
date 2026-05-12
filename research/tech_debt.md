@@ -127,3 +127,35 @@ When an item is fixed, move it under a `## Resolved` section with the
 resolving commit hash, instead of deleting, so the audit trail is
 preserved alongside `feature_validation.schema.md`'s `Corrections` section
 and `research/results/budget_reconciliation.md`.
+
+---
+
+## Resolved process incidents
+
+### 2026-05-12: Co-authored-by trailer leak on four commits
+
+Cursor agent shell auto-injected `Co-authored-by: Cursor` trailer on
+commits 2e17807, bfddc16, 6d1fbc9, c7cd43f despite the standing rule
+from 2e17807 review. Root cause: CURSOR_AGENT=1 environment variable
+triggers Cursor's commit wrapper, which prepends the trailer to the
+commit message after `-m`/`-F` is consumed but before the commit
+object is written. The wrapper also re-runs on `git commit --amend`,
+so post-commit stripping via `git interpret-trailers --trim-empty`
+followed by amend does not work — the amend re-injects.
+
+The naive `git commit --trailer "Co-authored-by="` does NOT suppress:
+it appends a second empty trailer while leaving the auto-injected
+`Co-authored-by: Cursor <cursoragent@cursor.com>` line intact.
+
+Verified working invocation (tested 2026-05-12 on two no-op commits,
+both reset; body contained zero `Co-authored-by` lines):
+
+    git -c trailer.ifExists=replace \
+        -c trailer.ifMissing=doNothing \
+        commit --trailer "Co-authored-by=Removed" \
+        -m "<message>"
+
+History not rewritten — the four leaked commits remain in `origin/main`
+with the trailer. Future commits use the verified incantation above
+and verify with `git log -1 --format=%B` post-commit. If a
+`Co-authored-by` line appears, halt and surface before pushing.
