@@ -121,6 +121,80 @@ execution writes a `<!-- BEGIN: 02b ... -->` marker into the sidecar.
 
 ---
 
+## 4. Scoring-playType `exclude` category strands 1,562 alt-encoding plays
+
+**Locations:**
+
+- `research/notebooks/02c_explosive_vs_sustained.ipynb`, cell `c02c0004`
+  (registry definition: 14 playTypes mapped to `exclude` sentinel).
+- `research/notebooks/02c_explosive_vs_sustained.ipynb`, points-bucket
+  helper cell (the `if cat == "exclude": continue` short-circuit).
+
+**Symptom:** 1,562 CFBD plays flagged `scoring == True` (~2% of all
+recognized scoring across the 2015-2024 corpus) are routed to `exclude`
+and contribute zero points to `dog_points_from_explosives`,
+`dog_points_from_sustained`, or `dog_points_from_returns`. Excluded
+playTypes are alt-encodings whose point value cannot be unambiguously
+determined from `playType` alone (same-bucket-different-value or
+cross-bucket ambiguity), or anomalous `scoring == True` false positives.
+
+Concentration of exclusions by destination bucket (per the 02c
+plan-approval investigation):
+
+- Returns bucket alt-encodings (would have routed to
+  `dog_points_from_returns` if disambiguated): `Punt` (314), `Kickoff`
+  (130), `Blocked Punt` (174), `Sack` (148), `Interception` (27),
+  `Blocked Field Goal` (21) -- ~814 plays, mostly worth 6+1 PAT each.
+- PAT bucket alt-encodings (would have attributed to whichever bucket
+  the preceding TD landed in via D12): `Uncategorized` (688) -- mostly
+  1pt PATs, with at least 1 in 50 sampled being a 2pt conversion.
+- Offensive bucket alt-encodings (would have routed to
+  `dog_points_from_explosives` or `dog_points_from_sustained`):
+  `Pass Reception` (30), `Rush` (21) -- ~51 plays, mostly OT or text-
+  format anomalies that overlap safety-against-offense cases.
+- Anomalous false-positives (no scoring text in playText): `Pass
+  Incompletion` (3), `Penalty` (3), `End Period` (1), `Timeout` (1),
+  `placeholder` (1) -- 9 plays.
+
+**Severity:** Low if `dog_points_from_returns` passes stability under
+the current exclusion. The conservative outcome is intentional: if the
+feature passes stability with the cleaner (smaller) returns-bucket
+values, that's real signal. If it fails stability and we'd previously
+have mapped `exclude` -> dominant category, we couldn't distinguish
+real signal from misclassification artifact.
+
+**Fix path (deferred; conditional on Phase 0 stability outcome):**
+
+If 02c stability shows `dog_points_from_returns` failing stability OR
+N03 needs higher-volume returns signal, revisit the 1,562 excluded
+plays via a text-branching registry extension. PlayText patterns are
+documented per-playType with sampled evidence in:
+
+- `research/results/_investigate_02c_unknown_scoring.csv` (328 sampled
+  rows: 128 n=10 initial across all 18 playTypes + 200 n=50 verification
+  for the four high-volume targets).
+- `research/results/_investigate_02c_unknown_scoring.summary.json`
+  (per-playType template counts and per-row exception details for the
+  rows that didn't match the dominant template).
+- `research/results/_investigate_02c_unknown_scoring_drive_attrib.csv`
+  (the Fumble Recovery (Own) drive-attribution check that confirmed
+  the existing points-bucket cell handles drive-level routing correctly
+  via `drive_had_dog_explosive` lookup).
+
+Implementation sketch: introduce a sub-registry `SCORING_PLAYTEXT_BRANCHES`
+mapping each `exclude`d playType to a per-playText classifier function
+(e.g., `Punt -> lambda txt: "safety_def" if "for a SAFETY" in txt else
+"return_td"`). The points-bucket helper consults the sub-registry when
+`cat == "exclude"` and applies the resolved category, including a
+defensive raise for any text not matching the expected templates. The
+n=50-verified template strings from the investigation CSV are the
+authoritative input set.
+
+**Identified during:** 02c notebook execution + post-investigation
+mapping decision (this commit).
+
+---
+
 ## Tracking
 
 When an item is fixed, move it under a `## Resolved` section with the
