@@ -40,6 +40,11 @@ own budget print.
 
 ## 2. sklearn `CalibratedClassifierCV(cv="prefit")` deprecation
 
+**STATUS: RESOLVED at commit [hash] via sklearn pin to ==1.7.2 (held
+below 1.8 to retain CalibratedClassifierCV(cv='prefit') and L1 logreg
+semantics). Migration to FrozenEstimator deferred to Item 5 (production
+cleanup sweep before N03).**
+
 **Locations:**
 
 - `research/notebooks/02a_baseline_features.ipynb`, cell `c02a000f`
@@ -192,6 +197,131 @@ authoritative input set.
 
 **Identified during:** 02c notebook execution + post-investigation
 mapping decision (this commit).
+
+---
+
+## 5. FrozenEstimator + l1_ratio=1.0 production migration
+
+**Locations:** all 02a-g notebooks' `fit_calibrate_evaluate` helper
+cells (the `CalibratedClassifierCV(estimator=..., cv="prefit")` and
+`LogisticRegression(penalty="l1", ...)` constructions).
+
+**Symptom:** sklearn 1.8 removes `cv="prefit"` (Item 2) and deprecates
+`penalty="l1"` in favor of `l1_ratio=1.0` (Item 6). Current sklearn
+pin (==1.7.2, held below 1.8) avoids both via Item 2's resolution, but
+the modern API is required eventually.
+
+**Fix path:** when N03 needs production-grade calibration API, do a
+coordinated migration across all 02a-g and N03/N04 notebooks in a
+single sweep commit:
+
+- Replace `CalibratedClassifierCV(estimator=est, method="isotonic",
+  cv="prefit")` with `CalibratedClassifierCV(FrozenEstimator(est),
+  method="isotonic")`.
+- Replace `LogisticRegression(penalty="l1", C=..., solver=...)`
+  with `LogisticRegression(l1_ratio=1.0, C=..., solver=...)`.
+- Bump sklearn pin past 1.8 in `backend/pyproject.toml`.
+- Verify L1 behavior via coefficient sparsity check (per Item 6).
+- Re-execute all 02a-g notebooks under the new pin and confirm
+  `feature_validation.csv` rows are byte-identical or document
+  any numerical drift.
+
+Do NOT migrate piecemeal — single coordinated commit, not per-
+notebook patches. Piecemeal migration creates a state where some
+notebooks use the old API and others use the new, and the validated
+feature set's reproducibility chain breaks.
+
+**Identified during:** Commit 2 of the N02c re-execution prep
+sequence (sklearn pin to `==1.7.2`).
+
+---
+
+## 6. LogisticRegression `penalty='l1'` -> silent L2 fallback in sklearn 1.8+
+
+**Locations:** all 02a-g notebooks' `fit_calibrate_evaluate` helper
+cells; any N03/N04 model code that uses `LogisticRegression`.
+
+**Symptom:** sklearn 1.8 deprecated `penalty="l1"` in favor of
+`l1_ratio=1.0`. Under 1.8+, passing `penalty="l1"` silently falls
+back to L2 regularization via the new default `l1_ratio=0.0`,
+emitting only a `FutureWarning`. This changes feature selection
+behavior (L1 produces sparse coefficients; L2 does not), which
+means stability-test results computed under 1.8+ would differ
+from those computed under <1.8 without any visible error.
+
+**Fix path:** when bumping sklearn pin past 1.8 (during Item 5
+sweep), explicitly verify the swap is semantically equivalent:
+fit `LogisticRegression(l1_ratio=1.0, C=1.0, solver="liblinear")`
+on a small synthetic dataset and check `coef_` has the L1
+sparsity pattern (some coefficients exactly zero). Document the
+verification in the Item 5 sweep commit.
+
+**Why this is its own item:** Item 2 (`cv="prefit"`) is a hard error
+that halts execution. Item 6 is a silent behavioral change that
+requires intentional testing to catch. They have different fix
+horizons and different risk profiles -- bundling them under one
+item would conflate "the calibrator API moved" with "the
+regularization API moved AND can silently corrupt results."
+
+**Identified during:** Commit 2 of the N02c re-execution prep
+sequence (sklearn pin to `==1.7.2`).
+
+---
+
+## 7. Phase 0 notebooks run under global Python, not the backend venv
+
+**Locations:**
+
+- `backend/pyproject.toml` -- manifests `scikit-learn==1.7.2` and all
+  other Phase 0 deps, but is not installed against any environment
+  that Phase 0 notebook execution actually uses.
+- All `research/notebooks/02*.ipynb` -- execute via `python -m jupyter
+  nbconvert` against the user's global Python 3.12 install
+  (`C:\Users\Alexander\AppData\Local\Programs\Python\Python312`,
+  per the nbconvert traceback paths observed during 02c's halt).
+
+**Symptom:** The manifest at `backend/pyproject.toml` and the runtime
+where notebooks actually execute have diverged. The manifest serves
+as intent-only documentation right now; the user's global site-
+packages is the de-facto runtime. Sklearn version (and any future
+pin change) must be applied as two independent operations: edit the
+manifest, then `pip install --force-reinstall` against the global
+environment. The two steps can silently drift -- the manifest is
+the canonical record of which version SHOULD be installed, but
+nothing currently enforces that the runtime matches.
+
+**Severity:** Medium-high if reproducibility is needed before N03.
+The Phase 0 `feature_validation.csv` rows are generated under
+whatever sklearn the global Python has installed. If that
+installation drifts away from `==1.7.2` (e.g., a future `pip install`
+on an unrelated dep silently upgrades sklearn), the rows are no
+longer reproducible from the manifest alone.
+
+**Fix path:** Before N03 production code begins:
+
+- Create a project venv (`.venv/` at the repo root or
+  `backend/.venv/`).
+- `pip install -e backend/` against that venv so the manifest's pins
+  become the runtime.
+- Switch notebook execution to that venv (either by reconfiguring
+  Jupyter's kernelspec to point at `.venv/Scripts/python.exe` on
+  Windows, or by running nbconvert via the venv's Python directly).
+- Document the venv setup in `README.md` so it's reproducible.
+- Verify by re-running 02a and 02b under the venv and confirming
+  `feature_validation.csv` rows are byte-identical to the committed
+  versions (or documenting any drift).
+
+Until that lands, sklearn and any future pin changes must be applied
+manually via `pip` against the global environment, with the
+`pyproject.toml` edit serving as the canonical record of which
+version SHOULD be installed.
+
+**Identified during:** Commit 2 of the N02c re-execution prep
+sequence -- the `scikit-learn==1.7.2` pin landed in
+`backend/pyproject.toml` but had to be separately applied to the
+global Python via `pip install --force-reinstall scikit-learn==1.7.2`
+because notebooks don't run against the manifest-installed
+environment.
 
 ---
 

@@ -14,7 +14,8 @@ license = { text = "Proprietary" }
 authors = [{ name = "Alexander" }]
 
 # All dependency pins were verified against pypi.org/pypi/<pkg>/json on
-# 2026-05-06 per .cursorrules R21. Bump deliberately, not on autopilot.
+# 2026-05-06 per .cursorrules R21 (scikit-learn re-verified 2026-05-13).
+# Bump deliberately, not on autopilot.
 dependencies = [
     # Web framework + ASGI server
     "fastapi==0.136.1",
@@ -45,7 +46,7 @@ dependencies = [
     # Modeling / numerics (shared with research notebooks)
     "pandas==3.0.2",
     "numpy==2.4.4",
-    "scikit-learn==1.8.0",
+    "scikit-learn==1.7.2",  # held <1.8 to retain CalibratedClassifierCV(cv='prefit') and L1 logreg semantics for Phase 0 reproducibility; see tech_debt.md item 5
     "joblib==1.5.3",
 ]
 
