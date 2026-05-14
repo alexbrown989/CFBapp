@@ -1445,3 +1445,156 @@ Three **conditional** relationships (orthogonal to **`plays_so_far`** tagging):
   02c's, 02d's, and 02e's sections -- tracked as `research/tech_debt.md`
   item 3.
 <!-- END: 02e red_zone_failure -->
+
+<!-- BEGIN: 02f down_distance_efficiency -->
+
+## 02f — Down-distance efficiency (`v1_down_distance_efficiency`)
+
+**Section last writer:** `research/notebooks/02f_down_distance_efficiency.ipynb`
+**Last writer commit:** `0a1e1fe8bdc0c7ab24536aa8a029f9d66377655f`
+**Last writer generation timestamp:** 2026-05-14 13:52:40 Pacific Daylight Time
+
+### Candidate DDL rates (Category B)
+
+- `fav_early_down_success_rate`, `fav_third_down_success_rate`, `dog_early_down_success_rate`, `dog_third_down_success_rate`
+
+Each rate scans **`plays_before`** under **`_chrono_key`**. **`NULL`** when either **early** or **third** denominator is zero for that owning-team column within completed drives before each trigger **(D7)**. Walk-forward evaluator: **`rate.fillna(0.0)`** + paired **`*_insufficient_sample`**; **`imputation_value`** remains **blank**.
+
+### Locked extraction keys
+
+**D2 exclusions — `playType`:** `['End Period', 'End of Game', 'End of Half', 'Penalty', 'Timeout', 'Two Point Conversion Failed', 'Two Point Conversion No Good', 'Two Point Pass', 'Two Point Rush', 'Uncategorized', 'placeholder']`
+
+**D5 TD gate — **`driveResult`:** `['END OF GAME TD', 'TD']` **`playType`:** `['Fumble Recovery (Own)', 'Passing Touchdown', 'Rushing Touchdown']`
+
+### D7 NULL + insufficient-sample (this execution)
+
+Triggers: **`11,416`** (`final_fav_won` non-null subset). Drive-1 triggers (**no prior completed drives**) — **`1,860`**.
+
+**Numeric rate NaNs (denominator-free states):**
+
+| Feature | Null rows | % |
+|---|---:|---:|
+| `fav_early_down_success_rate` | 2,008 | 17.59% |
+| `fav_third_down_success_rate` | 2,285 | 20.02% |
+| `dog_early_down_success_rate` | 3,007 | 26.34% |
+| `dog_third_down_success_rate` | 3,236 | 28.35% |
+
+**Insufficient-sample (=1):**
+
+| Column | Rows | % |
+|---|---:|---:|
+| `fav_early_down_success_rate_insufficient_sample` | 2,008 | 17.59% |
+| `fav_third_down_success_rate_insufficient_sample` | 2,285 | 20.02% |
+| `dog_early_down_success_rate_insufficient_sample` | 3,007 | 26.34% |
+| `dog_third_down_success_rate_insufficient_sample` | 3,236 | 28.35% |
+
+**N03 caveat (rates + paired indicators):** with **`fillna(0.0)` + `*_insufficient_sample`** the model must distinguish **literal rate zero** from **zeroed NULL** using the paired flag (**~17–28%** of triggers carry NULL rates per column prior to coercion). Correlation-vs-PASS-matrix orthogonality for the surviving three DDL columns is stated under the cross-notebook redundancy heading below (**`|ρ| < 0.6`** versus every validated column besides the single tagged pairing).
+
+**Build-time DN field audit:** the **`_build_02f`** pass skipped **116** plays corpus-wide with negative raw **`min(distance, yardsToGoal)`** (**99%** **Kickoff** and **Kickoff Return** **`playTypes`**, **1** Penalty, **1** Rush). **`_effective_distance`** clamps via **`max(0, min(distance, yardsToGoal))`**. The skipped plays never enter DDL feature denominators — special-teams rows should not appear in third-down or early-down rate constructions. Full mechanism is documented under **`research/corrections_log.md`** (02f subsection).
+
+### D10 (`playNumber` leak diagnostic — micro quantization)
+
+Integer buckets tally **`micro_chrono - micro_leaky`** on quantized rates (**`NaN`** rows share **`MICRO_NAN_SENT`** so NULL-vs-NULL pairs count as matches).
+
+| Feature | Match | chr>lck +1 | +2 | +3+ | sub | lck>chr -1 | -2 | <=-3 | sub | any diff |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `fav_early_down_success_rate` | 6,336 (55.50%) | 0 | 0 | 2,349 | 2,349 | 0 | 0 | 2,731 | 2,731 | 5,080 |
+| `fav_third_down_success_rate` | 6,314 (55.31%) | 0 | 0 | 3,039 | 3,039 | 0 | 0 | 2,063 | 2,063 | 5,102 |
+| `dog_early_down_success_rate` | 6,141 (53.79%) | 0 | 0 | 2,667 | 2,667 | 0 | 0 | 2,608 | 2,608 | 5,275 |
+| `dog_third_down_success_rate` | 6,405 (56.11%) | 0 | 0 | 3,101 | 3,101 | 0 | 0 | 1,910 | 1,910 | 5,011 |
+
+**Phase 0 exposure note:** disagreement rates (**~44–45%**) are the **largest** of any executed **02** notebook to date (**02e**: **~26%**; **02b**: **~32%**) — i.e., **DDL rates are structurally fragile under the leaky `playNumber` filter**. The **`MICRO_NAN_SENT`** quantization paths show the leak altering not only numerical rates but entire **trigger–feature eligibility** (**NULL ↔ defined** transitions), not incremental noise. **`_chrono_key` is load-bearing specifically for owning-team DDL accumulators.**
+
+Positive / negative tails recover the **02b-class** truncation vs cross-drive contamination story generalized to DDL rates.
+
+### D11 pairwise early vs third (intra-notebook)
+
+| Comparison | Pearson rho | Pairwise n |
+|---|---:|---:|
+| fav_early_vs_fav_third | +0.1927 | 9,129 |
+| dog_early_vs_dog_third | +0.2647 | 8,177 |
+
+
+### Cross-notebook Pearson redundancy vs cumulative PASS (**`_02f_correlations.csv`**)
+
+Harness: **`research/notebooks/_diag_02f_correlations.py`** (cache-only matrix: **four** DDL rates × **twenty-four** other PASS numeric columns on **11,416** triggers; pairwise-complete **ρ**).
+
+Gate (**02d** / **02e** precedent): **`|ρ| ≥ 0.6`** tags **`redundant_with`** (**max |ρ|** validated partner wins for the 02f feature).
+
+Applied:
+
+- **`dog_third_down_success_rate`** → **`redundant_with = dog_avg_drive_yards`** at **ρ ≈ +0.647** (*n* = **8,180** pairwise non-null).
+
+Advisory (**`< 0.6`**):
+
+- **`dog_early_down_success_rate`** vs **`dog_avg_drive_yards`**: **ρ ≈ +0.581**.
+- **`dog_third_down_success_rate`** vs **`dog_avg_drive_plays`**: **ρ ≈ +0.531**.
+- **`dog_third_down_success_rate`** vs **`fav_def_epa_per_play`** and **`dog_off_epa_per_play`**: **ρ ≈ +0.470** each (*n* = **8,179**).
+
+**Near-miss (`redundant_with` not applied):** **`dog_early_down_success_rate`** ↔ **`dog_avg_drive_yards`** at **ρ ≈ +0.581** falls just below the **0.6** redundancy threshold established in **02d**. No **`redundant_with`** tag applies per protocol, but mechanistically this pair mirrors the tagged **`dog_third_down_success_rate`** relationship (both dog DDL rates correlate with cumulative dog drive yardage). **N03** should consider whether both dog DDL features add independent signal beyond **`dog_avg_drive_yards`**, or whether **L1** will down-weight one to a near-zero coefficient.
+
+Intra-notebook pairwise early-vs-third correlations remain **below 0.6** (see **D11**).
+
+
+### Stability table per walk-forward folds (`feature_validation.csv`)
+
+| Feature | Train window → test season | Δ Brier test | Δ ECE test | R6 stab |
+|---|---|---:|---:|---|
+| `fav_early_down_success_rate` | 2015-2020 -> test 2022 | +0.00329 | -0.00156 | **PASS** |
+| `fav_early_down_success_rate` | 2015-2021 -> test 2023 | +0.00780 | +0.04257 | **PASS** |
+| `fav_early_down_success_rate` | 2015-2022 -> test 2024 | +0.00441 | +0.00766 | **PASS** |
+| `fav_third_down_success_rate` | 2015-2020 -> test 2022 | +0.00041 | -0.00171 | **PASS** |
+| `fav_third_down_success_rate` | 2015-2021 -> test 2023 | +0.00671 | +0.04340 | **PASS** |
+| `fav_third_down_success_rate` | 2015-2022 -> test 2024 | +0.00502 | +0.00499 | **PASS** |
+| `dog_early_down_success_rate` | 2015-2020 -> test 2022 | +0.00848 | -0.00272 | **PASS** |
+| `dog_early_down_success_rate` | 2015-2021 -> test 2023 | +0.00478 | +0.05874 | **PASS** |
+| `dog_early_down_success_rate` | 2015-2022 -> test 2024 | +0.00137 | -0.00492 | **PASS** |
+| `dog_third_down_success_rate` | 2015-2020 -> test 2022 | +0.00941 | +0.00901 | **PASS** |
+| `dog_third_down_success_rate` | 2015-2021 -> test 2023 | +0.00944 | +0.04786 | **PASS** |
+| `dog_third_down_success_rate` | 2015-2022 -> test 2024 | +0.00928 | +0.00102 | **PASS** |
+
+`R6 stab` echoes **`passed_stability`**: **`≥2`** folds with **Δ Brier > 0**.
+
+### D12 Consolidated **`feature_validation`** PASS rollup (post-append)
+
+| Feature | Feature set version | Brier-positive folds | ECE-positive folds |
+|---|---|---:|---:|| `dog_off_epa_per_play` | v1_baseline_efficiency_only | 3/3 | 2/3 |
+| `epa_divergence` | v1_baseline_efficiency_only | 2/3 | 1/3 |
+| `fav_def_epa_per_play` | v1_baseline_efficiency_only | 3/3 | 2/3 |
+| `plays_so_far` | v1_baseline_efficiency_only | 3/3 | 2/3 |
+| `dog_early_down_success_rate` | v1_down_distance_efficiency | 3/3 | 1/3 |
+| `dog_third_down_success_rate` | v1_down_distance_efficiency | 3/3 | 3/3 |
+| `fav_early_down_success_rate` | v1_down_distance_efficiency | 3/3 | 2/3 |
+| `fav_third_down_success_rate` | v1_down_distance_efficiency | 3/3 | 2/3 |
+| `dog_avg_drive_plays` | v1_explosive_vs_sustained | 3/3 | 2/3 |
+| `dog_avg_drive_yards` | v1_explosive_vs_sustained | 2/3 | 2/3 |
+| `dog_explosive_play_count` | v1_explosive_vs_sustained | 3/3 | 2/3 |
+| `dog_points_from_explosives` | v1_explosive_vs_sustained | 3/3 | 1/3 |
+| `dog_points_from_returns` | v1_explosive_vs_sustained | 2/3 | 1/3 |
+| `dog_points_from_sustained` | v1_explosive_vs_sustained | 3/3 | 2/3 |
+| `seconds_since_last_dog_explosive_play` | v1_explosive_vs_sustained | 2/3 | 1/3 |
+| `defense_stabilized_flag` | v1_opening_drive_shock | 3/3 | 2/3 |
+| `dog_received_opening_kickoff` | v1_opening_drive_shock | 2/3 | 2/3 |
+| `dog_scored_on_opening_drive` | v1_opening_drive_shock | 2/3 | 2/3 |
+| `fav_def_epa_after_first_drive` | v1_opening_drive_shock | 3/3 | 2/3 |
+| `opening_drive_was_explosive_td` | v1_opening_drive_shock | 2/3 | 2/3 |
+| `opening_drive_was_td` | v1_opening_drive_shock | 2/3 | 2/3 |
+| `fav_red_zone_tds` | v1_red_zone_failure | 3/3 | 3/3 |
+| `fav_red_zone_trips` | v1_red_zone_failure | 2/3 | 2/3 |
+| `fav_yards_per_point` | v1_red_zone_failure | 2/3 | 1/3 |
+| `dog_avg_starting_field_pos` | v1_turnover_short_field | 3/3 | 1/3 |
+| `dog_points_off_turnovers` | v1_turnover_short_field | 3/3 | 2/3 |
+| `fav_turnovers_so_far` | v1_turnover_short_field | 3/3 | 1/3 |
+| `short_field_tds_allowed` | v1_turnover_short_field | 2/3 | 2/3 |
+
+**Rows in rollup:** **`28`** (distinct `(feature_set_version, feature)` pairs surviving the **PASS** heuristic above).
+
+**02f redundancy:** correlate-and-tag (**`research/results/_02f_correlations.csv`**) yielded **`dog_third_down_success_rate` → `redundant_with=dog_avg_drive_yards`** (Pearson detail in the cross-notebook heading above).
+
+Historical cross-notebook identities / redundancy anecdotes mostly live in older sidecars — **02f** overlap is enumerated in this section.
+
+### Section provenance
+
+- Notebook **02f** splice updates only the sentinel-delimited block.
+- Re-running stale **02a** writers can clobber sibling sections (**`research/tech_debt.md` item 3**).
+<!-- END: 02f down_distance_efficiency -->

@@ -584,3 +584,25 @@ Treat **single-season** **held-out uplift** sceptically when newest season under
 
 Cross-reference redundancy diagnostics from **Notebook 02e**: **`research/results/_02e_correlations.csv`** and hedged‑verdict prose in **`feature_validation.schema.md`** ( **`<!-- BEGIN: 02e red_zone_failure -->`** section).
 
+Cross-reference **02f** redundancy: **`research/results/_02f_correlations.csv`** and the **02f** block in **`feature_validation.schema.md`** ( **`dog_third_down_success_rate` ↔ `dog_avg_drive_yards`**, **ρ ≈ +0.647**).
+
+
+---
+
+## 02f — D10 leak exposure (2026-05-14); cross-notebook DDL correlation
+
+### Empirical D10 scope (executed 02f notebook)
+
+On **Notebook 02f** owning-team down–distance rates, **D10** disagreement between canonical **`_chrono_key`** and leaky **`playNumber`** filters affected **~44–45%** of micro-quantized triggers per DDL column — the **widest Phase 0 footprint** observed so far (**02e** ~**26%**; **02b** ~**32%**).
+
+**Interpretation:** **`_chrono_key` was load-bearing specifically for these DDL accumulators** — not a cosmetic ordering tweak. The **`MICRO_NAN_SENT`** quantization used in **D10** also shows the leak moving rows between **defined rate** and **NULL** states, not merely nudging numerators inside an otherwise stable support set.
+
+### Negative `distance` / `yardsToGoal` audit (CFBD quirk)
+
+Rare `/plays` rows carry **negative `distance`** (especially **Kickoff**-typed rows with **`down ∈ {1,2,3}`** in the provider feed). **`_effective_distance`** now clamps **`max(0, min(distance, yardsToGoal))`**, and strict field audit **counts-and-skips** negatives instead of aborting. A full cache scan (**not** capped at the staged **250k** “good-audit” quota) finds **116** such DN-keyed snaps; **`dog_third_down_success_rate`** cross-correlation tag is independent of this plumbing fix.
+
+### Pearson redundancy vs cumulative PASS (**`|ρ| ≥ 0.6`**)
+
+**`research/notebooks/_diag_02f_correlations.py`** emits **`research/results/_02f_correlations.csv`**: **four** 02f DDL rates × **twenty-four** other PASS numeric columns (**11,416** triggers).
+
+One pair clears **0.6**: **`dog_third_down_success_rate`** vs **`dog_avg_drive_yards`** (**ρ ≈ +0.647**). **`feature_validation.csv`** row tag: **`redundant_with=dog_avg_drive_yards`** (**02d**/**02e** precedent: strongest partner wins). **`dog_early_down_success_rate`** peaked at **ρ ≈ +0.581** vs the same partner — advisory only (below gate).

@@ -218,7 +218,7 @@ add("markdown", "m02f0003", """
 
 **Intra-02f redundancy protocol:** pairwise Pearson **early vs third** on the fav pair and dog pair; **|rho| ≥ 0.6** triggers advisory **weak R6** tie-break (prefer lower mean ΔBrier) and **`redundant_with`** tagging versus the partner rate when corroborated after execution (**Phase 02f-f**, **D11**).
 
-`REDUNDANT_WITH` dict starts **empty** in the scaffold CSV writer; populate after correlate-and-tag diagnostics if applicable.
+`REDUNDANT_WITH`: populated after **`research/results/_02f_correlations.csv`** (Pearson **`|rho| ≥ 0.6`** vs cumulative PASS columns; see schema **02f** redundancy subsection).
 
 `FEATURE_SET_VERSION = "v1_down_distance_efficiency"`.
 """)
@@ -283,7 +283,10 @@ INSUFFICIENT_SAMPLE_COLS: dict[str, str] = {
     "dog_third_down_success_rate": "dog_third_down_success_rate_insufficient_sample",
 }
 
-REDUNDANT_WITH: dict[str, str] = {}
+REDUNDANT_WITH: dict[str, str] = {
+    # Cross-notebook diagnostic (2026-05-14): ρ(dog_third, dog_avg_drive_yards)=+0.647 on 22f trigger matrix — partner wins per protocol.
+    "dog_third_down_success_rate": "dog_avg_drive_yards",
+}
 
 EXTRACTOR_CATEGORY: dict[str, str] = {f: "B" for f in CANDIDATE_FEATURES}
 
@@ -485,6 +488,7 @@ print(f"[ok] drives_by_game sorted by driveNumber ({len(drives_by_game):,} games
 
 _DN_KEYS = frozenset({"distance", "yardsToGoal", "down", "yardsGained", "offense", "driveNumber", "playType"})
 _n_aud = 0
+_n_aud_skip_neg_eff = 0
 _cap_aud = min(250_000, sum(len(px) for px in plays_by_game.values()))
 for _px in plays_by_game.values():
     for _pj in _px:
@@ -498,11 +502,14 @@ for _px in plays_by_game.values():
         int(_pj["distance"])
         int(_pj["yardsToGoal"])
         if min(int(_pj["distance"]), int(_pj["yardsToGoal"])) < 0:
-            raise ValueError("negative dn distance")
+            _n_aud_skip_neg_eff += 1
+            continue
         _n_aud += 1
     if _n_aud >= _cap_aud:
         break
-print(f"[ok] dn field audit {_n_aud:,} snaps effective_distance=min(distance,yardsToGoal)")
+print(f"[ok] dn field audit {_n_aud:,} snaps effective_distance=max(0,min(distance,yardsToGoal))")
+if _n_aud_skip_neg_eff:
+    print(f"[warn] audit skipped {_n_aud_skip_neg_eff:,} DN snaps with negative raw min(distance,yardsToGoal)")
 ''')
 
 
@@ -594,7 +601,8 @@ def _eligible_dn_snap(p: dict, owning_team: str) -> bool:
 
 
 def _effective_distance(p: dict) -> int:
-    return min(int(p["distance"]), int(p["yardsToGoal"]))
+    """FO effective distance; clamp at 0 — rare CFBD rows carry negative distance/YTG."""
+    return max(0, min(int(p["distance"]), int(p["yardsToGoal"])))
 
 
 def _yards_gained_int(p: dict) -> int:
