@@ -336,6 +336,50 @@ environment.
 
 ---
 
+## 8. 02e `fav_yards_per_point`: D7 bucket (b) far above plan tech-debt threshold
+
+**Locations:**
+
+- Plan / schema: `feature_validation.schema.md`, 02e **D7** subsection
+  (bucket (b) count and `%` of triggers).
+- Implementation: `research/notebooks/_build_02e.py`,
+  `_classify_yards_per_point_null_bucket` plus D8 paired-indicator wiring.
+
+**Symptom:** At execution (`v1_red_zone_failure`), bucket **(b)** –
+drives exist but **0 fav offensive points** – hit **4,517** triggers
+**(39.57%** of 11,416 in-scope triggers). The plan flagged **> 200**
+as the threshold warranting **N03** review of a worst-case-imputation
+alternative (`tech_debt` / “tech-debt entry for N03”). The empirical
+ratio is roughly **22×** that gate. Despite this, walk-forward stability
+passed **PASS** (**2/3** folds with positive Brier improvement — R6).
+
+**Interpretation:** The paired `fav_yards_per_point_is_null` indicator
+(absorbing structured missingness across both bucket (a) and (b))
+may carry more of the signal than the median-imputed efficiency
+scalar for triggers in bucket **(b)** — worth an explicit hypothesis
+during N03 ablation (`NULL`/`Non-NULL`-only regressions vs full
+paired design). Execution did **not** change the locked Mode B design;
+this item captures follow-up analytics only.
+
+**Severity:** Non-blocking for Phase 0 deliverables — same PASS bar as
+committed rows in `feature_validation.csv`. Signals that **N03**
+should revisit imputation-choice sensitivity when integrating this
+feature.
+
+**Fix path (N03 sweep):**
+
+- Ablation table: baseline + continuous only; indicator only;
+  paired-as-shipped — on overlapping train/test protocol.
+- If continuous contribution is negligible in bucket **(b)** dominant
+  regimes, consider tech-debt child item: directional imputation
+  (bounded “bad efficiency” substitute for bucket **(b)** only) vs
+  global median; must preserve R16 paired-indicator coherence.
+
+**Identified during:** Notebook `02e_red_zone_failure` execution /
+schema write (deliverables commit pending user authorization).
+
+---
+
 ## Tracking
 
 When an item is fixed, move it under a `## Resolved` section with the

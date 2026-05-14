@@ -1165,3 +1165,283 @@ that tag.
   this section. Re-running 02a in its current form WILL clobber 02b's,
   02c's, and 02d's sections -- tracked as `research/tech_debt.md` item 3.
 <!-- END: 02d turnover_short_field -->
+
+<!-- BEGIN: 02e red_zone_failure -->
+
+## 02e -- Red-zone failure features
+
+**Section last writer:** `research/notebooks/02e_red_zone_failure.ipynb`
+**Last writer commit:** `526c74dc2f187bd2b0706b1a6c860a63e6ee9928`
+**Last writer generation timestamp:** 2026-05-14 09:47:57 Pacific Daylight Time
+**Feature set version:** `v1_red_zone_failure`
+**Source DDL:** `BUILD_SPEC.md` `trigger_features` red-zone failure block (V5 lines 195-198)
+
+### Candidate features (3)
+
+- `fav_red_zone_trips` (D1/D3; **Category B**; always defined; 0 when no fav red-zone drives)
+- `fav_red_zone_tds` (D1/D3/D4; **Category B**; always defined; 0 when no fav red-zone TDs)
+- `fav_yards_per_point` (D5/D7/D8; **Category A**; NULL when bucket-(a) no completed fav drives OR bucket-(b) zero fav offensive points; per-train-window median imputation + paired `fav_yards_per_point_is_null` indicator)
+
+### D1: red-zone threshold
+
+Locked at `yardsToGoal <= 20` (standard NFL/CFB convention; user-approved at plan time as locked, not parameterized).
+
+### D3 + D5: red-zone trip detection
+
+A completed fav-offense drive `D` counts as a red-zone trip iff
+`∃ play p ∈ plays_before : p.driveNumber == D.driveNumber AND
+p.offense == D.offense AND p.yardsToGoal <= 20`.
+
+The `p.offense == D.offense` guard (plan-approval D5) protects against
+defensive returns and kickoff plays that might be mis-attributed to a
+drive in CFBD's data. This is a Category B feature: it iterates plays
+within completed drives, making the leak-correction (`_chrono_key`)
+necessary -- the leaky `playNumber < trig.playNumber` filter truncates
+plays within drives because CFBD `playNumber` resets per drive.
+
+### D4: fav TD attribution
+
+A drive counts as a fav TD iff `D.driveResult ∈ ['END OF GAME TD', 'TD']`
+AND `D.offense == fav`. Excludes defensive/special-teams TDs by the
+opposing team (`INT TD`, `FUMBLE TD`, `FUMBLE RETURN TD`, `PUNT TD`).
+Includes `END OF GAME TD` (fav offensive TD that happens to end the game).
+
+### D7 two-bucket NULL breakdown for `fav_yards_per_point` (plan-approval addition 2)
+
+In-scope triggers (post NaN `final_fav_won` drop): 11,416.
+
+| Bucket | Description | Triggers | % of in-scope |
+|---|---|---:|---:|
+| (a) | No completed fav drives (drive-1 / early-game) | 1,997 | 17.49% |
+| (b) | Drives exist; 0 fav offensive points | 4,517 | 39.57% |
+| nonnull | Drives + fav points > 0 | 4,902 | 42.94% |
+
+**Interpretation:** bucket (a) is the early-game / drive-1 floor (no
+data yet). Bucket (b) is the informative "fav offense stalled" state
+-- drives exist but the fav has scored 0 offensive points. The
+imputation strategy (D8 per-train-window median) treats both bucket
+types uniformly, with the paired `fav_yards_per_point_is_null`
+indicator preserving the missingness signal. If bucket (b) is large
+(>200 triggers) AND `fav_yards_per_point` fails at small magnitudes,
+the worst-case-imputation alternative (impute to a high "bad
+efficiency" value instead of the train-window median) becomes a
+tech-debt entry for N03.
+
+Bucket (b) threshold check (>200): yes -- flagged for N03 tech-debt review.
+
+**Post-execution note:** bucket **(b)** at **4,517** (**39.57%**) is
+orders-of-magnitude above the plan’s **>200** discretionary review gate
+(see **`research/tech_debt.md` item 8**). Stability still **PASSED** —
+mechanistically, the trial may rely heavily on **`fav_yards_per_point_is_null`**
+to encode missingness (`NULL` ∪ bucket **(a)** ∪ bucket **(b)** uniformly)
+rather than variance in the median-imputed scalar. N03 should treat
+paired-indicator attribution as an explicit ablation question before
+trust transfer.
+
+### D8 paired-indicator imputation
+
+`fav_yards_per_point` follows 02c's Mode B pattern:
+
+1. NULL when D7 bucket (a) OR bucket (b) fires.
+2. R16-safe per-train-window median imputed for NULL rows in train/val/test.
+3. Paired `fav_yards_per_point_is_null` indicator added alongside the continuous value.
+4. Per-window imputation value stored in the `imputation_value` column on `feature_validation.csv`.
+
+### D10 disagreement-magnitude distribution (plan-approval addition 1)
+
+The Cat A feature (`fav_yards_per_point`) was byte-identical between
+canonical and leaky filters across all 11,416
+triggers, confirming the Category A claim.
+
+The two Cat B features had non-trivial **bidirectional** disagreement
+distributions (diff = chrono - leaky). **Positive diff** (chrono > leaky)
+is the playNumber **truncation** mechanism within drives. **Negative
+diff** (leaky > chrono) is **forward contamination** across drives
+because `playNumber` resets per drive and is not a global chronological
+threshold. There is **no** `chrono >= leaky` monotonicity guarantee.
+
+| Feature | Match | chr>lck +1 | +2 | +3+ | sub | lck>chr -1 | -2 | <=-3 | sub | any diff |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `fav_red_zone_trips` | 8,412 (73.69%) | 1,822 | 714 | 462 | 2,998 | 6 | 0 | 0 | 6 | 3,004 |
+| `fav_red_zone_tds` | 9,776 (85.63%) | 1,242 | 320 | 75 | 1,637 | 3 | 0 | 0 | 3 | 1,640 |
+
+**Interpretation:** the disagreement quantifies how broken the leaky
+version would have been if shipped -- both under-counting (truncation)
+and over-counting (forward leak) are visible. Generalizes 02b's
+mechanistic story for play-iteration features.
+
+**Residual `lck > chr` magnitude-1 slice:** all disagreements where
+**leaky > chrono** are **−1** (6 trigger rows **×** **`fav_red_zone_trips`**, 3
+**×** **`fav_red_zone_tds`**), spanning **four** distinct `game_id`s for **trips**
+(`401404065`, `401411150`, `401415624`, `401644775` — two IDs appear twice each
+because the same `(game_id, drive, play)` hosts **two** in-scope triggers)
+and **`401404065`** + **`401415624`** for **TDs**. Only **`401415624`**
+lies in the CFBD negative-integer **`play.id`** encoding set (§2 of
+`corrections_log.md`). **`corrections_log.md`** §**1** (**749** adjacent
+**(c)** cases; **~0.394%** trigger-impact residual bound) discusses
+**ordering** disagreement between `_chrono_key` and alternative lex sorts
+—it is **not** the same enumerated population as these D10 rows, which arise
+specifically because **leaky** `plays_before` admits **later-calendar drives**
+whose **`playNumber` is `<` the trigger **`playNumber`**. Negative-id games
+overlap **lightly** (**1**/4 IDs), consistent with orthogonal mechanisms that
+could co-occur sporadically, not wholesale identity.
+
+### D11 red-zone conversion diagnostic
+
+For each trigger, classified by (`fav_red_zone_trips`, `fav_red_zone_tds`):
+
+| Bucket | Triggers | % of total |
+|---|---:|---:|
+| Zero trips | 6,479 | 56.75% |
+| Zero conversion (trips > 0, tds = 0) | 2,082 | 18.24% |
+| Partial conversion (0 < tds < trips) | 1,614 | 14.14% |
+| Perfect conversion (tds = trips) | 1,241 | 10.87% |
+
+Median `red_zone_pct = tds/trips` among non-zero-trips triggers: 0.333.
+
+**Interpretation:** zero-trips bucket reflects triggers fired BEFORE
+the fav reached the red zone (dog scoring did the work; not red-zone
+failure per se). Zero-conversion bucket isolates the "fav stalled in
+red zone" state -- the structural condition `fav_red_zone_tds` measures.
+
+**Trigger-conditioning caveat:** With **zero trips** dominating
+(**56.75%**) of triggers, the unconditional interpretation of **`fav_red_zone_trips`**
+/`fav_red_zone_tds`/`fav_yards_per_point` at the sampled margin shifts from
+"a fav that reached the RZ is **failing to finish**"
+toward "**has not accumulated RZ volume yet** -- loss is coming from
+elsewhere (dog offense, field position, etc.)". The three features still
+measure pre-trigger offensive state, but the **prevalent** bucket is
+**absence of RZ exposure**, not **RZ inefficiency**; feature utilities are
+correspondingly **mixture** signals under the live trigger rule.
+
+### Per-feature null counts (this run)
+
+In-scope triggers (post NaN `final_fav_won` drop): 11,416.
+Drive-1 trigger count: 1,860.
+
+| Feature | Null rows | % of in-scope |
+|---|---:|---:|
+| `fav_red_zone_trips` | 0 | 0.00% |
+| `fav_red_zone_tds` | 0 | 0.00% |
+| `fav_yards_per_point` | 6,514 | 57.06% (D7 bucket-(a) no completed fav drives OR bucket-(b) zero fav points) |
+
+### Per-feature x per-test-season results (this run, v1_red_zone_failure)
+
+| Feature | Window -> Test | Brier improvement | ECE improvement | Stability |
+|---|---|---:|---:|---|
+| `fav_red_zone_trips` | 2015-2020 -> test 2022 | +0.00872 | +0.00984 | **PASS** |
+| `fav_red_zone_trips` | 2015-2021 -> test 2023 | +0.00956 | +0.04283 | **PASS** |
+| `fav_red_zone_trips` | 2015-2022 -> test 2024 | -0.00229 | -0.01793 | **PASS** |
+| `fav_red_zone_tds` | 2015-2020 -> test 2022 | +0.00855 | +0.00016 | **PASS** |
+| `fav_red_zone_tds` | 2015-2021 -> test 2023 | +0.00013 | +0.03699 | **PASS** |
+| `fav_red_zone_tds` | 2015-2022 -> test 2024 | +0.00079 | +0.00256 | **PASS** |
+| `fav_yards_per_point` | 2015-2020 -> test 2022 | +0.00363 | -0.00480 | **PASS** |
+| `fav_yards_per_point` | 2015-2021 -> test 2023 | +0.00568 | +0.02599 | **PASS** |
+| `fav_yards_per_point` | 2015-2022 -> test 2024 | -0.00266 | -0.01858 | **PASS** |
+
+Sign convention: positive = candidate beat baseline. `**PASS**` means
+`sum(brier_improvement > 0) >= 2` across the 3 test seasons.
+
+**Interpretive hedge (R6 verdict vs fold magnitudes):** The `**PASS**`
+entries above are mechanically correct under the approved R6 floor (**≥ 2**/3 folds with strictly positive **Δ Brier**).
+Do **not** read “3 × PASS” here as uniformly strong signal.
+Per the methodological soft gate in **`corrections_log.md`** (**Δ Brier < +0.005** merits skepticism —
+noise-fold territory): **`fav_red_zone_tds`** has **three** positive folds
+yet **two** sit **below** +0.005 (**2023**, **2024**); only the **2022**
+fold is clearly above bar. **`fav_red_zone_trips`** and
+**`fav_yards_per_point`** — each **PASS** at **2/3** folds — exhibit a **weak**
+or **negative** **2024** test fold (**trips −0.00229**, **ypp −0.00266**),
+consistent with sampling noise surviving R6 rather than uniformly improving
+risk. **`N03`** should treat aggregation as **credentialing under R6** only and
+cross-check **2024 weakness** (see project-wide fold diagnostic
+**`research/notebooks/_diag_02e_fold_pattern.py`**) plus the **correlation**
+artifact **`research/results/_02e_correlations.csv`** for L1 penalties.
+
+### D12: cumulative validated-set context after 02e
+
+All passing features across `feature_validation.csv` after this run:
+
+| Feature | Feature set | Brier 3-fold | ECE 3-fold |
+|---|---|---:|---:|
+| `dog_off_epa_per_play` | v1_baseline_efficiency_only | 3/3 | 2/3 |
+| `epa_divergence` | v1_baseline_efficiency_only | 2/3 | 1/3 |
+| `fav_def_epa_per_play` | v1_baseline_efficiency_only | 3/3 | 2/3 |
+| `plays_so_far` | v1_baseline_efficiency_only | 3/3 | 2/3 |
+| `dog_avg_drive_plays` | v1_explosive_vs_sustained | 3/3 | 2/3 |
+| `dog_avg_drive_yards` | v1_explosive_vs_sustained | 2/3 | 2/3 |
+| `dog_explosive_play_count` | v1_explosive_vs_sustained | 3/3 | 2/3 |
+| `dog_points_from_explosives` | v1_explosive_vs_sustained | 3/3 | 1/3 |
+| `dog_points_from_returns` | v1_explosive_vs_sustained | 2/3 | 1/3 |
+| `dog_points_from_sustained` | v1_explosive_vs_sustained | 3/3 | 2/3 |
+| `seconds_since_last_dog_explosive_play` | v1_explosive_vs_sustained | 2/3 | 1/3 |
+| `defense_stabilized_flag` | v1_opening_drive_shock | 3/3 | 2/3 |
+| `dog_received_opening_kickoff` | v1_opening_drive_shock | 2/3 | 2/3 |
+| `dog_scored_on_opening_drive` | v1_opening_drive_shock | 2/3 | 2/3 |
+| `fav_def_epa_after_first_drive` | v1_opening_drive_shock | 3/3 | 2/3 |
+| `opening_drive_was_explosive_td` | v1_opening_drive_shock | 2/3 | 2/3 |
+| `opening_drive_was_td` | v1_opening_drive_shock | 2/3 | 2/3 |
+| `fav_red_zone_tds` | v1_red_zone_failure | 3/3 | 3/3 |
+| `fav_red_zone_trips` | v1_red_zone_failure | 2/3 | 2/3 |
+| `fav_yards_per_point` | v1_red_zone_failure | 2/3 | 1/3 |
+| `dog_avg_starting_field_pos` | v1_turnover_short_field | 3/3 | 1/3 |
+| `dog_points_off_turnovers` | v1_turnover_short_field | 3/3 | 2/3 |
+| `fav_turnovers_so_far` | v1_turnover_short_field | 3/3 | 1/3 |
+| `short_field_tds_allowed` | v1_turnover_short_field | 2/3 | 2/3 |
+
+**Total cumulative validated features:** 24.
+
+Notable cross-notebook conditional identities accumulating into N03's
+feature-selection picture:
+
+1. `dog_def_epa_per_play` (02a) tagged `redundant_with=fav_off_epa_per_play`
+   (byte-identical pair; FAILED under correction).
+2. `dog_off_epa_per_play` (02a) tagged `redundant_with=fav_def_epa_per_play`
+   (byte-identical pair; both PASSED).
+3. `dog_explosive_play_count` (02c) <-> `opening_drive_was_explosive_td` (02b):
+   drive-1 conditional overlap.
+4. `dog_points_off_turnovers` (02d) <-> `dog_points_from_returns` (02c):
+   co-occurrence measured at 2.67% (D11 from 02d); independent in correlation.
+5. `fav_red_zone_trips` (02e) ⊇ `fav_red_zone_tds` (02e): inclusion
+   relation (every TD requires a trip). NOT structural identity.
+6. **`fav_red_zone_trips`** /**`fav_red_zone_tds`** (02e): post-hoc **|ρ| ≥ 0.6**
+   vs **`plays_so_far`** — CSV **`redundant_with=plays_so_far`** (**see
+   Redundancy tagging** subsection below).
+
+### Redundancy tagging (per 02d-established |ρ| ≥ 0.6 protocol)
+
+Post-execution Pearson correlation (**`research/results/_02e_correlations.csv`**; reproducible via **`research/notebooks/_diag_02e_correlations.py`**) between each 02e candidate and the **21** pre-02e PASS feature columns (**11,416** triggers; non-null pairwise intersection). The **02d** sidecar precedent treats **|ρ| ≥ 0.6** as the bar for tagging **`redundant_with`** (vs the weaker “meaningful overlap” **0.3–0.6** band reserved for advisory L1 penalties).
+
+Applied (**6 CSV rows** — three walk-forward folds × two features):
+
+- **`fav_red_zone_trips`** → **`redundant_with = plays_so_far`** at **ρ = +0.781** (maximum **|ρ|** against validated columns).
+- **`fav_red_zone_tds`** → **`redundant_with = plays_so_far`** at **ρ = +0.650** (**`dog_points_from_explosives`** is next at **+0.635**; **`plays_so_far`** clears **0.6** and denotes the coarsest cumulative clock underlying both metrics).
+
+Companion highs **0.6–0.65** (**`dog_explosive_play_count`**, **`dog_points_from_explosives`**) remain in **`_02e_correlations.csv`** for **N03** weight-awareness; **`plays_so_far`** is designated as redundant partner per maximal clarity.
+
+Within-matrix coherence (not substituted for tagging): **`fav_red_zone_trips` ↔ `fav_red_zone_tds`** **ρ = +0.772** (*n* = **11,416**).
+
+**`fav_yards_per_point`:** every validated-column Pearson ρ satisfies **|ρ| < 0.6**. **Largest magnitude:** **`fav_def_epa_after_first_drive`**, ρ = **−0.210** (*n* = **4,892**). **Largest positive ρ:** **`fav_turnovers_so_far`**, **≈ +0.185** (*n* = **4,902**). **`redundant_with`** remains **empty** on all **`fav_yards_per_point`** rows.
+
+### Redundancy discoveries (02e plan-time audit)
+
+Plan-time **structural** audit: zero byte-identical duplicate among three 02e
+candidates. **Execution** attaches **Pearson-derived** redundancy tags (**above**) on top of that baseline — **distinct** from purely algebraic inclusion (**trips ⊇ TDs**) or correlation **below** **0.6**.
+
+Three **conditional** relationships (orthogonal to **`plays_so_far`** tagging):
+
+1. `fav_red_zone_trips` ⊇ `fav_red_zone_tds`: inclusion (every TD requires
+   a trip). The (trips, tds) basis carries the same info as (tds, tds/trips)
+   in linear-model space. **Independent** redundancy decision versus **`plays_so_far`**.
+2. `fav_red_zone_tds` vs `fav_yards_per_point`: TDs reduce yards/point
+   ratio (denominator grows by 6-8). Correlated; **below the 0.6 redundancy gate**.
+3. `fav_red_zone_trips` vs `fav_yards_per_point`: more trips ~ more
+   yards numerator. Correlated; **below the 0.6 redundancy gate**.
+
+### Section provenance
+
+- Last writer: this 02e run (timestamp + commit above).
+- Splicing strategy: sentinel-delimited; re-running 02e refreshes only
+  this section. Re-running 02a in its current form WILL clobber 02b's,
+  02c's, 02d's, and 02e's sections -- tracked as `research/tech_debt.md`
+  item 3.
+<!-- END: 02e red_zone_failure -->

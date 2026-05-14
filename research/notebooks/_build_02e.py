@@ -170,8 +170,7 @@ applies (decision **B** from 02a).
 - **D9** -- Composite `_chrono_key` filter from 02c carries forward. Plays sorted by chrono_key at load time. The play subset gates `assert_no_lookahead`; the Category B extractors (`fav_red_zone_trips`, `fav_red_zone_tds`) iterate `plays_before` to detect red-zone entry per completed drive.
 - **D10 disagreement-distribution diagnostic (plan-approval addition 1):**
     - Category A (`fav_yards_per_point`): build the feature matrix twice (chrono_key and leaky-playNumber filters); **assert byte-identical** values. Confirms the Category A claim empirically.
-    - Category B (`fav_red_zone_trips`, `fav_red_zone_tds`): build twice; do NOT assert byte-identical. **Quantify the magnitude distribution** of (chrono - leaky) per trigger: off-by-1, off-by-2, off-by-3+, negative (defensive check; should be 0). Plus the byte-identical fraction (triggers where they agree).
-    - Assertion: chrono >= leaky on every trigger for both Cat B features (the leak only TRUNCATES; it cannot create plays). Negative diffs indicate a bug.
+    - Category B (`fav_red_zone_trips`, `fav_red_zone_tds`): build twice; do NOT assert byte-identical. **Quantify the bidirectional magnitude distribution** of `diff = chrono - leaky` per trigger. **Positive diff** (chrono > leaky): playNumber-based TRUNCATION within drives (02b mechanism) -- undercounts red-zone entry that happened on high `playNumber` plays in completed drives. **Negative diff** (leaky > chrono): CROSS-DRIVE FORWARD CONTAMINATION -- `playNumber < trig_pn` is not a global chronological threshold, so the leaky `plays_before` can include plays from *later* calendar-time drives that happen to have low `playNumber`, creating spurious red-zone detection on completed drives. No monotonicity guarantee between the two filters; both directions are reported (off-by-1 / 2 / 3+ per sign). Plus the match fraction.
 - **D11** -- Red-zone conversion diagnostic: at trigger time, classify each trigger by (`fav_red_zone_trips`, `fav_red_zone_tds`) state. Report:
     - Fraction with zero trips (conversion rate undefined).
     - Fraction with `trips > 0 AND tds == 0` (zero conversion).
@@ -451,10 +450,10 @@ add("markdown", "m02e0003", """
 
 **Mixed-category extractor structure:**
 
-- `fav_red_zone_trips` and `fav_red_zone_tds` are **Category B** (drive-metadata filter PLUS play iteration to detect red-zone entry). The diff-vs-leaky verification in Phase 02e-e reports magnitude distributions for the disagreement, not a byte-identical assertion. The leak truncates plays within drives, undercounting red-zone events.
+- `fav_red_zone_trips` and `fav_red_zone_tds` are **Category B** (drive-metadata filter PLUS play iteration to detect red-zone entry). The diff-vs-leaky verification in Phase 02e-e reports **bidirectional** magnitude distributions (chrono > leaky from truncation within drives; leaky > chrono from cross-drive forward contamination because `playNumber` resets each drive).
 - `fav_yards_per_point` is **Category A** (drive-metadata only). Byte-identical IS asserted for this feature.
 
-`REDUNDANT_WITH = {}` -- the plan-time redundancy audit found zero structural duplicates among 02e candidates. Three pairs are conditionally identifiable but not byte-identical.
+`REDUNDANT_WITH` -- plan-time redundancy audit found **zero structural duplicates** among 02e candidates. **Three** pairwise conditions are plausible but non-identity correlations (see sidecar **Redundancy discoveries**). Execution applies **additional** **`redundant_with`** tags when **Pearson |rho|** vs the consolidated validated set hits **≥ 0.6** (02d precedent) — **`fav_red_zone_trips`** and **`fav_red_zone_tds`** → **`plays_so_far`**; **`fav_yards_per_point`** stays untagged (**every |rho|** vs pre-02e PASS stays **below 0.6**).
 
 `FEATURE_SET_VERSION = "v1_red_zone_failure"` -- the per-notebook tag stamped into every row this notebook writes.
 
@@ -511,9 +510,12 @@ CANDIDATE_FEATURES: list[str] = [
     "fav_yards_per_point",
 ]
 
-# Structural-redundancy map for 02e. Empty: the plan-time redundancy
-# audit found zero structural duplicates among 02e candidates.
-REDUNDANT_WITH: dict[str, str] = {}
+# Post-execution redundancy tags (*|rho| ≥ 0.6* versus validated set via
+# _diag_02e_correlations.py). Empty for fav_yards_per_point.
+REDUNDANT_WITH: dict[str, str] = {
+    "fav_red_zone_trips": "plays_so_far",
+    "fav_red_zone_tds": "plays_so_far",
+}
 
 # Per-extractor category classification (plan-time audit).
 EXTRACTOR_CATEGORY: dict[str, str] = {
@@ -1229,16 +1231,13 @@ add("markdown", "m02e000e", """
 Rebuild the feature matrix under the **leaky `playNumber < trig.playNumber` filter** (the pre-correction filter that silently leaks future plays AND truncates plays within drives because CFBD's `playNumber` resets per drive). Two-mode comparison:
 
 - **Category A** (`fav_yards_per_point`): **assert byte-identical**. The extractor doesn't touch plays_before, so the filter is irrelevant. Disagreement here would indicate a structural bug.
-- **Category B** (`fav_red_zone_trips`, `fav_red_zone_tds`): the leak truncates plays within drives, undercounting red-zone-entry detections. **Quantify the magnitude distribution** of `(chrono_value - leaky_value)` per trigger:
-    - 0 (matches)
-    - +1 (off-by-1: one drive's red-zone trip undercounted)
-    - +2 (off-by-2)
-    - +3 or more (off-by-3+)
-    - negative (defensive check: should be 0; the leak only truncates, never creates plays)
+- **Category B** (`fav_red_zone_trips`, `fav_red_zone_tds`): two leak mechanisms coexist in this filter:
+    1. **Truncation (typically chrono > leaky):** within completed drives, high-`playNumber` plays drop out when `trig_pn` is small -- red-zone-entry plays can be missed.
+    2. **Forward contamination (typically leaky > chrono):** because `playNumber` resets each drive, the filter is not globally chronological; leaky `plays_before` can wrongly include plays from **later calendar-time drives** whose `playNumber` happens to satisfy `< trig_pn`, spuriously crediting red-zone entry on drives that canonically should not yet have those plays visible.
 
-This is the analog of 02b's "542 evaluable triggers flipped 0->1" mechanistic finding, generalized across all completed fav drives. Interpretation: tells us how broken the leaky version would have been if shipped. Informational beyond just confirming the fix works.
+Quantify **`diff = chrono - leaky` bidirectionally:** match; +1 / +2 / +3+ (chrono greater); -1 / -2 / <= -3 (leaky greater).
 
-Assertion: chrono >= leaky on every trigger for both Cat B features. Negative diffs (leaky > chrono) indicate a bug.
+**No `chrono >= leaky` assertion** — both signs are mechanically possible for Category B features that iterate `plays_before`; the distribution is the diagnostic.
 """)
 
 
@@ -1308,58 +1307,71 @@ for feat in catB_features:
     diff = left - right  # chrono - leaky
     catB_diffs[feat] = diff.tolist()
 
-    # Hard assertion: chrono >= leaky (the leak only truncates).
     n_negative = int((diff < 0).sum())
-    assert n_negative == 0, (
-        f"Cat B integrity check FAILED for {feat}: {n_negative} trigger(s) "
-        f"have leaky > chrono. The leak should only truncate, never create "
-        f"plays. Investigate."
-    )
-
-    # Magnitude buckets.
+    n_positive = int((diff > 0).sum())
     n_match = int((diff == 0).sum())
-    n_off1 = int((diff == 1).sum())
-    n_off2 = int((diff == 2).sum())
-    n_off3p = int((diff >= 3).sum())
-    n_disagree = n_off1 + n_off2 + n_off3p
+
+    # Positive diff: chrono > leaky (truncation within drives).
+    n_p1 = int((diff == 1).sum())
+    n_p2 = int((diff == 2).sum())
+    n_p3p = int((diff >= 3).sum())
+    n_pos_total = n_p1 + n_p2 + n_p3p
+
+    # Negative diff: leaky > chrono (forward contamination).
+    n_m1 = int((diff == -1).sum())
+    n_m2 = int((diff == -2).sum())
+    n_m3p = int((diff <= -3).sum())
+    n_neg_total = n_m1 + n_m2 + n_m3p
+
+    n_any_disagree = n_pos_total + n_neg_total
 
     pct_match = (n_match / n_total * 100) if n_total else 0
-    pct_disagree = (n_disagree / n_total * 100) if n_total else 0
-    pct_off1 = (n_off1 / n_total * 100) if n_total else 0
-    pct_off2 = (n_off2 / n_total * 100) if n_total else 0
-    pct_off3p = (n_off3p / n_total * 100) if n_total else 0
 
     catB_distributions[feat] = {
-        "match": n_match, "off1": n_off1, "off2": n_off2, "off3plus": n_off3p,
-        "disagree": n_disagree,
+        "match": n_match,
+        "p_off1": n_p1, "p_off2": n_p2, "p_off3plus": n_p3p, "p_total": n_pos_total,
+        "n_off1": n_m1, "n_off2": n_m2, "n_off3plus": n_m3p, "n_total": n_neg_total,
+        "n_negative_triggers": n_negative, "n_positive_triggers": n_positive,
+        "any_disagree": n_any_disagree,
     }
 
     print(f"\\n  {feat}:")
-    print(f"    | bucket                  | count   | %        |")
-    print(f"    |-------------------------|---------|---------:|")
-    print(f"    | matches (diff == 0)     | {n_match:>5,}   | {pct_match:>7.2f}% |")
-    print(f"    | off-by-1 (chrono = leaky+1) | {n_off1:>5,}   | {pct_off1:>7.2f}% |")
-    print(f"    | off-by-2                | {n_off2:>5,}   | {pct_off2:>7.2f}% |")
-    print(f"    | off-by-3+               | {n_off3p:>5,}   | {pct_off3p:>7.2f}% |")
-    print(f"    | TOTAL DISAGREE          | {n_disagree:>5,}   | {pct_disagree:>7.2f}% |")
-    if n_disagree > 0:
-        # Sample mismatch rows for context.
-        mismatch_idx = (diff != 0)[diff != 0].index[:5].tolist()
-        print(f"    First {len(mismatch_idx)} mismatch examples:")
-        for idx in mismatch_idx:
+    print(f"    diff = chrono - leaky   (match={n_match:,}, chrono>leaky={n_positive:,}, leaky>chrono={n_negative:,})")
+    print(f"    | direction / bucket              | count   | % of all triggers |")
+    print(f"    |-----------------------------------|---------|------------------:|")
+    print(f"    | match (diff == 0)                 | {n_match:>5,}   | {pct_match:>15.2f}% |")
+    print(f"    | chrono > leaky: +1                | {n_p1:>5,}   | {(n_p1 / n_total * 100) if n_total else 0:>15.2f}% |")
+    print(f"    | chrono > leaky: +2                | {n_p2:>5,}   | {(n_p2 / n_total * 100) if n_total else 0:>15.2f}% |")
+    print(f"    | chrono > leaky: +3+               | {n_p3p:>5,}   | {(n_p3p / n_total * 100) if n_total else 0:>15.2f}% |")
+    print(f"    | SUBTOTAL chrono > leaky           | {n_pos_total:>5,}   | {(n_pos_total / n_total * 100) if n_total else 0:>15.2f}% |")
+    print(f"    | leaky > chrono: -1                | {n_m1:>5,}   | {(n_m1 / n_total * 100) if n_total else 0:>15.2f}% |")
+    print(f"    | leaky > chrono: -2                | {n_m2:>5,}   | {(n_m2 / n_total * 100) if n_total else 0:>15.2f}% |")
+    print(f"    | leaky > chrono: -3 or less        | {n_m3p:>5,}   | {(n_m3p / n_total * 100) if n_total else 0:>15.2f}% |")
+    print(f"    | SUBTOTAL leaky > chrono           | {n_neg_total:>5,}   | {(n_neg_total / n_total * 100) if n_total else 0:>15.2f}% |")
+    print(f"    | TOTAL any disagree               | {n_any_disagree:>5,}   | {(n_any_disagree / n_total * 100) if n_total else 0:>15.2f}% |")
+
+    if n_any_disagree > 0:
+        mismatch_idx_any = diff[diff != 0].index[:5].tolist()
+        print(f"    First {len(mismatch_idx_any)} disagreement examples:")
+        for idx in mismatch_idx_any:
+            dd = int(diff.iloc[idx])
             print(f"      row {int(idx)}: game={int(feature_matrix_df.at[idx, 'game_id'])} "
                   f"drive_n={int(feature_matrix_df.at[idx, 'drive_number_in_game'])} "
                   f"play_n={int(feature_matrix_df.at[idx, 'play_number'])} "
                   f"chrono={int(left.iloc[idx])} leaky={int(right.iloc[idx])} "
-                  f"diff={int(diff.iloc[idx])}")
+                  f"diff={dd}")
 
-# Interpretation summary.
-print(f"\\nInterpretation:")
-print(f"  The leak truncates plays within drives because CFBD playNumber resets")
-print(f"  per drive. Triggers in later drives with low playNumber filter OUT")
-print(f"  late-drive plays in earlier drives -- including red-zone entry plays.")
-print(f"  The non-zero disagreement counts above quantify how much red-zone")
-print(f"  context the leaky version would have missed if shipped.")
+print(f"\\nInterpretation (D10 bidirectional):")
+print(f"  Positive diff -- chrono REDUCES the count vs leaky within the truncation")
+print(f"    mechanism (02b-class playNumber truncation within drives).")
+print(f"  Negative diff -- leaky INFLATES the count vs chrono via forward")
+print(f"    contamination (playNumber is not chronological across drives).")
+print(f"  The canonical `_chrono_key` filter is the only leakage-safe comparator.")
+
+for _bf in catB_features:
+    _nn = catB_distributions[_bf]["n_negative_triggers"]
+    if _nn > 0:
+        print(f"[info] {_bf}: {_nn} triggers where leaky > chrono (forward contamination; expected).")
 
 # Discard the leaky matrix.
 del feature_matrix_df_leaky
@@ -1790,17 +1802,16 @@ for feat in CANDIDATE_FEATURES:
         tag = ""
     null_rows.append(f"| `{feat}` | {n_null:,} | {pct:.2f}%{tag} |")
 
-# D10 magnitude-distribution rows for Cat B features.
+# D10 magnitude-distribution rows for Cat B features (bidirectional table).
 catB_dist_rows = []
 for feat in catB_features:
     d = catB_distributions[feat]
-    n_total_local = len(feature_matrix_df)
+    nl = len(feature_matrix_df)
     catB_dist_rows.append(
-        f"| `{feat}` | {d['match']:,} ({d['match'] / n_total_local * 100:.2f}%) | "
-        f"{d['off1']:,} ({d['off1'] / n_total_local * 100:.2f}%) | "
-        f"{d['off2']:,} ({d['off2'] / n_total_local * 100:.2f}%) | "
-        f"{d['off3plus']:,} ({d['off3plus'] / n_total_local * 100:.2f}%) | "
-        f"{d['disagree']:,} ({d['disagree'] / n_total_local * 100:.2f}%) |"
+        f"| `{feat}` | {d['match']:,} ({d['match'] / nl * 100:.2f}%) | "
+        f"{d['p_off1']:,} | {d['p_off2']:,} | {d['p_off3plus']:,} | {d['p_total']:,} | "
+        f"{d['n_off1']:,} | {d['n_off2']:,} | {d['n_off3plus']:,} | {d['n_total']:,} | "
+        f"{d['any_disagree']:,} |"
     )
 
 # Cumulative validated set after 02e.
@@ -1815,8 +1826,8 @@ for (fsv, feat), grp in fv_after.groupby(["feature_set_version", "feature"]):
 
 cumulative_validated.sort()
 cumul_rows = []
-for fsv, feat, n_b, n_e in cumulative_validated:
-    cumul_rows.append(f"| `{feat}` | {fsv} | {n_b}/3 | {n_e}/3 |")
+for fsv, feat, n_fold_b_pass, n_fold_e_pass in cumulative_validated:
+    cumul_rows.append(f"| `{feat}` | {fsv} | {n_fold_b_pass}/3 | {n_fold_e_pass}/3 |")
 
 # D11 red-zone conversion rows.
 n_total_rz = len(feature_matrix_df)
@@ -1893,6 +1904,8 @@ tech-debt entry for N03.
 
 Bucket (b) threshold check (>200): { "yes -- flagged for N03 tech-debt review" if n_b > 200 else "no -- imputation strategy is locked"}.
 
+**Post-execution note:** bucket **(b)** at **{n_b:,}** (**{n_b / n_total_rz * 100:.2f}%**) is orders-of-magnitude above the plan’s **>200** discretionary review gate (**`research/tech_debt.md` item 8**). Stability **PASSED** anyway — paired **`fav_yards_per_point_is_null`** likely carries much of the useful signal versus the median-imputed scalar alone; treat indicator attribution as an **N03** ablation target.
+
 ### D8 paired-indicator imputation
 
 `fav_yards_per_point` follows 02c's Mode B pattern:
@@ -1908,19 +1921,35 @@ The Cat A feature (`fav_yards_per_point`) was byte-identical between
 canonical and leaky filters across all {len(feature_matrix_df):,}
 triggers, confirming the Category A claim.
 
-The two Cat B features had non-trivial disagreement distributions:
+The two Cat B features had non-trivial **bidirectional** disagreement
+distributions (diff = chrono - leaky). **Positive diff** (chrono > leaky)
+is the playNumber **truncation** mechanism within drives. **Negative
+diff** (leaky > chrono) is **forward contamination** across drives
+because `playNumber` resets per drive and is not a global chronological
+threshold. There is **no** `chrono >= leaky` monotonicity guarantee.
 
-| Feature | Matches (diff=0) | Off-by-1 | Off-by-2 | Off-by-3+ | TOTAL disagree |
-|---|---|---|---|---|---|
+| Feature | Match | chr>lck +1 | +2 | +3+ | sub | lck>chr -1 | -2 | <=-3 | sub | any diff |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 """ + "\\n".join(catB_dist_rows) + f"""
 
-Hard assertion: chrono >= leaky on every trigger for both Cat B features
-(verified). The leak only truncates plays; it cannot create them, so any
-negative diff would be a structural bug.
-
 **Interpretation:** the disagreement quantifies how broken the leaky
-version would have been if shipped. Generalizes 02b's "542 evaluable
-triggers flipped 0->1" finding across all completed fav drives.
+version would have been if shipped -- both under-counting (truncation)
+and over-counting (forward leak) are visible. Generalizes 02b's
+mechanistic story for play-iteration features.
+
+**Residual `lck > chr` magnitude-1 slice (empirical 02e run):** all
+**leaky > chrono** rows are **−1** — **6** trigger rows for **`fav_red_zone_trips`**
+and **3** for **`fav_red_zone_tds`**, spanning **four** distinct `game_id`s for
+**trips** (`401404065`, `401411150`, `401415624`, `401644775`; two IDs each
+host **two** in-scope triggers at the same drive/play) and **`401404065`**
++ **`401415624`** for **TDs**. Only **`401415624`** intersects the CFBD
+negative-integer **`play.id`** encoding set (`corrections_log.md` §2). The
+**749** adjacent **(c)** cases and **~0.394%** residual bound in
+`corrections_log.md` §1 concern **ordering** vs alternative lex sorts — not
+the same population as these D10 rows, which come from **cross-drive forward
+contamination** under the leaky `playNumber` filter. Light overlap with
+negative-id games (**1**/4 trip-level IDs) is consistent with **orthogonal**
+mechanisms co-occurring rarely, not identity.
 
 ### D11 red-zone conversion diagnostic
 
@@ -1936,6 +1965,8 @@ Median `red_zone_pct = tds/trips` among non-zero-trips triggers: {pct_50:.3f}.
 the fav reached the red zone (dog scoring did the work; not red-zone
 failure per se). Zero-conversion bucket isolates the "fav stalled in
 red zone" state -- the structural condition `fav_red_zone_tds` measures.
+
+**Trigger-conditioning caveat:** With **zero trips** at **{n_zero_trips / n_total_rz * 100:.2f}%** of triggers, the prevalent read is **not** “RZ visits but fail to finish” but “**no RZ volume yet** — loss is explained elsewhere (dog scoring, field position, etc.)”. The three features still encode pre-trigger offensive state, but the **dominant** bucket is **absence of RZ exposure**; expect **mixture** semantics under the live trigger rule.
 
 ### Per-feature null counts (this run)
 
@@ -1954,6 +1985,21 @@ Drive-1 trigger count: {n_drive1:,}.
 
 Sign convention: positive = candidate beat baseline. `**PASS**` means
 `sum(brier_improvement > 0) >= 2` across the 3 test seasons.
+
+**Interpretive hedge (R6 verdict vs fold magnitudes):** The `**PASS**`
+entries above are mechanically correct under the approved R6 floor (**≥ 2**/3 folds with strictly positive **Δ Brier**).
+Do **not** read “3 × PASS” here as uniformly strong signal.
+Per the methodological soft gate in **`corrections_log.md`** (**Δ Brier < +0.005** merits skepticism —
+noise-fold territory): **`fav_red_zone_tds`** has **three** positive folds
+yet **two** sit **below** +0.005 (**2023**, **2024**); only the **2022**
+fold is clearly above bar. **`fav_red_zone_trips`** and
+**`fav_yards_per_point`** — each **PASS** at **2/3** folds — exhibit a **weak**
+or **negative** **2024** test fold (**trips −0.00229**, **ypp −0.00266**),
+consistent with sampling noise surviving R6 rather than uniformly improving
+risk. **`N03`** should treat aggregation as **credentialing under R6** only and
+cross-check **2024 weakness** (see project-wide fold diagnostic
+**`research/notebooks/_diag_02e_fold_pattern.py`**) plus the **correlation**
+artifact **`research/results/_02e_correlations.csv`** for L1 penalties.
 
 ### D12: cumulative validated-set context after 02e
 
@@ -1978,22 +2024,39 @@ feature-selection picture:
    co-occurrence measured at 2.67% (D11 from 02d); independent in correlation.
 5. `fav_red_zone_trips` (02e) ⊇ `fav_red_zone_tds` (02e): inclusion
    relation (every TD requires a trip). NOT structural identity.
+6. **`fav_red_zone_trips`** /**`fav_red_zone_tds`** (02e): post-hoc **|ρ| ≥ 0.6**
+   vs **`plays_so_far`** — CSV **`redundant_with=plays_so_far`** (**see
+   Redundancy tagging** subsection below).
+
+### Redundancy tagging (per 02d-established |ρ| ≥ 0.6 protocol)
+
+Post-execution Pearson correlation (**`research/results/_02e_correlations.csv`**; reproducible via **`research/notebooks/_diag_02e_correlations.py`**) between each 02e candidate and the **21** pre-02e PASS feature columns (**11,416** triggers; non-null pairwise intersection). The **02d** sidecar precedent treats **|ρ| ≥ 0.6** as the bar for tagging **`redundant_with`** (vs the weaker “meaningful overlap” **0.3–0.6** band reserved for advisory L1 penalties).
+
+Applied (**6 CSV rows** — three walk-forward folds × two features):
+
+- **`fav_red_zone_trips`** → **`redundant_with = plays_so_far`** at **ρ = +0.781** (maximum **|ρ|** against validated columns).
+- **`fav_red_zone_tds`** → **`redundant_with = plays_so_far`** at **ρ = +0.650** (**`dog_points_from_explosives`** is next at **+0.635**; **`plays_so_far`** clears **0.6** and denotes the coarsest cumulative clock underlying both metrics).
+
+Companion highs **0.6–0.65** (**`dog_explosive_play_count`**, **`dog_points_from_explosives`**) remain in **`_02e_correlations.csv`** for **N03** weight-awareness; **`plays_so_far`** is designated as redundant partner per maximal clarity.
+
+Within-matrix coherence (not substituted for tagging): **`fav_red_zone_trips` ↔ `fav_red_zone_tds`** **ρ = +0.772** (*n* = **11,416**).
+
+**`fav_yards_per_point`:** every validated-column Pearson ρ satisfies **|ρ| < 0.6**. **Largest magnitude:** **`fav_def_epa_after_first_drive`**, ρ = **−0.210** (*n* = **4,892**). **Largest positive ρ:** **`fav_turnovers_so_far`**, **≈ +0.185** (*n* = **4,902**). **`redundant_with`** remains **empty** on all **`fav_yards_per_point`** rows.
 
 ### Redundancy discoveries (02e plan-time audit)
 
-Plan-time verdict: **zero structural duplicates among 02e's 3
-candidates.** `REDUNDANT_WITH = {{}}` for this feature set version.
-All 9 rows have `redundant_with == ""`.
+Plan-time **structural** audit: zero byte-identical duplicate among three 02e
+candidates. **Execution** attaches **Pearson-derived** redundancy tags (**above**) on top of that baseline — **distinct** from purely algebraic inclusion (**trips ⊇ TDs**) or correlation **below** **0.6**.
 
-Three **conditional identities** flagged at plan time:
+Three **conditional** relationships (orthogonal to **`plays_so_far`** tagging):
 
 1. `fav_red_zone_trips` ⊇ `fav_red_zone_tds`: inclusion (every TD requires
    a trip). The (trips, tds) basis carries the same info as (tds, tds/trips)
-   in linear-model space. No `redundant_with` tag.
+   in linear-model space. **Independent** redundancy decision versus **`plays_so_far`**.
 2. `fav_red_zone_tds` vs `fav_yards_per_point`: TDs reduce yards/point
-   ratio (denominator grows by 6-8). Correlated, not redundant.
+   ratio (denominator grows by 6-8). Correlated; **below the 0.6 redundancy gate**.
 3. `fav_red_zone_trips` vs `fav_yards_per_point`: more trips ~ more
-   yards numerator. Correlated, not redundant.
+   yards numerator. Correlated; **below the 0.6 redundancy gate**.
 
 ### Section provenance
 
@@ -2072,9 +2135,10 @@ print(f"  fav_yards_per_point (Cat A):     byte-identical "
 for feat in catB_features:
     d = catB_distributions[feat]
     print(f"  {feat} (Cat B):")
-    print(f"    matches: {d['match']:,}  off-by-1: {d['off1']:,}  "
-          f"off-by-2: {d['off2']:,}  off-by-3+: {d['off3plus']:,}  "
-          f"total disagree: {d['disagree']:,}")
+    print(f"    match: {d['match']:,}  chrono>leaky(+1/+2/+3+): "
+          f"{d['p_off1']:,}/{d['p_off2']:,}/{d['p_off3plus']:,}  "
+          f"leaky>chrono(-1/-2/<=-3): {d['n_off1']:,}/{d['n_off2']:,}/{d['n_off3plus']:,}  "
+          f"any disagree: {d['any_disagree']:,}")
 
 print(f"\\nRed-zone conversion (D11) bucket fractions:")
 print(f"  zero trips:         {n_zero_trips:>5,} ({n_zero_trips / n_total_rz * 100:.2f}%)")

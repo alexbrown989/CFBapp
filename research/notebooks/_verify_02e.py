@@ -64,6 +64,7 @@ if bad:
 
 # Verify the _chrono_key source was spliced into the cache-reload cell.
 all_code_src = "\n".join("".join(c["source"]) for c in cells if c["cell_type"] == "code")
+all_md_src = "\n".join("".join(c["source"]) for c in cells if c["cell_type"] == "markdown")
 assert "def _chrono_key(p: dict)" in all_code_src, (
     "Notebook does not contain the _chrono_key function body. The build "
     "script's import-then-splice contract from _lib_chrono.py is broken. "
@@ -95,18 +96,26 @@ assert 'plays_before_filter="chrono_key"' in all_code_src, (
 )
 print(f"[ok] diff-vs-leaky verification path present (both filter modes)")
 
-# Verify the D10 magnitude-distribution diagnostic is present (off-by-1 / 2 / 3+).
-# These specific bucket labels are unique to 02e's D10 addition.
-for marker in ["off-by-1", "off-by-2", "off-by-3+", "magnitude-distribution"]:
-    assert marker in all_code_src or marker in "\n".join(
-        "".join(c["source"]) for c in cells if c["cell_type"] == "markdown"
-    ), (
+# Verify the D10 magnitude-distribution diagnostic is present (bidirectional
+# buckets per sign: +1/+2/+3+ when chrono > leaky, -1/-2/<=-3 when leaky > chrono).
+combined_src = all_code_src + "\n" + all_md_src
+for marker in [
+    "magnitude-distribution",
+    "chrono > leaky: +1",
+    "chrono > leaky: +2",
+    "chrono > leaky: +3+",
+    "leaky > chrono: -1",
+    "catB_distributions",
+]:
+    assert marker in combined_src, (
         f"D10 magnitude-distribution diagnostic missing marker {marker!r}. "
-        f"plan-approval addition 1 requires off-by-N bucketing of "
-        f"(chrono - leaky) per trigger."
+        "Plan-approval addition 1 requires magnitude bucketing of "
+        "`diff = chrono - leaky` per trigger for Category B features."
     )
-print(f"[ok] D10 magnitude-distribution diagnostic present "
-      f"(off-by-1 / off-by-2 / off-by-3+ buckets)")
+print(
+    "[ok] D10 magnitude-distribution diagnostic present "
+    "(bidirectional +/+ buckets and -/- buckets)"
+)
 
 # Verify the D7 two-bucket NULL breakdown path is present.
 assert "_classify_yards_per_point_null_bucket" in all_code_src, (
@@ -136,7 +145,6 @@ assert "fav_yards_per_point_is_null" in all_code_src, (
 print(f"[ok] D8 Mode B paired-indicator present (fav_yards_per_point_is_null)")
 
 # Verify the sentinel-spliced sidecar markers are present.
-all_md_src = "\n".join("".join(c["source"]) for c in cells if c["cell_type"] == "markdown")
 assert ("<!-- BEGIN: 02e red_zone_failure -->" in all_code_src
         or "<!-- BEGIN: 02e red_zone_failure -->" in all_md_src), (
     "Sidecar sentinel BEGIN marker missing."

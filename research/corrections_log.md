@@ -539,3 +539,48 @@ script; the benefit is catching pseudo-independent signals that L1
 will collapse anyway. The 02d run found zero outright redundancies
 (`|rho| >= 0.6`) but four meaningful (0.3-0.6) overlaps that would
 have been invisible without the diagnostic.
+
+---
+
+## 2024-fold weakness pattern (project-wide)
+
+Documentation of systematic **walk-forward Δ Brier** weakening on **2024-test** folds surfaced during **Notebook 02e** empirical review ( **`research/notebooks/_diag_02e_fold_pattern.py`**, diagnostic-only script — presently **untracked**; rerun after updating **`feature_validation.csv`** ).
+
+### Empirical aggregates
+
+**Mean Δ Brier (unweighted) across the twenty-one PASS feature names that pre-date `v1_red_zone_failure`:**
+
+| Test season | Mean Δ Brier |
+|---|---:|
+| 2022 | +0.00686 |
+| 2023 | +0.00475 |
+| 2024 | +0.00162 |
+
+Roughly **4× erosion** comparing **2022** → **2024** (**+0.00686 → +0.00162**).
+
+**Negative Δ Brier fold counts among all PASS cohort rows (distinct features × folds = **24 features** × **three** test seasons summarized as row counts):**
+
+| Test season | # features with Δ Brier `< 0` | Denominator |
+|---|---:|---:|
+| 2022 | **1** | 24 PASS features |
+| 2023 | **4** | 24 PASS features |
+| 2024 | **6** | 24 PASS features |
+
+The deterioration is visible **without** restricting to **`v1_red_zone_failure`** — i.e., it precedes interpreting any single new red-zone PASS.
+
+### Interpretation (hypotheses, not adjudicated here)
+
+Possibilities coexist:
+
+1. **Temporal signal attenuation:** comeback‑equity / pre‑trigger structure may compress as league metadata, pacing, officiating trends, scoring environment, or calibration baselines drift (2015–train windows vs newest hold‑out seasons).
+2. **Selection leakage into older regimes:** features earned **PASS** under **≥2-of-3** walk-forward uplift; uplift could concentrate on **early** eras even when aggregates still nominally PASS on **2024** — i.e., **overfit curvature** disguised behind R6 aggregates.
+3. **Higher variance regime** for **2024**‑only — especially plausible if cohort **n_test** swings or parity noise rises; distinguishing true decay from sampling noise needs held‑out repeats **not** embodied in Phase‑0 scaffolding.
+
+These are bookkeeping uncertainties for **N03**, not indictment of any lone feature.
+
+### N03 implication
+
+Treat **single-season** **held-out uplift** sceptically when newest season underperforms the portfolio mean. Calibration / stake‑sizing artefacts should emphasize **recent** eras — e.g., **over-weight 2024** when fitting isotonic calibration on validation slices, prefer **designating 2024 as primary calibration-validation cohort**, or withhold **recent season** folds from naive training mixtures so production behaviour tracks **nearest-to-live conditions**. The farthest chronological test season is materially **easier historically** yet **furthest culturally** from next-season deployment; blindly trusting uniform fold weighting biases deployment optimism. This finding also affects feature-selection design for **N03**, not just calibration. Some currently-**PASS** features may not retain their **R6** verdict under a **2024**-weighted re-test. Before training the production model, run a re-stability check that weights the **2024** fold **≥ 2×** the other folds and flag any feature whose verdict flips under that weighting. Such features should either be dropped from the production set or carry an explicit **`pre-2024-only`** caveat.
+
+Cross-reference redundancy diagnostics from **Notebook 02e**: **`research/results/_02e_correlations.csv`** and hedged‑verdict prose in **`feature_validation.schema.md`** ( **`<!-- BEGIN: 02e red_zone_failure -->`** section).
+
