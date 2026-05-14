@@ -191,3 +191,48 @@ PROJECT-OWNER ADDITIONS (R21-R22):
 
     At each stop, produce a short status note: what was just done, what's next,
     any blockers or open questions.
+
+23. COMMIT MESSAGE STANDARDS (auto-applied without per-commit approval gate):
+
+    Codifies the commit-message pattern enforced through Phase 0 N02a/02b/02c
+    review. Replaces the prior per-commit approval gate; the agent drafts and
+    commits without first surfacing the message for approval. Halt-and-surface
+    is still required on substantive surprises during the work (verdicts
+    diverge from expectations, unexpected CFBD calls fire, hooks fail, etc.).
+
+    Every commit message body must include:
+    - Title with conventional-commit prefix matching the work type (fix:,
+      feat:, chore:, docs:, refactor:). Be honest -- a correction is fix:,
+      not feat:.
+    - One-paragraph summary of what the commit does and why.
+    - "Supersedes [hash]" references for any commit being corrected or
+      overwritten in effect (even if not via revert).
+    - Files-in-this-commit section listing every staged path with a one-line
+      note on its role.
+    - For corrections commits: explicit mechanistic explanation of the bug
+      being fixed, the diagnostic that proved the fix, and the per-feature
+      or per-artifact impact summary.
+    - For commits affecting feature_validation.csv or schema sidecars:
+      verdict deltas (prior vs new) for any feature whose verdict changed,
+      with magnitudes preserved to at least 5 decimal places.
+    - For commits with known transitional states (e.g., schema sidecar
+      sections that will be re-emitted by later commits): explicit
+      "intentional transitional state, see [next commit] for resolution"
+      note.
+    - Honest framing -- claims must be empirically supported by the diff.
+      No "robust" / "validated" / "the only feature" language unless backed
+      by current measurements, not prior leaked ones.
+
+    Commit invocation: B3 pattern --
+
+        git -c trailer.ifExists=replace \
+            -c trailer.ifMissing=doNothing \
+            commit --trailer "Co-authored-by=Removed" \
+            -F <msg_file>
+
+    Post-commit verification: run
+
+        git log -1 --format=%B | Select-String -Pattern "^Co-authored-by:" -CaseSensitive
+
+    and confirm zero matches before pushing. If any match appears, halt
+    and surface -- do not push.
