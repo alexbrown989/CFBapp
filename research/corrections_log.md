@@ -285,7 +285,54 @@ verdicts).
 
 ### 02a — Baseline efficiency features
 
-*Filled in after Commit 2 lands.*
+**Superseded commits:**
+
+- `9822cfc` — Phase 0 N02a scaffold (baseline efficiency features
+  unexecuted)
+- `2e17807` — docs(n02a): correct feature-count narrative; tag EPA
+  redundancies in CSV (5-feature validated set under the leaky filter)
+
+The 02a deliverables published at the time of `2e17807` claimed a
+5-feature validated set (`fav_off_epa_per_play`, `fav_def_epa_per_play`,
+`dog_off_epa_per_play`, `dog_def_epa_per_play`, `epa_divergence`), with
+`plays_so_far` as the sole 1/3 FAIL. The CSV rows for those verdicts
+are superseded by this commit; the prior CSV values for 02a remain in
+the `2e17807` commit's tree for historical reference.
+
+**Verdict delta under corrected chrono_key** (per
+`feature_validation.csv v1_baseline_efficiency_only`, 18 rows):
+
+| Feature | Pre-correction | Post-correction | Notes |
+|---|---|---|---|
+| `fav_def_epa_per_play` | PASS | PASS (3/3) | Mean Brier improvement +0.00316 across folds. Conditional identity with `dog_off_epa_per_play` (byte-identical 3 fold rows). |
+| `dog_off_epa_per_play` | PASS | PASS (3/3) | Mean Brier improvement +0.00316. Tagged `redundant_with=fav_def_epa_per_play` from `2e17807` survives the correction. |
+| `epa_divergence` | PASS (3/3 leaky) | PASS (3/3 corrected) | **10x magnitude collapse:** prior mean Brier improvement was +0.044 under the leak; corrected mean is +0.00094. Verdict holds but the prior "standout" framing was leak-inflated; N03 should treat this signal as marginal. |
+| `plays_so_far` | **FAIL (1/3)** | **PASS (3/3)** | Mean Brier improvement +0.01472 (+0.022 / +0.013 / +0.009 across folds) -- **strongest single 02a signal** post-correction. The leak had actively destroyed a clean game-time-elapsed proxy by including future plays in the per-trigger play count for some triggers and excluding real past plays for others, distorting the cumulative-count signal. |
+| `fav_off_epa_per_play` | PASS | **FAIL (0/3)** | Mean Brier improvement collapsed to -0.00057 across folds. The leak inflated this feature's signal; post-correction, the favorite's offensive performance over the pre-trigger window adds no signal beyond the baseline. Conditional identity with `dog_def_epa_per_play` (byte-identical 3 fold rows). |
+| `dog_def_epa_per_play` | PASS | **FAIL (0/3)** | Mean Brier improvement -0.00057. Tagged `redundant_with=fav_off_epa_per_play` from `2e17807`; both members of the conditional-identity pair collapsed to FAIL together. |
+
+**Net change to 02a validated set:** 4 features (was 5 under the leaky
+filter; counting conditional-identity pairs once would give 3, but
+preserving the `2e17807` convention of counting both members of a
+conditional-identity pair gives 4).
+
+The validated 02a set under the corrected filter:
+
+- `fav_def_epa_per_play` (≡ `dog_off_epa_per_play` under conditional identity)
+- `dog_off_epa_per_play`
+- `epa_divergence` (weak; +0.00094 mean Brier improvement)
+- `plays_so_far` (strongest 02a signal; +0.01472 mean Brier improvement)
+
+Removed from the validated set:
+
+- `fav_off_epa_per_play` (and its conditional-identity pair
+  `dog_def_epa_per_play`)
+
+The `plays_so_far` FAIL → PASS recovery is the single most significant
+swing in this correction sweep -- the leak was actively destroying a
+clean signal. The `epa_divergence` magnitude collapse from +0.044 to
++0.00094 (verdict holding) means N03 must revise its prior
+interpretation: this feature is a survivor, not a standout.
 
 ### 02b — Opening-drive shock features
 

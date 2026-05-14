@@ -15,26 +15,37 @@ sidecar. Add new items here as discovered.
 
 ## 1. Hardcoded monthly free-tier limit in budget cells
 
+**STATUS: RESOLVED-FOR-02a at the 02a corrections commit in the
+chrono_key sequence (alongside Commit 1 `28a1b4b`). 02a's budget cell
+now uses 02c's dual-display format (stated 1,000 vs. actual 3,000).
+Item remains OPEN for `research/notebooks/01_trigger_events.ipynb`
+and any other notebook with the stale single-quota narrative.**
+
 **Locations:**
 
 - `research/notebooks/01_trigger_events.ipynb` — budget summary cell
-- `research/notebooks/02a_baseline_features.ipynb` — final budget summary cell
+  (still OPEN)
+- `research/notebooks/02a_baseline_features.ipynb` — final budget
+  summary cell (RESOLVED as of the 02a corrections commit; uses
+  dual-display matching 02c)
 
-**Symptom:** Both notebooks print `"monthly free-tier limit: 1,000"` in
-the budget summary. The actual quota on the current CFBD key is
-3000/cycle, observed via `x-calllimit-remaining: 2999` after one call in
-`_probe_cfbd_quota.py` on 2026-05-12 (see
+**Symptom:** The 01 notebook still prints `"monthly free-tier limit:
+1,000"` in the budget summary. The actual quota on the current CFBD
+key is 3000/cycle, observed via `x-calllimit-remaining: 2999` after
+one call in `_probe_cfbd_quota.py` on 2026-05-12 (see
 `research/results/budget_reconciliation.md`).
 
 **Severity:** Display-only. Budget enforcement does not depend on this
 value — the in-notebook assertion only checks fresh CFBD calls for the
 current run (must be 0 in 02a-onwards), not cumulative quota usage. The
-displayed "remaining" number is wrong by 2,000.
+displayed "remaining" number was wrong by 2,000 in 02a; fixed via the
+dual-display pattern that surfaces both the stated free-tier ceiling
+and the observed key-specific ceiling.
 
-**Fix path:** Centralize as a single constant `CFBD_MONTHLY_LIMIT = 3000`
-(or read from `backend/.env` / a new `research/data/config.yaml`) so a
-future tier change updates all notebooks in one place. Sweep before N03's
-own budget print.
+**Fix path (for the still-open 01 notebook):** Centralize as a single
+constant `CFBD_MONTHLY_LIMIT = 3000` (or read from `backend/.env` /
+a new `research/data/config.yaml`) so a future tier change updates
+all notebooks in one place. Sweep before N03's own budget print.
 
 ---
 
