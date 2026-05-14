@@ -63,6 +63,48 @@ consideration:
   to derive both features reliably, or do older seasons have coverage
   gaps? To verify at 02g plan time from N00 audit data.
 
+### Categorical-window momentum features (target: N03 or follow-up to N02c)
+
+- **Proposed by:** project owner (alexbrown989)
+- **Proposed on:** 2026-05-13
+- **Origin:** N02c P3 trigger logic, after `seconds_since_last_dog_explosive_play`
+  passed 2/3 Brier-improving folds under R6 stability — passes the
+  rule's floor but doesn't strengthen across all test seasons
+  (+0.00468 / +0.00780 / −0.00269) — and
+  `prior_drive_had_dog_explosive_play` failed 0/3 stability with
+  near-zero Brier deltas (−0.00009 / −0.00014 / −0.00010). See
+  `research/corrections_log.md` for the chrono_key correction context.
+- **Mechanism:** the corrected 02c results suggest momentum decay is
+  finer-grained than possession boundaries (binary "prior drive had
+  one" form failed) but the continuous-seconds signal is weak — only
+  2 of 3 folds improve on Brier, with one fold going negative. A
+  binned middle ground may capture what continuous-seconds catches in
+  a more interpretable, less noise-prone form — explicit time windows
+  give the model step changes the continuous signal had to earn
+  through nonlinear transformation.
+- **Inversion vs. literature:** Roebber 2022 found the binary
+  streak-style momentum feature carried signal in NFL win-probability
+  modelling; 02c's corrected result suggests this transfer doesn't
+  hold for CFB comeback-trigger contexts. Possible explanation:
+  trigger conditioning already selects for games where the underdog
+  has been productive, compressing the variance the binary form needs
+  to detect. The continuous form survives weakly because it preserves
+  recency information the binary form discards.
+- **Testable form:** three or more binary indicators based on
+  time-since-last-dog-explosive-play, e.g.:
+  - `had_dog_explosive_in_last_60s`
+  - `had_dog_explosive_in_last_180s`
+  - `had_dog_explosive_in_last_300s`
+  - `had_dog_explosive_in_last_600s`
+- **Open question:** bin boundaries are arbitrary; could test
+  30/60/120/300/600 seconds or any reasonable schedule. Would benefit
+  from a brief literature scan on momentum-decay timescales in
+  play-by-play data.
+- **Target notebook:** N03 if the validated 02c features show
+  sufficient combined signal in production training to motivate
+  refinement; otherwise deferred. Conditional on N03 model performance
+  with the seven validated 02c features baseline.
+
 ---
 
 ## Deferred / not currently scheduled
