@@ -2,7 +2,7 @@ You are working on CFB Live Edge Journal — a personal betting research and liv
 
 This file pins the build agent's behavior. Re-read it at the start of every response and state which rules apply to the current task.
 
-Rules 1-13 are the V5 spec from the project CTO. Rules 14-20 are the V5.1 patch. Rules 21-22 are operational guardrails added by the project owner.
+Rules 1-13 are the V5 spec from the project CTO. Rules 14-20 are the V5.1 patch. Rules 21-24 are operational guardrails added by the project owner.
 
 ABSOLUTE RULES (never violate):
 
@@ -156,7 +156,7 @@ features) is fully honored by this substitution.
     Output: research/data/data_quality_report.md with counts and exclusion list.
 
 
-PROJECT-OWNER ADDITIONS (R21-R22):
+PROJECT-OWNER ADDITIONS (R21-R24):
 
 21. VERIFY EXTERNAL FACTS BEFORE CODING:
     Do not trust training data on:
@@ -236,3 +236,41 @@ PROJECT-OWNER ADDITIONS (R21-R22):
 
     and confirm zero matches before pushing. If any match appears, halt
     and surface -- do not push.
+
+24. PROCESS DISCIPLINE FOR LIMITED-CONTEXT MODELS:
+    When the active model has limited reliability or context (e.g., Composer 2,
+    rate-limited fallback models, or any session where the user has flagged
+    capability concerns), apply these patterns proactively:
+
+    (a) Halt-evidence-authorize-execute-summarize-authorize cycles. Do not
+        bundle bug discovery, fix, re-execution, and commit into a single
+        "done" message. Each transition between these phases is a stop point.
+        When you find a bug during execution: stop, surface with diagnostic
+        evidence, wait for authorization to fix. After fixing: stop, post
+        the diff, wait for re-execution authorization. After re-execution:
+        stop, post the report, wait for commit authorization.
+
+    (b) Surface central findings as headlines, not subordinate clauses.
+        When a diagnostic produces multiple findings, identify which one
+        most affects project decisions and lead with it. Verdict tables
+        answer "did each item pass the rule?" — structural findings answer
+        "what does this batch tell us about the project?" The structural
+        finding is usually more important than the per-item verdict.
+
+    (c) Surface verification-script changes before applying. Verification
+        scripts encode "what correct looks like." Modifying them is a
+        non-trivial change. When you propose to update a _verify_*.py file
+        to match new emitted output, post the proposed diff inline before
+        making the change and explain why the new check is at least as
+        strict as the old one.
+
+    (d) Run-state check at the top of every turn. Confirm HEAD hash,
+        branch state, and tracked/untracked file state matches the prior
+        turn's expectation. If anything differs, surface it before
+        proceeding with the requested work.
+
+    (e) Single-agent-per-repo invariant. Multiple parallel Cursor chats
+        against the same repo have produced four documented parallel-agent
+        incidents in this project. If you see evidence of work you didn't
+        do (commits, file changes, partial state) at the start of a turn,
+        halt and surface immediately — do not attempt to reconcile.
