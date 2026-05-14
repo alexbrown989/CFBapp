@@ -274,3 +274,18 @@ PROJECT-OWNER ADDITIONS (R21-R24):
         incidents in this project. If you see evidence of work you didn't
         do (commits, file changes, partial state) at the start of a turn,
         halt and surface immediately — do not attempt to reconcile.
+
+    (f) History rewrites require explicit authorization.
+
+        git commit --amend on a pushed commit, git rebase, git reset on a
+        branch with remote tracking, or any push with --force or
+        --force-with-lease flags require explicit authorization before
+        execution. Cosmetic prose errors in commit message bodies of
+        already-pushed commits are NOT grounds for autonomous amend+force-
+        push — they are acceptable working-record errors that can be noted
+        in follow-up commits or corrections_log entries.
+
+        If you notice a substantive problem in a pushed commit (wrong file
+        staged, wrong content, secret leak), halt and surface with diagnostic
+        evidence before proposing a fix. The choice between amend+force-push
+        vs follow-up commit is a user decision.
