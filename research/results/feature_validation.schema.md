@@ -1488,9 +1488,9 @@ Triggers: **`11,416`** (`final_fav_won` non-null subset). Drive-1 triggers (**no
 | `dog_early_down_success_rate_insufficient_sample` | 3,007 | 26.34% |
 | `dog_third_down_success_rate_insufficient_sample` | 3,236 | 28.35% |
 
-**N03 caveat (rates + paired indicators):** with **`fillna(0.0)` + `*_insufficient_sample`** the model must distinguish **literal rate zero** from **zeroed NULL** using the paired flag (**~17–28%** of triggers carry NULL rates per column prior to coercion). Correlation-vs-PASS-matrix orthogonality for the surviving three DDL columns is stated under the cross-notebook redundancy heading below (**`|ρ| < 0.6`** versus every validated column besides the single tagged pairing).
+**Build-time field audit (negative distance / CFBD):** Skipped **116** plays corpus-wide with negative raw **`min(distance, yardsToGoal)`** (**99%** Kickoff and Kickoff Return **`playTypes`**, **1** Penalty, **1** Rush). **`_effective_distance`** clamps via **`max(0, min(distance, yardsToGoal))`**. The skipped plays do not enter DDL feature denominators by design — special-teams plays should not be in third-down or early-down rate calculations. Full mechanism documented in **`corrections_log.md`** (**02f — D10 leak exposure** entry).
 
-**Build-time DN field audit:** the **`_build_02f`** pass skipped **116** plays corpus-wide with negative raw **`min(distance, yardsToGoal)`** (**99%** **Kickoff** and **Kickoff Return** **`playTypes`**, **1** Penalty, **1** Rush). **`_effective_distance`** clamps via **`max(0, min(distance, yardsToGoal))`**. The skipped plays never enter DDL feature denominators — special-teams rows should not appear in third-down or early-down rate constructions. Full mechanism is documented under **`research/corrections_log.md`** (02f subsection).
+**N03 caveat (rates + paired indicators):** with **`fillna(0.0)` + `*_insufficient_sample`** the model must distinguish **literal rate zero** from **zeroed NULL** using the paired flag (**~17–28%** of triggers carry NULL rates per column prior to coercion). Correlation-vs-PASS-matrix orthogonality for the surviving three DDL columns is stated under the cross-notebook redundancy heading below (**`|ρ| < 0.6`** versus every validated column besides the single tagged pairing).
 
 ### D10 (`playNumber` leak diagnostic — micro quantization)
 
