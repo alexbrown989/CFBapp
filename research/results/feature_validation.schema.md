@@ -865,3 +865,303 @@ column specifically.
   this section. Re-running 02a in its current form WILL clobber 02b's
   and 02c's sections -- tracked as `research/tech_debt.md` item 3.
 <!-- END: 02c explosive_vs_sustained -->
+
+<!-- BEGIN: 02d turnover_short_field -->
+
+## 02d -- Turnover & short-field features
+
+**Section last writer:** `research/notebooks/02d_turnover_and_short_field.ipynb`
+**Last writer commit:** `a1ff1a48348d4bf163f8ddbbbf71e4f02c8a5dbf`
+**Last writer generation timestamp:** 2026-05-14 08:36:15 Pacific Daylight Time
+**Feature set version:** `v1_turnover_short_field`
+**Source DDL:** `BUILD_SPEC.md` `trigger_features` turnover & short-field block (V5 lines 189-193)
+
+### Candidate features (4)
+
+- `fav_turnovers_so_far` (D1; always defined; 0 when no fav turnovers)
+- `dog_points_off_turnovers` (D3/D4/D7; NULL when no completed dog drive; excludes return TDs which are bucketed in 02c's `dog_points_from_returns`)
+- `dog_avg_starting_field_pos` (D5; yards-from-own-end-zone convention; NULL when no completed dog drive)
+- `short_field_tds_allowed` (D2/D6; always defined; counts completed dog-offense drives with `startYardsToGoal <= 40` AND `driveResult == 'TD'`)
+
+### D1: turnover definition
+
+`fav_turnovers_so_far` counts pre-trigger fav-offense completed drives whose
+`driveResult` falls in the standard NFL/CFB turnover set:
+
+```python
+TURNOVER_DRIVE_RESULTS = {"INT", "INT TD", "FUMBLE", "FUMBLE TD", "FUMBLE RETURN TD"}
+```
+
+Excludes `DOWNS` (turnover-on-downs; "giveaway" but not a traditional
+turnover) and `SF` (safety; defensive score against the offense, not a
+turnover-causing play). 22,021 PUNT drives and 4,947 FG drives are
+correctly not counted.
+
+### D3 worked example: in-progress trigger drive
+
+`dog_points_off_turnovers` follows each non-return-TD fav turnover (INT
+or FUMBLE) to the immediate-next dog-offense drive and adds that drive's
+points to the feature.
+
+The edge case is the **last** fav turnover before the trigger when its
+immediate next drive happens to be the trigger drive itself (in
+progress, so not in the "completed drives" filter). In that case:
+
+- Look up the trigger drive in `drives_for_game` by
+  `driveNumber == trig_drive_in_game`.
+- If `trigger_drive.offense == dog`, add
+  `max(0, dog_score_at_trigger - trigger_drive.startOffenseScore)`.
+- Otherwise (trigger drive isn't dog-offense), add nothing -- the
+  in-progress non-dog drive doesn't capitalize for the dog.
+
+**Worked example** (synthetic):
+
+- Game state: fav threw an INT on drive 8 (their 4th offensive drive).
+- Drive 9 begins as dog offense, at the 30 yard line (short field).
+- The dog scores a TD on drive 9 (the trigger play is the TD itself, or
+  the post-TD play that crossed the deficit threshold).
+- At the trigger, `drive_number_in_game = 9`, so drive 9 is **NOT** in
+  `completed_drives_before_trigger`. Drives 1-8 are.
+- Of drives 1-8, drive 8 is the only fav turnover. The "immediate next"
+  drive (drive 9) is the trigger drive.
+- `_trigger_drive(drives_for_game, 9)` returns drive 9.
+- `trigger_drive.offense == dog`. `dog_score_at_trigger == 7` (dog scored
+  the TD + PAT just now). `trigger_drive.startOffenseScore == 0` (dog
+  had 0 points entering drive 9).
+- Contribution: `max(0, 7 - 0) == 7`. `dog_points_off_turnovers == 7`.
+
+**General clarity note** (per plan-approval D3 refinement): when the
+trigger drive itself is dog-offense for ANY reason (not necessarily
+following a turnover), `dog_score_at_trigger` correctly captures the
+dog's score AFTER any points scored on the trigger drive prior to (or
+on) the trigger play. The formula `dog_score_at_trigger -
+trigger_drive.startOffenseScore` isolates the points from this
+in-progress drive specifically -- if the dog had scored on an earlier
+drive (e.g., a TD on drive 5 = 7 pts), `startOffenseScore` would be 7
+at the start of drive 9, and the formula would correctly attribute the
+drive-9 points only.
+
+### D4: return-TD exclusion
+
+`dog_points_off_turnovers` EXCLUDES the three return-TD turnover
+driveResults (`INT TD`, `FUMBLE TD`, `FUMBLE RETURN TD`) because those
+are dog points scored DIRECTLY on the turnover by the dog defense. The
+dog defense scoring a pick-6 on a fav INT is bucketed under 02c's
+`dog_points_from_returns` (the kickoff or punt return TD category +
+INT/Fumble return TD category). Counting them here too would
+double-count.
+
+Only `INT` and `FUMBLE` (the non-return turnovers) contribute to
+`dog_points_off_turnovers`, via the points scored on the SUBSEQUENT
+dog-offense drive.
+
+### D11: overlap-fraction diagnostic
+
+For each evaluable trigger, classify into a 4-bucket co-occurrence
+table on (`dog_points_off_turnovers` nonzero, `dog_points_from_returns`
+nonzero). Triggers where either feature is NULL are excluded.
+
+Evaluable triggers: 8,434. Skipped (NULL on either): 2,982.
+
+| Bucket | Triggers | % of evaluable |
+|---|---:|---:|
+| Both nonzero | 225 | 2.67% |
+| Only `dog_points_off_turnovers` > 0 | 2,524 | 29.93% |
+| Only `dog_points_from_returns` > 0 | 346 | 4.10% |
+| Both zero | 5,339 | 63.30% |
+
+Both-nonzero fraction: 2.67%.
+<10% -> features are cleanly separable; L1 will treat them as independent signals.
+
+Recomputation uses 02c's `SCORING_PLAYTYPE_REGISTRY` (duplicated inline
+in this notebook as `SCORING_PLAYTYPE_REGISTRY_FOR_DIAGNOSTIC`). The
+recomputed values are NOT written to `feature_validation.csv` -- this is
+a per-trigger diagnostic only.
+
+### D10: diff-vs-leaky verification
+
+Built the feature matrix twice -- canonical (chrono_key) and leaky
+(`playNumber < trig.playNumber`) -- and asserted byte-identical per-trigger
+values across all 4 candidate columns. Result: **all 4 features
+byte-identical across 11,416 triggers**. The Category
+A claim (drive-metadata-only extractors) is empirically confirmed.
+
+### Per-feature null counts (this run)
+
+In-scope triggers (post NaN `final_fav_won` drop): 11,416.
+Drive-1 trigger count (D7 null floor): 1,860.
+
+| Feature | Null rows | % of in-scope |
+|---|---:|---:|
+| `fav_turnovers_so_far` | 0 | 0.00% |
+| `dog_points_off_turnovers` | 2,982 | 26.12% (D7 no-completed-dog-drive NULL) |
+| `dog_avg_starting_field_pos` | 2,982 | 26.12% (D5 no-completed-dog-drive NULL) |
+| `short_field_tds_allowed` | 0 | 0.00% |
+
+### Per-feature x per-test-season results (this run, v1_turnover_short_field)
+
+| Feature | Window -> Test | Brier improvement | ECE improvement | Stability |
+|---|---|---:|---:|---|
+| `fav_turnovers_so_far` | 2015-2020 -> test 2022 | +0.00725 | -0.01532 | **PASS** |
+| `fav_turnovers_so_far` | 2015-2021 -> test 2023 | +0.00982 | +0.00247 | **PASS** |
+| `fav_turnovers_so_far` | 2015-2022 -> test 2024 | +0.00241 | -0.00045 | **PASS** |
+| `dog_points_off_turnovers` | 2015-2020 -> test 2022 | +0.00593 | -0.00784 | **PASS** |
+| `dog_points_off_turnovers` | 2015-2021 -> test 2023 | +0.00512 | +0.05184 | **PASS** |
+| `dog_points_off_turnovers` | 2015-2022 -> test 2024 | +0.00555 | +0.00409 | **PASS** |
+| `dog_avg_starting_field_pos` | 2015-2020 -> test 2022 | +0.00095 | -0.00243 | **PASS** |
+| `dog_avg_starting_field_pos` | 2015-2021 -> test 2023 | +0.00338 | +0.02610 | **PASS** |
+| `dog_avg_starting_field_pos` | 2015-2022 -> test 2024 | +0.00085 | -0.00803 | **PASS** |
+| `short_field_tds_allowed` | 2015-2020 -> test 2022 | +0.00829 | -0.00211 | **PASS** |
+| `short_field_tds_allowed` | 2015-2021 -> test 2023 | -0.00409 | +0.02362 | **PASS** |
+| `short_field_tds_allowed` | 2015-2022 -> test 2024 | +0.00355 | +0.00181 | **PASS** |
+
+Sign convention: positive = candidate beat baseline. `**PASS**` means
+`sum(brier_improvement > 0) >= 2` across the 3 test seasons.
+
+### D12: cumulative validated-set context after 02d
+
+All passing features across `feature_validation.csv` after this run:
+
+| Feature | Feature set | Brier 3-fold | ECE 3-fold |
+|---|---|---:|---:|
+| `dog_off_epa_per_play` | v1_baseline_efficiency_only | 3/3 | 2/3 |
+| `epa_divergence` | v1_baseline_efficiency_only | 2/3 | 1/3 |
+| `fav_def_epa_per_play` | v1_baseline_efficiency_only | 3/3 | 2/3 |
+| `plays_so_far` | v1_baseline_efficiency_only | 3/3 | 2/3 |
+| `dog_avg_drive_plays` | v1_explosive_vs_sustained | 3/3 | 2/3 |
+| `dog_avg_drive_yards` | v1_explosive_vs_sustained | 2/3 | 2/3 |
+| `dog_explosive_play_count` | v1_explosive_vs_sustained | 3/3 | 2/3 |
+| `dog_points_from_explosives` | v1_explosive_vs_sustained | 3/3 | 1/3 |
+| `dog_points_from_returns` | v1_explosive_vs_sustained | 2/3 | 1/3 |
+| `dog_points_from_sustained` | v1_explosive_vs_sustained | 3/3 | 2/3 |
+| `seconds_since_last_dog_explosive_play` | v1_explosive_vs_sustained | 2/3 | 1/3 |
+| `defense_stabilized_flag` | v1_opening_drive_shock | 3/3 | 2/3 |
+| `dog_received_opening_kickoff` | v1_opening_drive_shock | 2/3 | 2/3 |
+| `dog_scored_on_opening_drive` | v1_opening_drive_shock | 2/3 | 2/3 |
+| `fav_def_epa_after_first_drive` | v1_opening_drive_shock | 3/3 | 2/3 |
+| `opening_drive_was_explosive_td` | v1_opening_drive_shock | 2/3 | 2/3 |
+| `opening_drive_was_td` | v1_opening_drive_shock | 2/3 | 2/3 |
+| `dog_avg_starting_field_pos` | v1_turnover_short_field | 3/3 | 1/3 |
+| `dog_points_off_turnovers` | v1_turnover_short_field | 3/3 | 2/3 |
+| `fav_turnovers_so_far` | v1_turnover_short_field | 3/3 | 1/3 |
+| `short_field_tds_allowed` | v1_turnover_short_field | 2/3 | 2/3 |
+
+**Total cumulative validated features:** 21.
+
+Notable cross-notebook conditional identities accumulating into N03's
+feature-selection picture:
+
+1. `dog_def_epa_per_play` (02a) tagged `redundant_with=fav_off_epa_per_play`
+   (byte-identical pair; FAILED under correction).
+2. `dog_off_epa_per_play` (02a) tagged `redundant_with=fav_def_epa_per_play`
+   (byte-identical pair; both PASSED).
+3. `dog_explosive_play_count` (02c) <-> `opening_drive_was_explosive_td`
+   (02b): drive-1 conditional overlap.
+4. `dog_avg_drive_yards` (02c) <-> `opening_drive_yards` (02b): conditional
+   identity on drive_number_in_game == 2 + dog had drive 1 (02b's
+   opening_drive_yards FAILED; identity is moot for the validated set).
+5. `dog_avg_drive_plays` (02c) <-> `opening_drive_plays` (02b): same
+   conditional structure (also moot; opening_drive_plays FAILED).
+6. `dog_points_off_turnovers` (02d) <-> `dog_points_from_returns` (02c):
+   co-occurrence empirically measured above (2.67% both-nonzero).
+7. `dog_points_off_turnovers` (02d) <-> `short_field_tds_allowed` (02d):
+   partial subset (a short-field TD allowed after a fav turnover counts in
+   both); subset relation, not structural identity.
+
+### Redundancy discoveries (02d plan-time audit)
+
+Plan-time verdict: **zero structural duplicates among 02d's 4
+candidates.** `REDUNDANT_WITH = {}` for this feature set version.
+All 12 rows have `redundant_with == ""`.
+
+Two **conditional identities** flagged at plan time:
+
+1. `dog_points_off_turnovers` <-> `short_field_tds_allowed` (within 02d):
+   partial subset. A short-field TD allowed after a fav turnover contributes
+   to both features. Not structural identity (turnovers without short
+   fields, and short fields not from turnovers, both produce one-only
+   nonzero cases). N03 should treat them as independent signals unless
+   the empirical correlation post-eval suggests otherwise.
+2. `dog_points_off_turnovers` <-> `dog_points_from_returns` (02c):
+   co-occurrence measured by the D11 diagnostic above. They are
+   cleanly separable (no double-counting) but can co-occur when a
+   game has multiple fav turnovers (a pick-6 + later non-return turnover
+   the dog converts via offense).
+
+### Post-execution cross-notebook correlation diagnostic
+
+Triggered by the 4/4 PASS rate vs. the plan-time 2/4 prior. Pearson
+correlations were computed between each of the 4 new 02d features and
+the 16 validated features carried into 02d (the 17-feature post-
+correction validated set, after dropping `dog_off_epa_per_play` since
+it is byte-identical to `fav_def_epa_per_play` and contributes no
+distinct correlation information). On the non-null intersection of
+each pair; full table in `research/results/_02d_correlations.csv`
+(diagnostic-only, untracked).
+
+Interpretation thresholds (per the diagnostic plan):
+
+- `|rho| < 0.3` -> independent signal, verdict is real.
+- `0.3 <= |rho| < 0.6` -> meaningful correlation; L1 will likely
+  down-weight one when both are included.
+- `|rho| >= 0.6` -> redundant signal; tag `redundant_with` for N03
+  feature-selection awareness.
+
+**Result: zero pairs with `|rho| >= 0.6`.** No `redundant_with` tags
+applied to 02d features against the validated set. Four pairs fall in
+the meaningful (0.3-0.6) band:
+
+| 02d feature | Validated feature | rho | n |
+|---|---|---:|---:|
+| `fav_turnovers_so_far` | `plays_so_far` | +0.501 | 11,416 |
+| `short_field_tds_allowed` | `dog_points_from_sustained` | +0.425 | 9,502 |
+| `short_field_tds_allowed` | `plays_so_far` | +0.349 | 11,416 |
+| `fav_turnovers_so_far` | `dog_explosive_play_count` | +0.320 | 11,416 |
+
+Per-feature summary against the validated set (max `|rho|` and the
+matching column):
+
+| 02d feature | max `|rho|` | matched validated feature |
+|---|---:|---|
+| `fav_turnovers_so_far` | 0.501 | `plays_so_far` |
+| `dog_points_off_turnovers` | 0.257 | `dog_points_from_sustained` |
+| `dog_avg_starting_field_pos` | 0.244 | `dog_points_from_sustained` |
+| `short_field_tds_allowed` | 0.425 | `dog_points_from_sustained` |
+
+**Interpretation for N03 (no verdict changes -- R6 PASS stands):**
+
+- `dog_points_off_turnovers` and `dog_avg_starting_field_pos` are
+  cleanly independent of the validated set (max `|rho|` 0.257 and
+  0.244 respectively). Their PASS verdicts most plausibly reflect
+  novel signal, not double-counting of existing features.
+- `dog_points_off_turnovers` <-> `dog_points_from_returns` separately
+  measured: `rho = +0.042`, n=8,426. Confirms the D11 2.67%
+  co-occurrence -- cleanly separable in both diagnostics.
+- `fav_turnovers_so_far` correlates meaningfully with `plays_so_far`
+  (rho=+0.501) and with all three drive-volume buckets
+  (rho 0.260-0.291). Mechanism: longer game -> more drives -> more
+  opportunities for both turnovers and dog scoring. L1 is likely to
+  partially down-weight `fav_turnovers_so_far` when `plays_so_far`
+  is also included.
+- `short_field_tds_allowed` correlates meaningfully with
+  `dog_points_from_sustained` (rho=+0.425) -- mechanism: short-field
+  TDs are often sustained-style TDs (no explosive play in the
+  scoring drive) -- and weakly with `plays_so_far` (rho=+0.349). L1
+  may treat it as partially redundant with sustained scoring.
+- `dog_avg_starting_field_pos` has the smallest Brier improvements
+  (+0.00095 / +0.00338 / +0.00085) and the lowest validated-set
+  correlations. Worth flagging in N03: this feature is a noise-fold-
+  luck candidate per the methodological note in `corrections_log.md`
+  ("02d prediction-vs-result calibration").
+
+No `redundant_with` tags edited in `feature_validation.csv` -- all
+correlations are below the 0.6 threshold the protocol requires for
+that tag.
+
+### Section provenance
+
+- Last writer: this 02d run (timestamp + commit above).
+- Splicing strategy: sentinel-delimited; re-running 02d refreshes only
+  this section. Re-running 02a in its current form WILL clobber 02b's,
+  02c's, and 02d's sections -- tracked as `research/tech_debt.md` item 3.
+<!-- END: 02d turnover_short_field -->

@@ -466,3 +466,76 @@ existing 02a tags (which drops the two duplicate-identity 02a
 features). See `research/future_features.md` for the live
 categorical-window momentum hypothesis triggered by 02c's marginal
 continuous-form result.
+
+---
+
+## 02d prediction-vs-result calibration
+
+**Plan-time prediction:** 2/4 PASS (build-author prior, based on the
+expected harshness of trigger-conditioning on small-magnitude
+turnover/field-position features). **Observer hypothesis-watch:**
+relative ordering -- `dog_points_off_turnovers` more likely to pass
+than `short_field_tds_allowed`, again with an implicit ~2/4 base rate.
+
+**Observed:** 4/4 PASS under R6 stability (>=2 of 3 walk-forward test
+seasons with positive held-out Brier improvement).
+
+Both the plan author's and the reviewer's independent priors were
+systematically pessimistic about trigger-conditioning's harshness on
+small-magnitude turnover/field-position features. Two independent
+predictions 2x off the observed result is a calibration signal worth
+recording.
+
+**Cross-notebook correlation diagnostic (post-execution, pre-commit).**
+Pearson correlations between the 4 new 02d features and the 16
+validated features carried into 02d (17-feature set after dropping
+`dog_off_epa_per_play` as byte-identical to `fav_def_epa_per_play`).
+On the non-null intersection of each pair. Full matrix in
+`research/results/_02d_correlations.csv` (untracked, diagnostic-only).
+
+- **Zero pairs with `|rho| >= 0.6`.** No `redundant_with` tags applied.
+- Four pairs in the meaningful (0.3-0.6) band: `fav_turnovers_so_far`
+  with `plays_so_far` (rho=+0.501), `short_field_tds_allowed` with
+  `dog_points_from_sustained` (+0.425), `short_field_tds_allowed`
+  with `plays_so_far` (+0.349), and `fav_turnovers_so_far` with
+  `dog_explosive_play_count` (+0.320). All flagged for N03 L1
+  down-weighting awareness in the 02d schema sidecar.
+- The conditional-identity flag from D11 (`dog_points_off_turnovers`
+  vs `dog_points_from_returns`) confirmed at `rho=+0.042` -- the 2.67%
+  co-occurrence is mirrored by the correlation; cleanly separable in
+  both diagnostics.
+
+**Verdict-vs-correlation cross-classification for the 4 02d features:**
+
+| Feature | Brier mean | Max `|rho|` (validated) | Best-fit interpretation |
+|---|---:|---:|---|
+| `fav_turnovers_so_far` | +0.00649 | 0.501 (`plays_so_far`) | Real signal, but partly correlated with game-length proxy. |
+| `dog_points_off_turnovers` | +0.00553 | 0.257 (`dog_points_from_sustained`) | Independent signal; cleanly separable from `dog_points_from_returns` (rho=+0.042). |
+| `dog_avg_starting_field_pos` | +0.00173 | 0.244 (`dog_points_from_sustained`) | Independent of validated set but smallest Brier magnitudes; noise-fold-luck candidate. |
+| `short_field_tds_allowed` | +0.00258 | 0.425 (`dog_points_from_sustained`) | Partial overlap with sustained-style scoring; L1 will likely down-weight. |
+
+**No verdict changes.** R6 stability passed honestly for all four
+features under the corrected `_chrono_key` filter. Correlation context
+informs N03 feature-selection but does not invalidate the empirical
+walk-forward Brier improvements.
+
+**Open methodological question for 02e/02f/02g.** Are R6's stability
+thresholds permissive enough that small-magnitude features pass when
+they're closer to noise than signal? `dog_avg_starting_field_pos`
+posted three Brier improvements all `< +0.005` per fold (the smallest
+trio in the validated set to date) and the lowest cross-correlation
+with the validated set, yet still cleared the 2-of-3 PASS bar. The
+plan-time prior was directionally correct about this feature's
+weakness (Cursor's plan-time confidence: 35-50%), but R6 doesn't
+distinguish "passes with magnitude > X" from "passes with magnitude
+near zero". Magnitudes `< +0.005` Brier improvement on a fold should
+be treated with skepticism in N03 production feature-selection,
+regardless of fold count.
+
+This is a soft prior for 02e onwards: when a 4/4 PASS rate diverges
+sharply from a calibrated 2/4 plan-time prior, run a correlation
+diagnostic before committing. The cost is one cache-only diagnostic
+script; the benefit is catching pseudo-independent signals that L1
+will collapse anyway. The 02d run found zero outright redundancies
+(`|rho| >= 0.6`) but four meaningful (0.3-0.6) overlaps that would
+have been invisible without the diagnostic.
