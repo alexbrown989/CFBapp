@@ -1,0 +1,2 @@
+# Shell hooks must use LF shebang/endings across platforms.
+research/git-hooks/commit-msg text eol=lf

@@ -1,0 +1,25 @@
+#!/bin/sh
+# Block commits containing Co-authored-by trailers.
+# The B3 invocation in R23 is supposed to suppress these, but the
+# suppression has been intermittent. This hook is the backstop.
+#
+# If this fires, halt and surface the situation per R24(a)/(f). Do
+# NOT amend or force-push to scrub the trailer — fix the commit
+# invocation so the trailer never appears in the first place.
+
+MSG_FILE="$1"
+
+if grep -qE '^Co-authored-by:' "$MSG_FILE"; then
+  echo "ERROR: Commit message contains Co-authored-by trailer." >&2
+  echo "" >&2
+  echo "This is blocked by .git/hooks/commit-msg." >&2
+  echo "Per R24(f), do NOT amend+force-push to scrub the trailer." >&2
+  echo "Instead, halt and surface to the user. The commit invocation" >&2
+  echo "must be fixed so the trailer never appears." >&2
+  echo "" >&2
+  echo "Offending lines:" >&2
+  grep -nE '^Co-authored-by:' "$MSG_FILE" >&2
+  exit 1
+fi
+
+exit 0
