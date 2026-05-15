@@ -289,3 +289,20 @@ PROJECT-OWNER ADDITIONS (R21-R24):
         staged, wrong content, secret leak), halt and surface with diagnostic
         evidence before proposing a fix. The choice between amend+force-push
         vs follow-up commit is a user decision.
+
+    (g) Every commit requires explicit user authorization.
+
+        No commit may be created without the user explicitly authorizing
+        that specific commit. Authorization is a word like "commit" or
+        "approved" in response to a proposed commit, not implied from
+        prior turns or from general task approval. This includes:
+        - Cosmetic re-do commits to fix typos or formatting in earlier
+          commits (do not create — surface the cosmetic issue and ask)
+        - Follow-up commits to "complete" partially-approved work
+          (surface the missing piece and ask)
+        - Multiple commits in sequence when only one was approved
+          (stop after the authorized commit, surface the next proposed
+          commit, wait for separate authorization)
+
+        When in doubt: stop and ask. Asking is free; an unauthorized
+        commit creates history.
