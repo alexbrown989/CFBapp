@@ -1,0 +1,85 @@
+﻿target game 400869254: 163 plays in cache
+
+sample play (index 0) keys (sorted):
+  away                   = 'Wyoming'
+  clock                  = <complex: dict>
+  defense                = 'New Mexico'
+  defenseConference      = 'Mountain West'
+  defenseScore           = 0
+  defenseTimeouts        = 3
+  distance               = 10
+  down                   = 1
+  driveId                = '4008692541'
+  driveNumber            = 1
+  gameId                 = 400869254
+  home                   = 'New Mexico'
+  id                     = '400869254101849901'
+  offense                = 'Wyoming'
+  offenseConference      = 'Mountain West'
+  offenseScore           = 0
+  offenseTimeouts        = 3
+  period                 = 1
+  playNumber             = 1
+  playText               = 'Cooper Rothe kickoff for 65 yds , Matt Quarells return for 7 yds to the NMex 7'
+  playType               = 'Kickoff'
+  ppa                    = None
+  scoring                = False
+  wallclock              = None
+  yardline               = 65
+  yardsGained            = 7
+  yardsToGoal            = 65
+
+playNumber distribution in game (top 20 most common):
+  playNumber=1         count=23
+  playNumber=2         count=22
+  playNumber=3         count=21
+  playNumber=4         count=20
+  playNumber=5         count=20
+  playNumber=6         count=13
+  playNumber=7         count=11
+  playNumber=8         count=9
+  playNumber=9         count=7
+  playNumber=10        count=5
+  playNumber=13        count=3
+  playNumber=11        count=3
+  playNumber=12        count=3
+  playNumber=14        count=2
+  playNumber=15        count=1
+unique playNumber values: 15
+max playNumber: 15
+total plays in game: 163
+
+(driveNumber, playNumber) duplicate pairs: 0 (should be 0 if both fields combined uniquely identify a play)
+
+drive 1: 5 plays
+  playNumber=1  period=1  clock={'minutes': 15, 'seconds': 0}  playType='Kickoff'  offense='Wyoming'
+  playNumber=2  period=1  clock={'minutes': 15, 'seconds': 0}  playType='Rush'  offense='New Mexico'
+  playNumber=3  period=1  clock={'minutes': 15, 'seconds': 0}  playType='Rush'  offense='New Mexico'
+
+drive 5: 3 plays
+  playNumber=1  period=1  clock={'minutes': 3, 'seconds': 14}  playType='Rush'  offense='New Mexico'
+  playNumber=2  period=1  clock={'minutes': 3, 'seconds': 14}  playType='Rush'  offense='New Mexico'
+  playNumber=3  period=1  clock={'minutes': 1, 'seconds': 56}  playType='Rushing Touchdown'  offense='New Mexico'
+
+drive 9: 2 plays
+  playNumber=1  period=2  clock={'minutes': 8, 'seconds': 5}  playType='Rush'  offense='New Mexico'
+  playNumber=2  period=2  clock={'minutes': 7, 'seconds': 22}  playType='Rushing Touchdown'  offense='New Mexico'
+
+drive 21: 1 plays
+  playNumber=1  period=4  clock={'minutes': 6, 'seconds': 47}  playType='Rushing Touchdown'  offense='New Mexico'
+
+All integer-looking fields seen on plays (and their min/max in this game):
+  defenseScore           min=0  max=56  unique=9  n=163
+  defenseTimeouts        min=1  max=3  unique=3  n=163
+  distance               min=0  max=47  unique=23  n=163
+  down                   min=0  max=4  unique=5  n=163
+  driveNumber            min=1  max=23  unique=23  n=163
+  gameId                 min=400869254  max=400869254  unique=1  n=163
+  offenseScore           min=0  max=56  unique=9  n=163
+  offenseTimeouts        min=1  max=3  unique=3  n=163
+  period                 min=1  max=4  unique=4  n=163
+  playNumber             min=1  max=15  unique=15  n=163
+  ppa                    min=-4.235985525861569  max=5.836347004290806  unique=119  n=124
+  yardline               min=0  max=99  unique=67  n=163
+  yardsGained            min=-15  max=73  unique=43  n=163
+  yardsToGoal            min=0  max=100  unique=71  n=163

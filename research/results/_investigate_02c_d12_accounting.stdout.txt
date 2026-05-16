@@ -1,0 +1,187 @@
+﻿merged: 11,416 rows on ['game_id','fav_deficit'] (dropped 0 with NaN final_fav_won)
+distinct cache tuples: 161
+[ok] /plays cache load: 10.2s, 8,536 games, 1,541,058 plays
+
+triggers iterated: 11,416
+  with completed dog drive (D7 non-null buckets): 8,940
+  positive delta (typical: trigger play is dog scoring): 6,498
+  zero delta (clean attribution): 96
+  NEGATIVE delta (over-attribution candidate): 2,346
+
+=== Distribution by delta magnitude (most-common negative deltas) ===
+  delta=   -5  count=  372  (15.86%)
+  delta=   -2  count=  256  (10.91%)
+  delta=   -3  count=  202  ( 8.61%)
+  delta=  -11  count=  175  ( 7.46%)
+  delta=   -8  count=  174  ( 7.42%)
+  delta=   -4  count=  159  ( 6.78%)
+  delta=   -1  count=  155  ( 6.61%)
+  delta=   -9  count=  124  ( 5.29%)
+  delta=  -14  count=   87  ( 3.71%)
+  delta=   -7  count=   79  ( 3.37%)
+  delta=  -17  count=   72  ( 3.07%)
+  delta=  -10  count=   61  ( 2.60%)
+  delta=  -15  count=   58  ( 2.47%)
+  delta=   -6  count=   56  ( 2.39%)
+  delta=  -12  count=   49  ( 2.09%)
+  delta=  -20  count=   40  ( 1.71%)
+  delta=  -13  count=   35  ( 1.49%)
+  delta=  -16  count=   25  ( 1.07%)
+  delta=  -23  count=   21  ( 0.90%)
+  delta=  -21  count=   19  ( 0.81%)
+  delta=  -18  count=   16  ( 0.68%)
+  delta=  -19  count=   14  ( 0.60%)
+  delta=  -24  count=   13  ( 0.55%)
+  delta=  -26  count=   13  ( 0.55%)
+  delta=  -22  count=   12  ( 0.51%)
+  delta=  -25  count=   10  ( 0.43%)
+  delta=  -27  count=    9  ( 0.38%)
+  delta=  -29  count=    9  ( 0.38%)
+  delta=  -28  count=    8  ( 0.34%)
+  delta=  -32  count=    6  ( 0.26%)
+
+=== Distribution by deficit threshold (fav_deficit) ===
+  deficit=   3  triggers_total= 4311  negative_delta=1123  (26.05%)
+  deficit=   7  triggers_total= 3183  negative_delta= 604  (18.98%)
+  deficit=  10  triggers_total= 2025  negative_delta= 414  (20.44%)
+  deficit=  14  triggers_total= 1348  negative_delta= 169  (12.54%)
+  deficit=  21  triggers_total=  549  negative_delta=  36  ( 6.56%)
+
+=== 10 random sampled negative-delta triggers (with attribution traces) ===
+
+--- sample 1/10 ---
+  game_id=400869254  fav='Wyoming'  dog='New Mexico'  season=2016 week=13
+  trigger: play_id=400869254101915101  play_number=5  play_type='Rushing Touchdown'  q=1  drive_in_game=3  deficit=10
+  scoreboard: dog_score=14  fav_score=0
+  buckets: explosives=12  sustained=6  returns=0  SUM=18  DELTA=-4  dog_explosive_play_count=11
+  attribution trace (scoring plays in plays_before, in play order):
+      pn drv  q offense              playType                         cat            bkt         pts  reason
+       1  21  4 New Mexico           Rushing Touchdown                offensive_td   sustained     6  dog offensive TD on drive WITHOUT dog explosive
+       2   9  2 New Mexico           Rushing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+       3   5  1 New Mexico           Rushing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+
+--- sample 2/10 ---
+  game_id=400763541  fav='Indiana'  dog='Rutgers'  season=2015 week=7
+  trigger: play_id=400763541101948901  play_number=7  play_type='Rushing Touchdown'  q=1  drive_in_game=3  deficit=3
+  scoreboard: dog_score=7  fav_score=3
+  buckets: explosives=12  sustained=0  returns=6  SUM=18  DELTA=-11  dog_explosive_play_count=7
+  attribution trace (scoring plays in plays_before, in play order):
+      pn drv  q offense              playType                         cat            bkt         pts  reason
+       1  23  3 Indiana              Rushing Touchdown                offensive_td   -             0  offensive_td but offense='Indiana', not dog
+       4  10  2 Indiana              Passing Touchdown                offensive_td   -             0  offensive_td but offense='Indiana', not dog
+       5  21  3 Indiana              Passing Touchdown                offensive_td   -             0  offensive_td but offense='Indiana', not dog
+       5  29  4 Rutgers              Rushing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+       6  11  2 Rutgers              Rushing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+       6  17  3 Indiana              Passing Touchdown                offensive_td   -             0  offensive_td but offense='Indiana', not dog
+       6  25  4 Indiana              Fumble Return Touchdown          return_td      returns       6  return_td: offense='Indiana' -> scoring_team='Rutgers'=dog
+
+--- sample 3/10 ---
+  game_id=401114206  fav='Washington State'  dog='Oregon State'  season=2019 week=13
+  trigger: play_id=401114206101908301  play_number=5  play_type='Rushing Touchdown'  q=1  drive_in_game=2  deficit=3
+  scoreboard: dog_score=7  fav_score=0
+  buckets: explosives=12  sustained=0  returns=0  SUM=12  DELTA=-5  dog_explosive_play_count=9
+  attribution trace (scoring plays in plays_before, in play order):
+      pn drv  q offense              playType                         cat            bkt         pts  reason
+       3  26  4 Oregon State         Passing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+       4  11  2 Washington State     Passing Touchdown                offensive_td   -             0  offensive_td but offense='Washington State', not dog
+       4  19  3 Washington State     Passing Touchdown                offensive_td   -             0  offensive_td but offense='Washington State', not dog
+       4   8  2 Oregon State         Passing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+
+--- sample 4/10 ---
+  game_id=401112468  fav='Florida State'  dog='NC State'  season=2019 week=5
+  trigger: play_id=401112468102937401  play_number=11  play_type='Field Goal Good'  q=2  drive_in_game=11  deficit=3
+  scoreboard: dog_score=6  fav_score=3
+  buckets: explosives=6  sustained=3  returns=0  SUM=9  DELTA=-3  dog_explosive_play_count=4
+  attribution trace (scoring plays in plays_before, in play order):
+      pn drv  q offense              playType                         cat            bkt         pts  reason
+       6  12  2 Florida State        Passing Touchdown                offensive_td   -             0  offensive_td but offense='Florida State', not dog
+       7  22  3 Florida State        Passing Touchdown                offensive_td   -             0  offensive_td but offense='Florida State', not dog
+       9   7  2 NC State             Field Goal Good                  fg             sustained     3  dog FG on drive WITHOUT dog explosive
+      10  23  4 NC State             Passing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+      10  24  4 Florida State        Rushing Touchdown                offensive_td   -             0  offensive_td but offense='Florida State', not dog
+
+--- sample 5/10 ---
+  game_id=401020780  fav='Western Michigan'  dog='Ball State'  season=2018 week=12
+  trigger: play_id=401020780101926601  play_number=6  play_type='Passing Touchdown'  q=1  drive_in_game=3  deficit=3
+  scoreboard: dog_score=7  fav_score=0
+  buckets: explosives=12  sustained=0  returns=0  SUM=12  DELTA=-5  dog_explosive_play_count=5
+  attribution trace (scoring plays in plays_before, in play order):
+      pn drv  q offense              playType                         cat            bkt         pts  reason
+       2   9  2 Ball State           Rushing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+       3  24  5 Ball State           Passing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+       5  18  4 Western Michigan     Rushing Touchdown                offensive_td   -             0  offensive_td but offense='Western Michigan', not dog
+       5  25  5 Western Michigan     Rushing Touchdown                offensive_td   -             0  offensive_td but offense='Western Michigan', not dog
+
+--- sample 6/10 ---
+  game_id=400945263  fav='Air Force'  dog='New Mexico'  season=2017 week=5
+  trigger: play_id=400945263101977701  play_number=14  play_type='Rushing Touchdown'  q=1  drive_in_game=4  deficit=7
+  scoreboard: dog_score=7  fav_score=0
+  buckets: explosives=30  sustained=12  returns=0  SUM=42  DELTA=-35  dog_explosive_play_count=9
+  attribution trace (scoring plays in plays_before, in play order):
+      pn drv  q offense              playType                         cat            bkt         pts  reason
+       1  14  3 New Mexico           Passing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+       2  24  4 New Mexico           Rushing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+       4   6  2 New Mexico           Passing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+       4  16  3 New Mexico           Rushing Touchdown                offensive_td   sustained     6  dog offensive TD on drive WITHOUT dog explosive
+       4  20  4 New Mexico           Rushing Touchdown                offensive_td   sustained     6  dog offensive TD on drive WITHOUT dog explosive
+       5  18  3 New Mexico           Rushing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+       7   7  2 Air Force            Passing Touchdown                offensive_td   -             0  offensive_td but offense='Air Force', not dog
+       7  22  4 New Mexico           Rushing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+      10  23  4 Air Force            Passing Touchdown                offensive_td   -             0  offensive_td but offense='Air Force', not dog
+      11   9  2 Air Force            Rushing Touchdown                offensive_td   -             0  offensive_td but offense='Air Force', not dog
+      11  21  4 Air Force            Passing Touchdown                offensive_td   -             0  offensive_td but offense='Air Force', not dog
+
+--- sample 7/10 ---
+  game_id=400869561  fav='Navy'  dog='Tulsa'  season=2016 week=11
+  trigger: play_id=400869561101938801  play_number=9  play_type='Field Goal Good'  q=1  drive_in_game=4  deficit=3
+  scoreboard: dog_score=10  fav_score=7
+  buckets: explosives=18  sustained=0  returns=0  SUM=18  DELTA=-8  dog_explosive_play_count=12
+  attribution trace (scoring plays in plays_before, in play order):
+      pn drv  q offense              playType                         cat            bkt         pts  reason
+       2   2  1 Tulsa                Passing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+       4   5  1 Navy                 Rushing Touchdown                offensive_td   -             0  offensive_td but offense='Navy', not dog
+       5   1  1 Navy                 Rushing Touchdown                offensive_td   -             0  offensive_td but offense='Navy', not dog
+       6   8  2 Tulsa                Passing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+       6  14  3 Tulsa                Passing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+       6  17  4 Navy                 Rushing Touchdown                offensive_td   -             0  offensive_td but offense='Navy', not dog
+
+--- sample 8/10 ---
+  game_id=401636906  fav='Baylor'  dog='Oklahoma State'  season=2024 week=9
+  trigger: play_id=401636906101899901  play_number=9  play_type='Field Goal Good'  q=1  drive_in_game=2  deficit=3
+  scoreboard: dog_score=3  fav_score=0
+  buckets: explosives=6  sustained=0  returns=0  SUM=6  DELTA=-3  dog_explosive_play_count=6
+  attribution trace (scoring plays in plays_before, in play order):
+      pn drv  q offense              playType                         cat            bkt         pts  reason
+       3  17  3 Baylor               Passing Touchdown                offensive_td   -             0  offensive_td but offense='Baylor', not dog
+       4   7  2 Baylor               Passing Touchdown                offensive_td   -             0  offensive_td but offense='Baylor', not dog
+       5  23  4 Baylor               Rushing Touchdown                offensive_td   -             0  offensive_td but offense='Baylor', not dog
+       8   8  2 Oklahoma State       Passing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+
+--- sample 9/10 ---
+  game_id=400869644  fav='Ohio State'  dog='Wisconsin'  season=2016 week=7
+  trigger: play_id=400869644101909601  play_number=8  play_type='Field Goal Good'  q=1  drive_in_game=2  deficit=3
+  scoreboard: dog_score=3  fav_score=0
+  buckets: explosives=6  sustained=0  returns=0  SUM=6  DELTA=-3  dog_explosive_play_count=9
+  attribution trace (scoring plays in plays_before, in play order):
+      pn drv  q offense              playType                         cat            bkt         pts  reason
+       5   4  1 Wisconsin            Passing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+       6  25  5 Ohio State           Passing Touchdown                offensive_td   -             0  offensive_td but offense='Ohio State', not dog
+
+--- sample 10/10 ---
+  game_id=401404101  fav='Texas Tech'  dog='Baylor'  season=2022 week=9
+  trigger: play_id=401404101102998601  play_number=14  play_type='Rushing Touchdown'  q=2  drive_in_game=11  deficit=14
+  scoreboard: dog_score=17  fav_score=3
+  buckets: explosives=18  sustained=9  returns=6  SUM=33  DELTA=-16  dog_explosive_play_count=9
+  attribution trace (scoring plays in plays_before, in play order):
+      pn drv  q offense              playType                         cat            bkt         pts  reason
+       1  23  4 Texas Tech           Interception Return Touchdown    return_td      returns       6  return_td: offense='Texas Tech' -> scoring_team='Baylor'=dog
+       4  25  4 Baylor               Rushing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+       7   8  2 Texas Tech           Field Goal Good                  fg             -             0  fg but offense='Texas Tech', not dog
+       7  14  3 Baylor               Passing Touchdown                offensive_td   sustained     6  dog offensive TD on drive WITHOUT dog explosive
+       9   3  1 Baylor               Field Goal Good                  fg             sustained     3  dog FG on drive WITHOUT dog explosive
+      10  17  3 Texas Tech           Rushing Touchdown                offensive_td   -             0  offensive_td but offense='Texas Tech', not dog
+      12   9  2 Baylor               Rushing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+      13  18  4 Baylor               Rushing Touchdown                offensive_td   explosives    6  dog offensive TD on drive WITH dog explosive
+
+[ok] wrote _investigate_02c_d12_accounting.csv (2346 rows)
+[ok] wrote _investigate_02c_d12_accounting.summary.json

@@ -1,0 +1,26 @@
+fix(n02e): three features pass R6 floor (2/3 with negative 2024 fold for trips and ypp); two tagged redundant_with=plays_so_far; 2024-fold weakness pattern flagged project-wide
+
+Structural finding (lead): Notebook 02e's walk-forward reinforces a project-wide concern already visible across Phase 0 notebooks—newest test seasons systematically underperform the fold portfolio on raw uplift in many aggregates. research/corrections_log.md records this as the "2024-fold weakness pattern" with means / negative-fold counts and ties it to N03 calibration and feature-selection—not just stake sizing—including the requirement for a ≥2× 2024-weighted re-stability check before production training (verdict flip → drop or explicit pre-2024-only caveat). That structural risk matters more than any single PASS on this spreadsheet because it qualifies how every currently-validated feature should behave under nearer-to-deployment weighting.
+
+This commit replaces scaffold commit 526c74d placeholder rows with executed walk-forward numbers, fixes a cumulative-loop variable-shadow bug (n_b) in `_build_02e.py` that polluted builder/schema narratives, aligns `_verify_02e.py` with the emitted notebook, and publishes hedged redundancy context in CSV + schema alongside tech_debt item 8.
+
+Per-fold factuals (CSV column `brier_improvement` — positive deltas drive R6 stability counts under the canonical chrono_key eval path exported by `_build_02e.py`, three folds in row order):
+
+- fav_red_zone_tds — all three Brier improvements positive (0.008553093556369046, 0.00012533177821588692, 0.0007896315857300606); PASS all folds; redundant_with plays_so_far.
+- fav_red_zone_trips — Brier improvements positive on folds 1–2 (0.008721724907717832, 0.009564478169001911), negative on the 2023→2024 hold-out fold (2024 test season) (-0.002291842114671233); PASS via R6 ≥2-of-3; redundant_with plays_so_far.
+- fav_yards_per_point — same pattern: positives on folds 1–2 (0.0036294040477979628, 0.005675503925720027), negative newest-season fold (-0.0026636445604091286); PASS via R6 ≥2-of-3; redundant_with blank (orthogonal to the trips/tds pair per current correlation tagging).
+
+`_verify_02e.py` strictness versus the scaffold-era check (this paragraph is the durable defense; session notes are not canonical): the previous D10 gate encoded a one-sided reading of chrono-vs-leaky differences. The updated verifier requires the notebook to contain the full diff-vs-leaky path under BOTH `plays_before_filter="chrono_key"` and `plays_before_filter="leaky_playnumber"` and requires the emitted magnitude buckets for sign-magnitude diagnostics for BOTH directions (`chrono > leaky: +1/+2/+3+` AND `leaky > chrono: -1`/downward bucket schema). Allowing triggers where leaky exceeds chrono materially is strictly additional coverage versus any invariant that only asserted chrono dominated leaky; regressions must now reproduce both asymmetric tails rather than collapsing disagreement to half the event space.
+
+Files in this commit:
+- research/corrections_log.md — 2024-fold weakness section + concrete N03 implications (weighted re-check / caveat-or-drop rule).
+- research/notebooks/_build_02e.py — executed 02e builder + D7/D10/D11 prose; redundancy fields; cumulative-loop fix.
+- research/notebooks/_verify_02e.py — structural checks synced to emitted D10 bidirectional buckets and dual filter passes.
+- research/notebooks/02e_red_zone_failure.ipynb — regenerated from builder (committed unexecuted per verifier contract).
+- research/results/feature_validation.csv — empirical v1_red_zone_failure rows replacing placeholders.
+- research/results/feature_validation.schema.md — 02e section with hedged prose and ρ sidecar facts.
+- research/tech_debt.md — D7 bucket (b) vs N03 backlog item.
+
+Verdict deltas vs scaffold baseline 526c74d: three v1_red_zone_failure features transition from scaffold placeholder uplift fields to empirical `brier_improvement` triples listed above—tds all-positive; trips and yards_per_point show newest-fold negatives while preserving ≥2-of-3 PASS; two rows carry redundant_with plays_so_far.
+
+Supersedes: 526c74d (feat(n02e): scaffold emitted provisional CSV/notebook shells; this commit lands measured folds, verifier alignment, redundancy tagging, corrections_log linkage, builder bug fix.)

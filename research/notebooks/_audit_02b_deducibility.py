@@ -1,0 +1,47 @@
+"""One-shot audit: how much of 02b's candidate features is deducible
+from existing trigger_events columns?"""
+import pandas as pd
+
+df = pd.read_csv("research/results/trigger_events.csv")
+sub1 = df[df["drive_number_in_game"] == 1].copy()
+sub2plus = df[df["drive_number_in_game"] >= 2].copy()
+
+print(f"Total triggers: {len(df):,}")
+print(f"  drive_number_in_game == 1: {len(sub1):,} ({100*len(sub1)/len(df):.1f}%)")
+print(f"  drive_number_in_game >= 2: {len(sub2plus):,} ({100*len(sub2plus)/len(df):.1f}%)")
+print()
+print("DRIVE-1 TRIGGERS (1,860):")
+print(f"  trigger play_type top values:")
+print(sub1["play_type"].value_counts().head(10).to_string())
+print()
+print(f"  possession_team == dog_team: {(sub1['possession_team'] == sub1['dog_team']).sum():,}")
+print(f"  possession_team == fav_team: {(sub1['possession_team'] == sub1['fav_team']).sum():,}")
+print()
+print(f"  dog has ball AND dog_score > 0 AND fav_score == 0:")
+mask = (
+    (sub1["possession_team"] == sub1["dog_team"])
+    & (sub1["dog_score_at_trigger"] > 0)
+    & (sub1["fav_score_at_trigger"] == 0)
+)
+print(f"    {mask.sum():,} of {len(sub1):,} ({100*mask.sum()/len(sub1):.1f}%)")
+print()
+print(f"  dog has ball AND fav_score > 0 (dog scored AFTER fav, both on drive 1):")
+mask2 = (
+    (sub1["possession_team"] == sub1["dog_team"])
+    & (sub1["fav_score_at_trigger"] > 0)
+)
+print(f"    {mask2.sum():,} of {len(sub1):,}")
+print()
+print(f"  fav has ball at drive-1 trigger (fav trailing with ball on drive 1 -- unusual):")
+mask3 = sub1["possession_team"] == sub1["fav_team"]
+print(f"    {mask3.sum():,} of {len(sub1):,}")
+print(f"    of those, dog_score values: {sub1[mask3]['dog_score_at_trigger'].value_counts().to_dict()}")
+print()
+print("DRIVE-2+ TRIGGERS (rest):")
+print(f"  These triggers fire AFTER drive 1 is complete. From trigger_events.csv")
+print(f"  fields alone, drive-1 outcomes are NOT directly readable -- the trigger row's")
+print(f"  fav_score/dog_score at trigger time conflates drive-1 scoring with later scoring.")
+print()
+print("Example: drive_number_in_game == 3 trigger with dog_score=7, fav_score=4.")
+ex = sub2plus[(sub2plus["drive_number_in_game"] == 3)].head(3)
+print(ex[["drive_number_in_game", "dog_score_at_trigger", "fav_score_at_trigger", "possession_team", "fav_team", "dog_team", "play_type"]].to_string())

@@ -1,0 +1,617 @@
+{
+  "n10_initial": [
+    {
+      "playType": "Uncategorized",
+      "population_count": 688,
+      "samples_examined": 60,
+      "delta_0": 3,
+      "delta_2": 0,
+      "delta_6": 0,
+      "delta_7": 22,
+      "delta_8": 1,
+      "delta_other": 34,
+      "delta_other_examples": [
+        21,
+        24,
+        38,
+        17,
+        14,
+        10,
+        49,
+        10,
+        14,
+        17,
+        10,
+        14,
+        24,
+        34,
+        28,
+        14,
+        11,
+        10,
+        14,
+        31,
+        14,
+        41,
+        10,
+        17,
+        14,
+        25,
+        13,
+        28,
+        10,
+        14,
+        31,
+        14,
+        28,
+        24
+      ],
+      "negative_playId_count": 0
+    },
+    {
+      "playType": "Punt",
+      "population_count": 314,
+      "samples_examined": 60,
+      "delta_0": 1,
+      "delta_2": 0,
+      "delta_6": 1,
+      "delta_7": 20,
+      "delta_8": 0,
+      "delta_other": 38,
+      "delta_other_examples": [
+        21,
+        10,
+        14,
+        42,
+        14,
+        14,
+        10,
+        14,
+        10,
+        21,
+        14,
+        14,
+        14,
+        15,
+        10,
+        10,
+        14,
+        14,
+        10,
+        19,
+        14,
+        14,
+        14,
+        13,
+        14,
+        17,
+        21,
+        27,
+        10,
+        16,
+        51,
+        14,
+        14,
+        14,
+        14,
+        14,
+        10,
+        14
+      ],
+      "negative_playId_count": 0
+    },
+    {
+      "playType": "Fumble Recovery (Opponent)",
+      "population_count": 256,
+      "samples_examined": 60,
+      "delta_0": 2,
+      "delta_2": 0,
+      "delta_6": 1,
+      "delta_7": 26,
+      "delta_8": 0,
+      "delta_other": 31,
+      "delta_other_examples": [
+        13,
+        20,
+        58,
+        13,
+        14,
+        19,
+        10,
+        21,
+        14,
+        9,
+        22,
+        24,
+        14,
+        21,
+        10,
+        14,
+        14,
+        14,
+        14,
+        24,
+        14,
+        14,
+        14,
+        36,
+        58,
+        14,
+        27,
+        31,
+        21,
+        14,
+        13
+      ],
+      "negative_playId_count": 0
+    },
+    {
+      "playType": "Blocked Punt",
+      "population_count": 174,
+      "samples_examined": 10,
+      "delta_0": 0,
+      "delta_2": 1,
+      "delta_6": 0,
+      "delta_7": 3,
+      "delta_8": 0,
+      "delta_other": 6,
+      "delta_other_examples": [
+        10,
+        9,
+        14,
+        14,
+        14,
+        65
+      ],
+      "negative_playId_count": 0
+    },
+    {
+      "playType": "Sack",
+      "population_count": 148,
+      "samples_examined": 10,
+      "delta_0": 0,
+      "delta_2": 0,
+      "delta_6": 2,
+      "delta_7": 4,
+      "delta_8": 0,
+      "delta_other": 4,
+      "delta_other_examples": [
+        14,
+        14,
+        23,
+        10
+      ],
+      "negative_playId_count": 0
+    },
+    {
+      "playType": "Kickoff",
+      "population_count": 130,
+      "samples_examined": 60,
+      "delta_0": 0,
+      "delta_2": 0,
+      "delta_6": 1,
+      "delta_7": 5,
+      "delta_8": 0,
+      "delta_other": 54,
+      "delta_other_examples": [
+        null,
+        10,
+        null,
+        null,
+        16,
+        14,
+        14,
+        63,
+        10,
+        10,
+        14,
+        14,
+        null,
+        null,
+        null,
+        null,
+        null,
+        10,
+        10,
+        14,
+        9,
+        null,
+        null,
+        null,
+        14,
+        10,
+        34,
+        14,
+        13,
+        10,
+        44,
+        17,
+        10,
+        14,
+        14,
+        9,
+        14,
+        14,
+        14,
+        13,
+        14,
+        5,
+        14,
+        null,
+        14,
+        null,
+        14,
+        10,
+        14,
+        13,
+        14,
+        14,
+        13,
+        17
+      ],
+      "negative_playId_count": 0
+    },
+    {
+      "playType": "Fumble Recovery (Own)",
+      "population_count": 34,
+      "samples_examined": 10,
+      "delta_0": 0,
+      "delta_2": 0,
+      "delta_6": 1,
+      "delta_7": 1,
+      "delta_8": 0,
+      "delta_other": 8,
+      "delta_other_examples": [
+        28,
+        10,
+        62,
+        21,
+        10,
+        20,
+        52,
+        44
+      ],
+      "negative_playId_count": 0
+    },
+    {
+      "playType": "Pass Reception",
+      "population_count": 30,
+      "samples_examined": 10,
+      "delta_0": 1,
+      "delta_2": 1,
+      "delta_6": 0,
+      "delta_7": 2,
+      "delta_8": 0,
+      "delta_other": 6,
+      "delta_other_examples": [
+        21,
+        14,
+        14,
+        15,
+        36,
+        14
+      ],
+      "negative_playId_count": 0
+    },
+    {
+      "playType": "Interception",
+      "population_count": 27,
+      "samples_examined": 10,
+      "delta_0": 0,
+      "delta_2": 0,
+      "delta_6": 4,
+      "delta_7": 0,
+      "delta_8": 1,
+      "delta_other": 5,
+      "delta_other_examples": [
+        20,
+        13,
+        9,
+        13,
+        11
+      ],
+      "negative_playId_count": 0
+    },
+    {
+      "playType": "Blocked Field Goal",
+      "population_count": 21,
+      "samples_examined": 10,
+      "delta_0": 1,
+      "delta_2": 0,
+      "delta_6": 0,
+      "delta_7": 3,
+      "delta_8": 1,
+      "delta_other": 5,
+      "delta_other_examples": [
+        17,
+        21,
+        42,
+        45,
+        28
+      ],
+      "negative_playId_count": 0
+    },
+    {
+      "playType": "Rush",
+      "population_count": 21,
+      "samples_examined": 10,
+      "delta_0": 0,
+      "delta_2": 2,
+      "delta_6": 0,
+      "delta_7": 3,
+      "delta_8": 0,
+      "delta_other": 5,
+      "delta_other_examples": [
+        18,
+        14,
+        10,
+        9,
+        23
+      ],
+      "negative_playId_count": 0
+    },
+    {
+      "playType": "Kickoff Return (Offense)",
+      "population_count": 6,
+      "samples_examined": 6,
+      "delta_0": 0,
+      "delta_2": 0,
+      "delta_6": 0,
+      "delta_7": 0,
+      "delta_8": 0,
+      "delta_other": 6,
+      "delta_other_examples": [
+        14,
+        14,
+        14,
+        10,
+        14,
+        14
+      ],
+      "negative_playId_count": 0
+    },
+    {
+      "playType": "Pass Incompletion",
+      "population_count": 3,
+      "samples_examined": 3,
+      "delta_0": 0,
+      "delta_2": 1,
+      "delta_6": 0,
+      "delta_7": 1,
+      "delta_8": 0,
+      "delta_other": 1,
+      "delta_other_examples": [
+        24
+      ],
+      "negative_playId_count": 0
+    },
+    {
+      "playType": "Pass Interception Return",
+      "population_count": 3,
+      "samples_examined": 3,
+      "delta_0": 0,
+      "delta_2": 0,
+      "delta_6": 1,
+      "delta_7": 0,
+      "delta_8": 0,
+      "delta_other": 2,
+      "delta_other_examples": [
+        10,
+        40
+      ],
+      "negative_playId_count": 0
+    },
+    {
+      "playType": "Penalty",
+      "population_count": 3,
+      "samples_examined": 3,
+      "delta_0": 0,
+      "delta_2": 0,
+      "delta_6": 1,
+      "delta_7": 0,
+      "delta_8": 0,
+      "delta_other": 2,
+      "delta_other_examples": [
+        14,
+        21
+      ],
+      "negative_playId_count": 0
+    },
+    {
+      "playType": "End Period",
+      "population_count": 1,
+      "samples_examined": 1,
+      "delta_0": 0,
+      "delta_2": 0,
+      "delta_6": 0,
+      "delta_7": 0,
+      "delta_8": 0,
+      "delta_other": 1,
+      "delta_other_examples": [
+        15
+      ],
+      "negative_playId_count": 0
+    },
+    {
+      "playType": "Timeout",
+      "population_count": 1,
+      "samples_examined": 1,
+      "delta_0": 0,
+      "delta_2": 0,
+      "delta_6": 0,
+      "delta_7": 0,
+      "delta_8": 0,
+      "delta_other": 1,
+      "delta_other_examples": [
+        3
+      ],
+      "negative_playId_count": 0
+    },
+    {
+      "playType": "placeholder",
+      "population_count": 1,
+      "samples_examined": 1,
+      "delta_0": 0,
+      "delta_2": 0,
+      "delta_6": 0,
+      "delta_7": 0,
+      "delta_8": 0,
+      "delta_other": 1,
+      "delta_other_examples": [
+        3
+      ],
+      "negative_playId_count": 0
+    }
+  ],
+  "n50_verification": {
+    "Uncategorized": {
+      "population": 688,
+      "samples": 50,
+      "template_counts": {
+        "PAT_GOOD": 49,
+        "EXCEPTION": 1
+      },
+      "n_dominant_template": 49,
+      "n_exceptions": 1,
+      "exception_details": [
+        {
+          "gameId": 401282173,
+          "playId": "-21105",
+          "playText": "TWO-POINT CONVERSION ATTEMPT. J.Marshall steps back to pass. Catch made by B.Hockman at MNM 3. Gain of yards. TWO-POINT ATTEMPT SUCCEEDS.",
+          "reason": "playText does not contain PAT-good template: 'TWO-POINT CONVERSION ATTEMPT. J.Marshall steps back to pass. Catch made by B.Hockman at MNM 3. Gain of yards. TWO-POINT ATTEMPT SUCCEEDS.'",
+          "template_label": "EXCEPTION"
+        }
+      ]
+    },
+    "Punt": {
+      "population": 314,
+      "samples": 50,
+      "template_counts": {
+        "PUNT_RETURN_TD": 49,
+        "EXCEPTION_SAFETY": 1
+      },
+      "n_dominant_template": 49,
+      "n_exceptions": 1,
+      "exception_details": [
+        {
+          "gameId": 401404027,
+          "playId": "401404027104976801",
+          "playText": "Kyle Ostendorp punt for 45 yds for a SAFETY , Tiquan Gilmore returns for 45 yds",
+          "reason": "safety on punt-typed scoring play: 'Kyle Ostendorp punt for 45 yds for a SAFETY , Tiquan Gilmore returns for 45 yds'",
+          "template_label": "EXCEPTION_SAFETY"
+        }
+      ]
+    },
+    "Fumble Recovery (Opponent)": {
+      "population": 256,
+      "samples": 50,
+      "template_counts": {
+        "FUMBLE_RETURN_TD": 46,
+        "EXCEPTION": 4
+      },
+      "n_dominant_template": 46,
+      "n_exceptions": 4,
+      "exception_details": [
+        {
+          "gameId": 400787452,
+          "playId": "400787452104935601",
+          "playText": "Vegas Harley run for 4 yds Vegas Harley fumbled, forced by Robert Wagner, recovered by NMxSt Will Clement  , return for 74 yds, (Two-Point Conversion failed )",
+          "reason": "unrecognized fumble-rec-opp template: 'Vegas Harley run for 4 yds Vegas Harley fumbled, forced by Robert Wagner, recovered by NMxSt Will Clement  , return for 74 yds, (Two-Point Conversion failed )'",
+          "template_label": "EXCEPTION"
+        },
+        {
+          "gameId": 400869194,
+          "playId": "400869194102858401",
+          "playText": "Josh Allen run for a loss of 8 yards Josh Allen fumbled, forced by Zak Pettit, recovered by UCDav Keleen Culberson  , return for 21 yds, (Matt Blair PAT MISSED)",
+          "reason": "unrecognized fumble-rec-opp template: 'Josh Allen run for a loss of 8 yards Josh Allen fumbled, forced by Zak Pettit, recovered by UCDav Keleen Culberson  , return for 21 yds, (Matt Blair PAT MISSED)'",
+          "template_label": "EXCEPTION"
+        },
+        {
+          "gameId": 400869329,
+          "playId": "400869329103978601",
+          "playText": "Tyree Jackson run for a loss of 3 yards Tyree Jackson fumbled, recovered by MiaOh De'Andre Montgomery  , return for 92 yds, (Nick Dowd PAT MISSED)",
+          "reason": "unrecognized fumble-rec-opp template: \"Tyree Jackson run for a loss of 3 yards Tyree Jackson fumbled, recovered by MiaOh De'Andre Montgomery  , return for 92 yds, (Nick Dowd PAT MISSED)\"",
+          "template_label": "EXCEPTION"
+        },
+        {
+          "gameId": 400921256,
+          "playId": "400921256103927601",
+          "playText": "Glen Cuiellette run for a loss of 4 yards Glen Cuiellette fumbled, recovered by UCF Drico Johnson  , return for 30 yds, (Matthew Wright PAT MISSED)",
+          "reason": "unrecognized fumble-rec-opp template: 'Glen Cuiellette run for a loss of 4 yards Glen Cuiellette fumbled, recovered by UCF Drico Johnson  , return for 30 yds, (Matthew Wright PAT MISSED)'",
+          "template_label": "EXCEPTION"
+        }
+      ]
+    },
+    "Kickoff": {
+      "population": 130,
+      "samples": 50,
+      "template_counts": {
+        "KICKOFF_RETURN_TD": 43,
+        "EXCEPTION": 6,
+        "EXCEPTION_SAFETY": 1
+      },
+      "n_dominant_template": 43,
+      "n_exceptions": 7,
+      "exception_details": [
+        {
+          "gameId": 400953400,
+          "playId": "400953400101855102",
+          "playText": "Joe Reed 98 Yd Kickoff Return (A.J. Mejia Kick)",
+          "reason": "unrecognized kickoff template: 'Joe Reed 98 Yd Kickoff Return (A.J. Mejia Kick)'",
+          "template_label": "EXCEPTION"
+        },
+        {
+          "gameId": 401012347,
+          "playId": "401012347101854801",
+          "playText": "kickoff for 61 yds , Andre Wilson return for 9 yds Andre Wilson fumbled, forced by Brian Johnson, recovered by TexAM Larry Pryor  , return for 17 yds",
+          "reason": "unrecognized kickoff template: 'kickoff for 61 yds , Andre Wilson return for 9 yds Andre Wilson fumbled, forced by Brian Johnson, recovered by TexAM Larry Pryor  , return for 17 yds'",
+          "template_label": "EXCEPTION"
+        },
+        {
+          "gameId": 401013156,
+          "playId": "401013156104999901",
+          "playText": "Alex Kessman kickoff for 51 yds for a SAFETY , Johnathan Lloyd return for no gain Johnathan Lloyd fumbled, recovered by Duke for a SAFETY",
+          "reason": "safety on kickoff-typed scoring play: 'Alex Kessman kickoff for 51 yds for a SAFETY , Johnathan Lloyd return for no gain Johnathan Lloyd fumbled, recovered by Duke for a SAFETY'",
+          "template_label": "EXCEPTION_SAFETY"
+        },
+        {
+          "gameId": 401022522,
+          "playId": "401022522104869901",
+          "playText": "Jake Koehnke kickoff for 65 yds , Savon Scarver return for 21 yds Savon Scarver fumbled, forced by Christopher Musselman, recovered by AFA Christopher Musselman  , return for 21 yds",
+          "reason": "unrecognized kickoff template: 'Jake Koehnke kickoff for 65 yds , Savon Scarver return for 21 yds Savon Scarver fumbled, forced by Christopher Musselman, recovered by AFA Christopher Musselman  , return for 21 yds'",
+          "template_label": "EXCEPTION"
+        },
+        {
+          "gameId": 401207200,
+          "playId": "401207200104957901",
+          "playText": "Merek Glover kickoff for 65 yds , Tyrell Robinson return for 10 yds Tyrell Robinson fumbled, recovered by Tulan Jaetavian Toles  , return for 8 yds (Merek Glover KICK)",
+          "reason": "unrecognized kickoff template: 'Merek Glover kickoff for 65 yds , Tyrell Robinson return for 10 yds Tyrell Robinson fumbled, recovered by Tulan Jaetavian Toles  , return for 8 yds (Merek Glover KICK)'",
+          "template_label": "EXCEPTION"
+        },
+        {
+          "gameId": 401525855,
+          "playId": "401525855101917402",
+          "playText": "Drae McCray 100 Yd Kickoff Return (Gino Garcia Kick)",
+          "reason": "unrecognized kickoff template: 'Drae McCray 100 Yd Kickoff Return (Gino Garcia Kick)'",
+          "template_label": "EXCEPTION"
+        },
+        {
+          "gameId": 401644730,
+          "playId": "-2122",
+          "playText": "J.Barnum kicks 57 yards from CCSU 30 to the CMC 13. S.Bracey returns the kickoff. TOUCHDOWN.",
+          "reason": "unrecognized kickoff template: 'J.Barnum kicks 57 yards from CCSU 30 to the CMC 13. S.Bracey returns the kickoff. TOUCHDOWN.'",
+          "template_label": "EXCEPTION"
+        }
+      ]
+    }
+  },
+  "drive_attribution_fumble_recovery_own": {
+    "n_total": 34,
+    "n_in_trigger_game": 21,
+    "n_no_trigger_game": 13,
+    "n_dog_offense": 9,
+    "n_fav_offense": 12,
+    "n_dog_offense_with_prior_explosive": 8,
+    "n_dog_offense_without_prior_explosive": 1
+  }
+}

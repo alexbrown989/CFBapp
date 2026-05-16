@@ -1,0 +1,33 @@
+feat(n02e): scaffold red-zone failure features (unexecuted notebook)
+
+Builds the unexecuted scaffold for the Phase-0 02e (red-zone failure) feature pass per the plan-approval. Three candidate features tied to the V5 DDL block 5 (`BUILD_SPEC.md` lines 195-198): `fav_red_zone_trips` and `fav_red_zone_tds` (both Category B: drive-metadata filter PLUS play iteration to detect red-zone entry via `yardsToGoal <= 20`), and `fav_yards_per_point` (Category A: drive-metadata only with R16-safe per-train-window median imputation + paired `fav_yards_per_point_is_null` indicator following 02c's Mode B pattern). All three extractors use `_lib_chrono._chrono_key` via the established import-then-splice contract.
+
+Supersedes: nothing. Extends the Phase-0 feature-validation sequence past 02d (`c817c5d`). The 21-feature post-02d validated set is the working baseline this notebook adds to; expected outcome 2-3 PASS per the plan-time priors (Cursor: 3/3; reviewer: 2/3 with `fav_yards_per_point` as the marginal failure).
+
+This is **the first Category B feature set in 02-sequence**: the red-zone-trip / red-zone-TD extractors iterate plays within completed fav drives to detect `yardsToGoal <= 20` red-zone entries. The D10 diff-vs-leaky verification adopts a mixed-mode protocol per the plan-approval addition: for the Cat B features, the cell does NOT assert byte-identical -- it quantifies the magnitude distribution of `(chrono - leaky)` per trigger across four buckets (`matches`, `off-by-1`, `off-by-2`, `off-by-3+`) and asserts `chrono >= leaky` on every trigger (the leak only truncates plays, never creates them). For the Cat A `fav_yards_per_point`, byte-identical IS asserted. The disagreement-distribution generalizes 02b's "542 evaluable triggers flipped 0->1" mechanistic finding across all completed fav drives.
+
+The D7 two-bucket NULL breakdown for `fav_yards_per_point` (plan-approval addition 2) counts the two NULL conditions separately: bucket (a) no completed fav drives (early-game / drive-1 floor), and bucket (b) drives exist but cumulative fav offensive points == 0 (the "fav offense stalled" diagnostic state). The execution report flags bucket (b) > 200 triggers as a tech-debt trigger condition for N03 to consider a worst-case-imputation alternative if `fav_yards_per_point` fails at small magnitudes.
+
+Pre-execution audits (four-audit pattern from the 02b refinement):
+- Candidate-vs-candidate: `fav_red_zone_trips ⊇ fav_red_zone_tds` is an inclusion (every TD requires a trip), not structural identity. Three pairs conditionally correlated; zero `redundant_with` tags applied plan-time.
+- Candidate-vs-validated-set: expected meaningful (0.3-0.6) correlation between `fav_red_zone_trips` and `plays_so_far` (game-length proxy, mirrors 02d's `fav_turnovers_so_far <-> plays_so_far` rho=+0.501). No expected `|rho| >= 0.6` pre-execution.
+- Candidate-vs-trigger-fields: `fav_red_zone_tds * 6` is a lower bound on the offensive component of `fav_score_at_trigger` but not identity; `fav_yards_per_point` requires `fav_offensive_points` which is not in the trigger row.
+- Candidate-vs-extractor-structure: `fav_red_zone_trips` and `fav_red_zone_tds` classified Category B (NOT structurally safe under leaky filter); `fav_yards_per_point` classified Category A (structurally safe). Diff-vs-leaky protocol differs by category.
+
+Locked design decisions (per the plan-approval):
+- D1 red-zone threshold: `yardsToGoal <= 20`, locked, not parameterized.
+- D4 fav TD attribution: `driveResult in {'TD', 'END OF GAME TD'}` AND `offense == fav`. Includes the end-of-game offensive TD; excludes the four return-TD variants (INT TD / FUMBLE TD / FUMBLE RETURN TD / PUNT TD) which are dog defensive/special-teams TDs on a fav drive.
+- D5 cross-offense guard: red-zone trip detection requires `play.offense == drive.offense` (defends against any cross-offense plays misattributed to the drive).
+- Symmetric soft-prior threshold: correlation diagnostic runs on deviation in EITHER direction from the Cursor 3/3 prior (per the 02d precedent in `research/corrections_log.md`).
+
+Files in this commit:
+
+  - `research/notebooks/_build_02e.py` -- deterministic builder for `02e_red_zone_failure.ipynb`. Imports `CHRONO_KEY_SOURCE` from `_lib_chrono.py`. 28 cells (12 markdown + 16 code) following the 02d structure, with three 02e-specific additions: (1) mixed-category extractor design with the `_drive_reached_red_zone` helper and the `_classify_yards_per_point_null_bucket` D7 diagnostic; (2) magnitude-distribution diff-vs-leaky cell that reports off-by-N buckets for the two Cat B features and asserts byte-identical for the Cat A feature; (3) D11 red-zone conversion diagnostic with the (zero trips / zero conversion / partial / perfect) bucket classification and the `tds/trips` quantile distribution.
+
+  - `research/notebooks/_verify_02e.py` -- structural sanity verifier. Checks cell-id uniqueness, `ast.parse` cleanness, no stray outputs, `_chrono_key` body spliced, all 3 candidates referenced, BOTH filter modes in the diff-vs-leaky cell, off-by-N markers in the D10 diagnostic, the D7 two-bucket classifier path, the D11 red-zone conversion bucket path, the D8 Mode B paired-indicator presence, and the sentinel-spliced sidecar markers.
+
+  - `research/notebooks/02e_red_zone_failure.ipynb` -- the unexecuted notebook generated by `_build_02e.py`. 28 cells, no outputs, 122,481 bytes. To be executed via `jupyter nbconvert --to notebook --execute --output 02e_red_zone_failure.executed.ipynb` after explicit "execute 02e" go-ahead.
+
+Known transitional state: none new. `research/results/feature_validation.schema.md` retains the existing transitional note (tech_debt item 3) about 02a's overwrite-style writer clobbering 02b/02c/02d/02e sections if re-run. The cleanup sweep before N03 will migrate 02a to sentinel splicing.
+
+No CFBD calls fired in this commit's execution path (scaffold only; no notebook execution). No verdict-impacting artifacts touched. Cumulative validated-set count (21 features) unchanged.

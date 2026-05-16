@@ -1,0 +1,561 @@
+﻿executed notebook: 02c_explosive_vs_sustained.executed.ipynb
+  size: 159,289 bytes
+  cell count: 26
+
+======================================================================
+BUDGET PRINT (verbatim)
+======================================================================
+--- cell 25 ---
+================================================================
+CFBD call budget -- Notebook 02c
+================================================================
+
+This notebook run:
+  total calls this run:       181  (161 /plays + 20 /drives)
+  fresh (uncached) this run:     0  (budget: 0)
+
+Cumulative across all notebooks (call log: 3,049 rows):
+  total fresh CFBD calls (lifetime):    253
+  monthly free-tier limit (BUILD_SPEC A.4 stated):  1,000
+    actual quota on current key (probe header):     3,000
+  remaining this billing cycle (against actual 3K): 2,747
+
+[ok] notebook 02c complete -- STOP per R22. Do not start Notebook 02d without approval.
+
+======================================================================
+SCORING-PLAYTYPE ENUMERATION (Phase 02c-c, classified vs excluded)
+======================================================================
+--- cell 10 ---
+Scoring playType counts across cache (all seasons), by category:
+  [exclude] total  1,562 plays across 14 known playTypes
+    Blocked Field Goal                                   21
+    Blocked Punt                                        174
+    End Period                                            1
+    Interception                                         27
+    Kickoff                                             130
+    Pass Incompletion                                     3
+    Pass Reception                                       30
+    Penalty                                               3
+    Punt                                                314
+    Rush                                                 21
+    Sack                                                148
+    Timeout                                               1
+    Uncategorized                                       688
+    placeholder                                           1
+  [fg] total 19,090 plays across 1 known playTypes
+    Field Goal Good                                  19,090
+  [offensive_td] total 56,346 plays across 3 known playTypes
+    Fumble Recovery (Own)                                34
+    Passing Touchdown                                27,657
+    Rushing Touchdown                                28,655
+  [pat_1pt] total      0 plays across 2 known playTypes
+    Extra Point Good                                    (0)
+    PAT Good                                            (0)
+  [pat_2pt] total     17 plays across 5 known playTypes
+    2pt Conversion Good                                 (0)
+    Two Point Pass                                       12
+    Two Point Rush                                        5
+    Two-Point Pass                                      (0)
+    Two-Point Rush                                      (0)
+  [pat_def_ret] total     58 plays across 1 known playTypes
+    Defensive 2pt Conversion                             58
+  [return_td] total  2,644 plays across 11 known playTypes
+    Blocked Field Goal Touchdown                         34
+    Blocked Punt Touchdown                               83
+    Fumble Recovery (Opponent)                          256
+    Fumble Recovery Touchdown                           (0)
+    Fumble Return Touchdown                             346
+    Interception Return Touchdown                     1,443
+    Kickoff Return (Offense)                              6
+    Kickoff Return Touchdown                            376
+    Missed Field Goal Return Touchdown                    5
+    Pass Interception Return                              3
+    Punt Return Touchdown                                92
+  [safety_def] total    458 plays across 1 known playTypes
+    Safety                                              458
+
+Return-TD playType counts (decision D4):
+  Blocked Field Goal Touchdown                         34
+  Blocked Punt Touchdown                               83
+  Fumble Recovery (Opponent)                          256
+  Fumble Recovery Touchdown                             0
+  Fumble Return Touchdown                             346
+  Interception Return Touchdown                     1,443
+  Kickoff Return (Offense)                              6
+  Kickoff Return Touchdown                            376
+  Missed Field Goal Return Touchdown                    5
+  Pass Interception Return                              3
+  Punt Return Touchdown                                92
+  (total return-TD plays across cache: 2,644)
+
+[ok] all 32 observed scoring playTypes are in the registry (80,175 scoring plays total)
+
+
+======================================================================
+DRIVE-1 TRIGGER COUNT (D4 reporting symmetry)
+======================================================================
+--- cell 6 ---
+trigger_events.csv:    11,416 rows x 45 cols
+trigger_outcomes.csv:  11,416 rows x 6 cols
+merged:                11,416 rows x 49 cols
+
+Dropped 0 rows with NaN final_fav_won (ties / unknown).
+In-scope rows for 02c: 11,416
+
+Drive-1 scale (relevant to D9 null policy):
+  drive_number_in_game == 1 (prior_drive_had_dog_explosive_play NULL): 1,860 (16.3%)
+  drive_number_in_game >= 2: 9,556 (83.7%)
+
+[ok] always-present pre-game columns are non-null on the in-scope subset
+     spread_movement nulls (pre-impute): 6,352 (55.64% of in-scope)
+--- cell 24 ---
+======================================================================
+Notebook 02c -- explosive vs sustained + post-explosive momentum -- summary
+======================================================================
+
+In-scope corpus:
+  trigger rows (post NaN final_fav_won drop): 11,416
+  /plays cache hits this run:                 161 lookups, 1,541,058 plays across 8,536 games
+  /drives cache hits this run:                20 lookups, 214,313 drives across 8,537 games
+
+Drive-1 trigger count (D9 null floor for prior-drive momentum feature):
+  drive_number_in_game == 1: 1,860 (16.29%)
+
+D12 accounting (top accounting deltas):
+  delta=   7   3,304  (34.77%)
+  delta=   8   2,316  (24.37%)
+  delta=   9   1,207  (12.70%)
+  delta=  10     674  ( 7.09%)
+  delta=   3     642  ( 6.76%)
+
+Per-feature x per-test-season results (v1_explosive_vs_sustained):
+  feature                                    window->test          d_brier      d_ece      imp   stab
+  dog_avg_drive_plays                        2015-2020->2022      +0.00578   +0.00685        -   PASS
+  dog_avg_drive_plays                        2015-2021->2023      +0.00411   +0.05449        -   PASS
+  dog_avg_drive_plays                        2015-2022->2024      +0.00149   -0.01003        -   PASS
+  dog_avg_drive_yards                        2015-2020->2022      +0.00952   +0.01676        -   PASS
+  dog_avg_drive_yards                        2015-2021->2023      +0.00674   +0.03051        -   PASS
+  dog_avg_drive_yards                        2015-2022->2024      -0.00184   -0.01949        -   PASS
+  dog_explosive_play_count                   2015-2020->2022      +0.01588   +0.00964        -   PASS
+  dog_explosive_play_count                   2015-2021->2023      +0.01677   +0.04026        -   PASS
+  dog_explosive_play_count                   2015-2022->2024      +0.00297   -0.00594        -   PASS
+  dog_points_from_explosives                 2015-2020->2022      +0.02053   +0.01522        -   PASS
+  dog_points_from_explosives                 2015-2021->2023      +0.01405   -0.02350        -   PASS
+  dog_points_from_explosives                 2015-2022->2024      +0.00236   -0.00157        -   PASS
+  dog_points_from_returns                    2015-2020->2022      +0.00079   +0.00319        -   PASS
+  dog_points_from_returns                    2015-2021->2023      +0.00395   -0.05311        -   PASS
+  dog_points_from_returns                    2015-2022->2024      -0.00204   -0.00737        -   PASS
+  dog_points_from_sustained                  2015-2020->2022      +0.01162   +0.00922        -   PASS
+  dog_points_from_sustained                  2015-2021->2023      +0.00520   -0.00758        -   PASS
+  dog_points_from_sustained                  2015-2022->2024      +0.00290   +0.01082        -   PASS
+  prior_drive_had_dog_explosive_play         2015-2020->2022      -0.00009   +0.00013        -   FAIL
+  prior_drive_had_dog_explosive_play         2015-2021->2023      -0.00014   -0.00062        -   FAIL
+  prior_drive_had_dog_explosive_play         2015-2022->2024      -0.00010   -0.00064        -   FAIL
+  seconds_since_last_dog_explosive_play      2015-2020->2022      +0.00468   -0.00504      183   PASS
+  seconds_since_last_dog_explosive_play      2015-2021->2023      +0.00780   +0.04833      184   PASS
+  seconds_since_last_dog_explosive_play      2015-2022->2024      -0.00269   -0.01489      184   PASS
+
+Feature stability verdicts:
+  dog_points_from_explosives                 PASS  (3/3 brier-improving, 1/3 ece-improving)
+  dog_points_from_sustained                  PASS  (3/3 brier-improving, 2/3 ece-improving)
+  dog_points_from_returns                    PASS  (2/3 brier-improving, 1/3 ece-improving)
+  dog_explosive_play_count                   PASS  (3/3 brier-improving, 2/3 ece-improving)
+  dog_avg_drive_yards                        PASS  (2/3 brier-improving, 2/3 ece-improving)
+  dog_avg_drive_plays                        PASS  (3/3 brier-improving, 2/3 ece-improving)
+  seconds_since_last_dog_explosive_play      PASS  (2/3 brier-improving, 1/3 ece-improving)
+  prior_drive_had_dog_explosive_play         FAIL  (0/3 brier-improving, 1/3 ece-improving)
+
+Null counts per feature (in-scope triggers: 11,416):
+  dog_points_from_explosives                 1,914 null (16.77%) (D7 no-completed-dog-drive NULL)
+  dog_points_from_sustained                  1,914 null (16.77%) (D7 no-completed-dog-drive NULL)
+  dog_points_from_returns                    1,914 null (16.77%) (D7 no-completed-dog-drive NULL)
+  dog_explosive_play_count                       0 null ( 0.00%)
+  dog_avg_drive_yards                        2,982 null (26.12%)
+  dog_avg_drive_plays                        2,982 null (26.12%)
+  seconds_since_last_dog_explosive_play      1,944 null (17.03%) (D8 R16-safe impute in eval loop)
+  prior_drive_had_dog_explosive_play         1,860 null (16.29%) (D9 drive-1 NULL)
+
+P3 trigger logic (categorical-window variants disposition):
+  D8 PASS + D9 FAIL -> continuous form passes alone
+  -> log categorical-windows to tech_debt.md as 'could refine binning if N03 wants'
+  (Disposition is for execution-report time; no file edits in this notebook.)
+
+Deliverables (research/results/):
+  feature_validation.csv                       15,454 bytes
+  feature_validation.schema.md                 41,882 bytes
+
+======================================================================
+PER-FEATURE NULL COUNTS
+======================================================================
+--- cell 6 ---
+trigger_events.csv:    11,416 rows x 45 cols
+trigger_outcomes.csv:  11,416 rows x 6 cols
+merged:                11,416 rows x 49 cols
+
+Dropped 0 rows with NaN final_fav_won (ties / unknown).
+In-scope rows for 02c: 11,416
+
+Drive-1 scale (relevant to D9 null policy):
+  drive_number_in_game == 1 (prior_drive_had_dog_explosive_play NULL): 1,860 (16.3%)
+  drive_number_in_game >= 2: 9,556 (83.7%)
+
+[ok] always-present pre-game columns are non-null on the in-scope subset
+     spread_movement nulls (pre-impute): 6,352 (55.64% of in-scope)
+--- cell 15 ---
+feature_matrix_df:  11,416 rows x 28 cols
+  skipped (game not in plays_by_game): 0
+
+Null counts per candidate feature (this run):
+  total in-scope triggers: 11,416
+  dog_points_from_explosives                 1,914 null (16.77%) (D7 NULL when no completed dog drive)
+  dog_points_from_sustained                  1,914 null (16.77%) (D7 NULL when no completed dog drive)
+  dog_points_from_returns                    1,914 null (16.77%) (D7 NULL when no completed dog drive)
+  dog_explosive_play_count                       0 null ( 0.00%)
+  dog_avg_drive_yards                        2,982 null (26.12%)
+  dog_avg_drive_plays                        2,982 null (26.12%)
+  seconds_since_last_dog_explosive_play      1,944 null (17.03%) (D8 R16-safe impute in eval loop)
+  prior_drive_had_dog_explosive_play         1,860 null (16.29%) (D9 NULL on drive-1 triggers)
+
+  drive-1 trigger count (expected null floor for prior_drive_had_dog_explosive_play): 1,860
+
+R16-safe NaN handling for spread_movement (baseline):
+  spread_movement nulls AFTER impute:    0  (expected: 0)
+  spread_movement_is_null indicator sum: 6,352 (55.64% of in-scope)
+
+Accounting delta = dog_score_at_trigger - sum(3 buckets) (9,502 triggers with completed dog drives):
+  per D12: PAT/2pt attribute to preceding TD's bucket, so positive deltas
+  reflect the trigger play itself being a dog scoring play.
+  Top deltas (value: count, % of accounted):
+    delta=   7  count= 3,304  (34.77%)
+    delta=   8  count= 2,316  (24.37%)
+    delta=   9  count= 1,207  (12.70%)
+    delta=  10  count=   674  ( 7.09%)
+    delta=   3  count=   642  ( 6.76%)
+    delta=   4  count=   410  ( 4.31%)
+    delta=  11  count=   262  ( 2.76%)
+    delta=   5  count=   219  ( 2.30%)
+    delta=   6  count=   181  ( 1.90%)
+    delta=  12  count=    81  ( 0.85%)
+  [WARN] 8 triggers have NEGATIVE delta -- buckets exceeded dog_score_at_trigger. Investigate registry / attribution edge case before relying on these features in N03.
+--- cell 24 ---
+======================================================================
+Notebook 02c -- explosive vs sustained + post-explosive momentum -- summary
+======================================================================
+
+In-scope corpus:
+  trigger rows (post NaN final_fav_won drop): 11,416
+  /plays cache hits this run:                 161 lookups, 1,541,058 plays across 8,536 games
+  /drives cache hits this run:                20 lookups, 214,313 drives across 8,537 games
+
+Drive-1 trigger count (D9 null floor for prior-drive momentum feature):
+  drive_number_in_game == 1: 1,860 (16.29%)
+
+D12 accounting (top accounting deltas):
+  delta=   7   3,304  (34.77%)
+  delta=   8   2,316  (24.37%)
+  delta=   9   1,207  (12.70%)
+  delta=  10     674  ( 7.09%)
+  delta=   3     642  ( 6.76%)
+
+Per-feature x per-test-season results (v1_explosive_vs_sustained):
+  feature                                    window->test          d_brier      d_ece      imp   stab
+  dog_avg_drive_plays                        2015-2020->2022      +0.00578   +0.00685        -   PASS
+  dog_avg_drive_plays                        2015-2021->2023      +0.00411   +0.05449        -   PASS
+  dog_avg_drive_plays                        2015-2022->2024      +0.00149   -0.01003        -   PASS
+  dog_avg_drive_yards                        2015-2020->2022      +0.00952   +0.01676        -   PASS
+  dog_avg_drive_yards                        2015-2021->2023      +0.00674   +0.03051        -   PASS
+  dog_avg_drive_yards                        2015-2022->2024      -0.00184   -0.01949        -   PASS
+  dog_explosive_play_count                   2015-2020->2022      +0.01588   +0.00964        -   PASS
+  dog_explosive_play_count                   2015-2021->2023      +0.01677   +0.04026        -   PASS
+  dog_explosive_play_count                   2015-2022->2024      +0.00297   -0.00594        -   PASS
+  dog_points_from_explosives                 2015-2020->2022      +0.02053   +0.01522        -   PASS
+  dog_points_from_explosives                 2015-2021->2023      +0.01405   -0.02350        -   PASS
+  dog_points_from_explosives                 2015-2022->2024      +0.00236   -0.00157        -   PASS
+  dog_points_from_returns                    2015-2020->2022      +0.00079   +0.00319        -   PASS
+  dog_points_from_returns                    2015-2021->2023      +0.00395   -0.05311        -   PASS
+  dog_points_from_returns                    2015-2022->2024      -0.00204   -0.00737        -   PASS
+  dog_points_from_sustained                  2015-2020->2022      +0.01162   +0.00922        -   PASS
+  dog_points_from_sustained                  2015-2021->2023      +0.00520   -0.00758        -   PASS
+  dog_points_from_sustained                  2015-2022->2024      +0.00290   +0.01082        -   PASS
+  prior_drive_had_dog_explosive_play         2015-2020->2022      -0.00009   +0.00013        -   FAIL
+  prior_drive_had_dog_explosive_play         2015-2021->2023      -0.00014   -0.00062        -   FAIL
+  prior_drive_had_dog_explosive_play         2015-2022->2024      -0.00010   -0.00064        -   FAIL
+  seconds_since_last_dog_explosive_play      2015-2020->2022      +0.00468   -0.00504      183   PASS
+  seconds_since_last_dog_explosive_play      2015-2021->2023      +0.00780   +0.04833      184   PASS
+  seconds_since_last_dog_explosive_play      2015-2022->2024      -0.00269   -0.01489      184   PASS
+
+Feature stability verdicts:
+  dog_points_from_explosives                 PASS  (3/3 brier-improving, 1/3 ece-improving)
+  dog_points_from_sustained                  PASS  (3/3 brier-improving, 2/3 ece-improving)
+  dog_points_from_returns                    PASS  (2/3 brier-improving, 1/3 ece-improving)
+  dog_explosive_play_count                   PASS  (3/3 brier-improving, 2/3 ece-improving)
+  dog_avg_drive_yards                        PASS  (2/3 brier-improving, 2/3 ece-improving)
+  dog_avg_drive_plays                        PASS  (3/3 brier-improving, 2/3 ece-improving)
+  seconds_since_last_dog_explosive_play      PASS  (2/3 brier-improving, 1/3 ece-improving)
+  prior_drive_had_dog_explosive_play         FAIL  (0/3 brier-improving, 1/3 ece-improving)
+
+Null counts per feature (in-scope triggers: 11,416):
+  dog_points_from_explosives                 1,914 null (16.77%) (D7 no-completed-dog-drive NULL)
+  dog_points_from_sustained                  1,914 null (16.77%) (D7 no-completed-dog-drive NULL)
+  dog_points_from_returns                    1,914 null (16.77%) (D7 no-completed-dog-drive NULL)
+  dog_explosive_play_count                       0 null ( 0.00%)
+  dog_avg_drive_yards                        2,982 null (26.12%)
+  dog_avg_drive_plays                        2,982 null (26.12%)
+  seconds_since_last_dog_explosive_play      1,944 null (17.03%) (D8 R16-safe impute in eval loop)
+  prior_drive_had_dog_explosive_play         1,860 null (16.29%) (D9 drive-1 NULL)
+
+P3 trigger logic (categorical-window variants disposition):
+  D8 PASS + D9 FAIL -> continuous form passes alone
+  -> log categorical-windows to tech_debt.md as 'could refine binning if N03 wants'
+  (Disposition is for execution-report time; no file edits in this notebook.)
+
+Deliverables (research/results/):
+  feature_validation.csv                       15,454 bytes
+  feature_validation.schema.md                 41,882 bytes
+
+======================================================================
+D8 PER-TRAIN-WINDOW IMPUTATION MEDIANS
+======================================================================
+--- cell 20 ---
+existing feature_validation.csv: 72 rows, 17 cols
+  displaced 24 row(s) matching this run's keys
+
+[ok] wrote feature_validation.csv: 72 rows (24 from this run, 48 retained from prior runs)
+     columns: ['feature', 'feature_set_version', 'train_window', 'val_season', 'test_season', 'n_train', 'n_val', 'n_test', 'brier_test_baseline', 'brier_test_candidate', 'brier_improvement', 'ece_test_baseline', 'ece_test_candidate', 'calibration_improvement', 'passed_stability', 'redundant_with', 'imputation_value']
+     path: C:\Users\Alexander\Documents\CFB\CFBapp\research\results\feature_validation.csv
+
+======================================================================
+PER-FEATURE STABILITY VERDICT TABLE
+======================================================================
+--- cell 18 ---
+
+[ok] evaluation loop complete in 0.8s
+     rows: 24 (expected: 24 = 3 windows x 8 features)
+
+stability verdict per feature:
+  dog_points_from_explosives                 PASS  (3/3 test seasons with positive Brier)
+  dog_points_from_sustained                  PASS  (3/3 test seasons with positive Brier)
+  dog_points_from_returns                    PASS  (2/3 test seasons with positive Brier)
+  dog_explosive_play_count                   PASS  (3/3 test seasons with positive Brier)
+  dog_avg_drive_yards                        PASS  (2/3 test seasons with positive Brier)
+  dog_avg_drive_plays                        PASS  (3/3 test seasons with positive Brier)
+  seconds_since_last_dog_explosive_play      PASS  (2/3 test seasons with positive Brier)  per-window medians: [['2015-2020', 183.0], ['2015-2021', 184.0], ['2015-2022', 184.0]]
+  prior_drive_had_dog_explosive_play         FAIL  (0/3 test seasons with positive Brier)
+--- cell 24 ---
+======================================================================
+Notebook 02c -- explosive vs sustained + post-explosive momentum -- summary
+======================================================================
+
+In-scope corpus:
+  trigger rows (post NaN final_fav_won drop): 11,416
+  /plays cache hits this run:                 161 lookups, 1,541,058 plays across 8,536 games
+  /drives cache hits this run:                20 lookups, 214,313 drives across 8,537 games
+
+Drive-1 trigger count (D9 null floor for prior-drive momentum feature):
+  drive_number_in_game == 1: 1,860 (16.29%)
+
+D12 accounting (top accounting deltas):
+  delta=   7   3,304  (34.77%)
+  delta=   8   2,316  (24.37%)
+  delta=   9   1,207  (12.70%)
+  delta=  10     674  ( 7.09%)
+  delta=   3     642  ( 6.76%)
+
+Per-feature x per-test-season results (v1_explosive_vs_sustained):
+  feature                                    window->test          d_brier      d_ece      imp   stab
+  dog_avg_drive_plays                        2015-2020->2022      +0.00578   +0.00685        -   PASS
+  dog_avg_drive_plays                        2015-2021->2023      +0.00411   +0.05449        -   PASS
+  dog_avg_drive_plays                        2015-2022->2024      +0.00149   -0.01003        -   PASS
+  dog_avg_drive_yards                        2015-2020->2022      +0.00952   +0.01676        -   PASS
+  dog_avg_drive_yards                        2015-2021->2023      +0.00674   +0.03051        -   PASS
+  dog_avg_drive_yards                        2015-2022->2024      -0.00184   -0.01949        -   PASS
+  dog_explosive_play_count                   2015-2020->2022      +0.01588   +0.00964        -   PASS
+  dog_explosive_play_count                   2015-2021->2023      +0.01677   +0.04026        -   PASS
+  dog_explosive_play_count                   2015-2022->2024      +0.00297   -0.00594        -   PASS
+  dog_points_from_explosives                 2015-2020->2022      +0.02053   +0.01522        -   PASS
+  dog_points_from_explosives                 2015-2021->2023      +0.01405   -0.02350        -   PASS
+  dog_points_from_explosives                 2015-2022->2024      +0.00236   -0.00157        -   PASS
+  dog_points_from_returns                    2015-2020->2022      +0.00079   +0.00319        -   PASS
+  dog_points_from_returns                    2015-2021->2023      +0.00395   -0.05311        -   PASS
+  dog_points_from_returns                    2015-2022->2024      -0.00204   -0.00737        -   PASS
+  dog_points_from_sustained                  2015-2020->2022      +0.01162   +0.00922        -   PASS
+  dog_points_from_sustained                  2015-2021->2023      +0.00520   -0.00758        -   PASS
+  dog_points_from_sustained                  2015-2022->2024      +0.00290   +0.01082        -   PASS
+  prior_drive_had_dog_explosive_play         2015-2020->2022      -0.00009   +0.00013        -   FAIL
+  prior_drive_had_dog_explosive_play         2015-2021->2023      -0.00014   -0.00062        -   FAIL
+  prior_drive_had_dog_explosive_play         2015-2022->2024      -0.00010   -0.00064        -   FAIL
+  seconds_since_last_dog_explosive_play      2015-2020->2022      +0.00468   -0.00504      183   PASS
+  seconds_since_last_dog_explosive_play      2015-2021->2023      +0.00780   +0.04833      184   PASS
+  seconds_since_last_dog_explosive_play      2015-2022->2024      -0.00269   -0.01489      184   PASS
+
+Feature stability verdicts:
+  dog_points_from_explosives                 PASS  (3/3 brier-improving, 1/3 ece-improving)
+  dog_points_from_sustained                  PASS  (3/3 brier-improving, 2/3 ece-improving)
+  dog_points_from_returns                    PASS  (2/3 brier-improving, 1/3 ece-improving)
+  dog_explosive_play_count                   PASS  (3/3 brier-improving, 2/3 ece-improving)
+  dog_avg_drive_yards                        PASS  (2/3 brier-improving, 2/3 ece-improving)
+  dog_avg_drive_plays                        PASS  (3/3 brier-improving, 2/3 ece-improving)
+  seconds_since_last_dog_explosive_play      PASS  (2/3 brier-improving, 1/3 ece-improving)
+  prior_drive_had_dog_explosive_play         FAIL  (0/3 brier-improving, 1/3 ece-improving)
+
+Null counts per feature (in-scope triggers: 11,416):
+  dog_points_from_explosives                 1,914 null (16.77%) (D7 no-completed-dog-drive NULL)
+  dog_points_from_sustained                  1,914 null (16.77%) (D7 no-completed-dog-drive NULL)
+  dog_points_from_returns                    1,914 null (16.77%) (D7 no-completed-dog-drive NULL)
+  dog_explosive_play_count                       0 null ( 0.00%)
+  dog_avg_drive_yards                        2,982 null (26.12%)
+  dog_avg_drive_plays                        2,982 null (26.12%)
+  seconds_since_last_dog_explosive_play      1,944 null (17.03%) (D8 R16-safe impute in eval loop)
+  prior_drive_had_dog_explosive_play         1,860 null (16.29%) (D9 drive-1 NULL)
+
+P3 trigger logic (categorical-window variants disposition):
+  D8 PASS + D9 FAIL -> continuous form passes alone
+  -> log categorical-windows to tech_debt.md as 'could refine binning if N03 wants'
+  (Disposition is for execution-report time; no file edits in this notebook.)
+
+Deliverables (research/results/):
+  feature_validation.csv                       15,454 bytes
+  feature_validation.schema.md                 41,882 bytes
+
+======================================================================
+P3 TRIGGER-LOGIC DISPOSITION (D11)
+======================================================================
+--- cell 24 ---
+======================================================================
+Notebook 02c -- explosive vs sustained + post-explosive momentum -- summary
+======================================================================
+
+In-scope corpus:
+  trigger rows (post NaN final_fav_won drop): 11,416
+  /plays cache hits this run:                 161 lookups, 1,541,058 plays across 8,536 games
+  /drives cache hits this run:                20 lookups, 214,313 drives across 8,537 games
+
+Drive-1 trigger count (D9 null floor for prior-drive momentum feature):
+  drive_number_in_game == 1: 1,860 (16.29%)
+
+D12 accounting (top accounting deltas):
+  delta=   7   3,304  (34.77%)
+  delta=   8   2,316  (24.37%)
+  delta=   9   1,207  (12.70%)
+  delta=  10     674  ( 7.09%)
+  delta=   3     642  ( 6.76%)
+
+Per-feature x per-test-season results (v1_explosive_vs_sustained):
+  feature                                    window->test          d_brier      d_ece      imp   stab
+  dog_avg_drive_plays                        2015-2020->2022      +0.00578   +0.00685        -   PASS
+  dog_avg_drive_plays                        2015-2021->2023      +0.00411   +0.05449        -   PASS
+  dog_avg_drive_plays                        2015-2022->2024      +0.00149   -0.01003        -   PASS
+  dog_avg_drive_yards                        2015-2020->2022      +0.00952   +0.01676        -   PASS
+  dog_avg_drive_yards                        2015-2021->2023      +0.00674   +0.03051        -   PASS
+  dog_avg_drive_yards                        2015-2022->2024      -0.00184   -0.01949        -   PASS
+  dog_explosive_play_count                   2015-2020->2022      +0.01588   +0.00964        -   PASS
+  dog_explosive_play_count                   2015-2021->2023      +0.01677   +0.04026        -   PASS
+  dog_explosive_play_count                   2015-2022->2024      +0.00297   -0.00594        -   PASS
+  dog_points_from_explosives                 2015-2020->2022      +0.02053   +0.01522        -   PASS
+  dog_points_from_explosives                 2015-2021->2023      +0.01405   -0.02350        -   PASS
+  dog_points_from_explosives                 2015-2022->2024      +0.00236   -0.00157        -   PASS
+  dog_points_from_returns                    2015-2020->2022      +0.00079   +0.00319        -   PASS
+  dog_points_from_returns                    2015-2021->2023      +0.00395   -0.05311        -   PASS
+  dog_points_from_returns                    2015-2022->2024      -0.00204   -0.00737        -   PASS
+  dog_points_from_sustained                  2015-2020->2022      +0.01162   +0.00922        -   PASS
+  dog_points_from_sustained                  2015-2021->2023      +0.00520   -0.00758        -   PASS
+  dog_points_from_sustained                  2015-2022->2024      +0.00290   +0.01082        -   PASS
+  prior_drive_had_dog_explosive_play         2015-2020->2022      -0.00009   +0.00013        -   FAIL
+  prior_drive_had_dog_explosive_play         2015-2021->2023      -0.00014   -0.00062        -   FAIL
+  prior_drive_had_dog_explosive_play         2015-2022->2024      -0.00010   -0.00064        -   FAIL
+  seconds_since_last_dog_explosive_play      2015-2020->2022      +0.00468   -0.00504      183   PASS
+  seconds_since_last_dog_explosive_play      2015-2021->2023      +0.00780   +0.04833      184   PASS
+  seconds_since_last_dog_explosive_play      2015-2022->2024      -0.00269   -0.01489      184   PASS
+
+Feature stability verdicts:
+  dog_points_from_explosives                 PASS  (3/3 brier-improving, 1/3 ece-improving)
+  dog_points_from_sustained                  PASS  (3/3 brier-improving, 2/3 ece-improving)
+  dog_points_from_returns                    PASS  (2/3 brier-improving, 1/3 ece-improving)
+  dog_explosive_play_count                   PASS  (3/3 brier-improving, 2/3 ece-improving)
+  dog_avg_drive_yards                        PASS  (2/3 brier-improving, 2/3 ece-improving)
+  dog_avg_drive_plays                        PASS  (3/3 brier-improving, 2/3 ece-improving)
+  seconds_since_last_dog_explosive_play      PASS  (2/3 brier-improving, 1/3 ece-improving)
+  prior_drive_had_dog_explosive_play         FAIL  (0/3 brier-improving, 1/3 ece-improving)
+
+Null counts per feature (in-scope triggers: 11,416):
+  dog_points_from_explosives                 1,914 null (16.77%) (D7 no-completed-dog-drive NULL)
+  dog_points_from_sustained                  1,914 null (16.77%) (D7 no-completed-dog-drive NULL)
+  dog_points_from_returns                    1,914 null (16.77%) (D7 no-completed-dog-drive NULL)
+  dog_explosive_play_count                       0 null ( 0.00%)
+  dog_avg_drive_yards                        2,982 null (26.12%)
+  dog_avg_drive_plays                        2,982 null (26.12%)
+  seconds_since_last_dog_explosive_play      1,944 null (17.03%) (D8 R16-safe impute in eval loop)
+  prior_drive_had_dog_explosive_play         1,860 null (16.29%) (D9 drive-1 NULL)
+
+P3 trigger logic (categorical-window variants disposition):
+  D8 PASS + D9 FAIL -> continuous form passes alone
+  -> log categorical-windows to tech_debt.md as 'could refine binning if N03 wants'
+  (Disposition is for execution-report time; no file edits in this notebook.)
+
+Deliverables (research/results/):
+  feature_validation.csv                       15,454 bytes
+  feature_validation.schema.md                 41,882 bytes
+
+======================================================================
+ANY WARNINGS / ERRORS BY CELL (cell index + first stream-error line)
+======================================================================
+  cell 18: C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+
+total warning-emitting cells: 1
+
+======================================================================
+CONDITIONAL-IDENTITY DISCOVERIES (any new ones from execution)
+======================================================================
+--- cell 4 ---
+seasons: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]
+season types: ['regular', 'postseason']
+feature_set_version: v1_explosive_vs_sustained
+walk-forward windows (locked from 02a, binding for 02b-g):
+  train=2015-2020  val=2021  test=2022
+  train=2015-2021  val=2022  test=2023
+  train=2015-2022  val=2023  test=2024
+baseline pre-game features (6): ['pregame_spread', 'rating_gap', 'fav_pregame_rating', 'dog_pregame_rating', 'spread_movement', 'spread_movement_is_null']
+candidate features (8):
+  - dog_points_from_explosives
+  - dog_points_from_sustained
+  - dog_points_from_returns
+  - dog_explosive_play_count
+  - dog_avg_drive_yards
+  - dog_avg_drive_plays
+  - seconds_since_last_dog_explosive_play (R16-safe pair with seconds_since_last_dog_explosive_play_is_null; D8/D10)
+  - prior_drive_had_dog_explosive_play
+explosive thresholds (D1, carried from 02b):
+  pass yards >= 20; pass types: ['Pass Reception', 'Passing Touchdown']
+  rush yards >= 12; rush types: ['Rush', 'Rushing Touchdown']
+scoring playType registry: 38 entries across 8 categories (['exclude', 'fg', 'offensive_td', 'pat_1pt', 'pat_2pt', 'pat_def_ret', 'return_td', 'safety_def'])
+return_td playTypes: ['Blocked Field Goal Touchdown', 'Blocked Punt Touchdown', 'Fumble Recovery (Opponent)', 'Fumble Recovery Touchdown', 'Fumble Return Touchdown', 'Interception Return Touchdown', 'Kickoff Return (Offense)', 'Kickoff Return Touchdown', 'Missed Field Goal Return Touchdown', 'Pass Interception Return', 'Punt Return Touchdown']
+redundant_with map (0 entries): {}
+random state: 42
+--- cell 20 ---
+existing feature_validation.csv: 72 rows, 17 cols
+  displaced 24 row(s) matching this run's keys
+
+[ok] wrote feature_validation.csv: 72 rows (24 from this run, 48 retained from prior runs)
+     columns: ['feature', 'feature_set_version', 'train_window', 'val_season', 'test_season', 'n_train', 'n_val', 'n_test', 'brier_test_baseline', 'brier_test_candidate', 'brier_improvement', 'ece_test_baseline', 'ece_test_candidate', 'calibration_improvement', 'passed_stability', 'redundant_with', 'imputation_value']
+     path: C:\Users\Alexander\Documents\CFB\CFBapp\research\results\feature_validation.csv
+
+======================================================================
+CSV / SIDECAR DELIVERABLE SANITY
+======================================================================
+feature_validation.csv: 15,454 bytes
+  rows including header: 73
+  data rows: 72
+  header: ['feature', 'feature_set_version', 'train_window', 'val_season', 'test_season', 'n_train', 'n_val', 'n_test', 'brier_test_baseline', 'brier_test_candidate', 'brier_improvement', 'ece_test_baseline', 'ece_test_candidate', 'calibration_improvement', 'passed_stability', 'redundant_with', 'imputation_value']
+  rows by feature_set_version:
+    v1_baseline_efficiency_only: 18
+    v1_explosive_vs_sustained: 24
+    v1_opening_drive_shock: 30
+
+feature_validation.schema.md: 41,882 bytes
+  contains '<!-- BEGIN: 02c': True
+  contains '<!-- BEGIN: 02b': True
+  contains '<!-- BEGIN: 02a': False
+
+======================================================================
+END OF EXTRACTION
+======================================================================

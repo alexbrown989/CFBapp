@@ -1,0 +1,49 @@
+Phase 0 N02a scaffold: baseline efficiency features (unexecuted)
+
+Adds research/notebooks/02a_baseline_features.ipynb -- the first per-feature
+stability-test notebook in the 02a-g series. Tests seven baseline-efficiency
+candidates (fav/dog x off/def EPA per play, epa_divergence, plays_so_far)
+against a pre-game-only baseline on three walk-forward test seasons
+(2022/2023/2024) under the V5.1 stability rule.
+
+Baseline pre-game model (5 features + 1 R16-safe missingness indicator,
+decision alpha from plan-approval):
+features = [pregame_spread, rating_gap, fav_pregame_rating,
+            dog_pregame_rating, spread_movement]
+indicator = spread_movement_is_null (1 if source spread_movement was NaN
+            pre-impute, else 0; impute spread_movement NaN -> 0)
+L1 logreg + StandardScaler, default C=1.0, seed 42; isotonic-calibrated
+on val; ECE 10 equal-width bins.
+
+Locked decisions (per 02a plan-approval, binding for 02b-g):
+- Walk-forward windows: train from 2015 (not 2017), val/test 2022-2024.
+- Per-feature null policy: drop nulls per-feature only, never globally.
+- feature_validation.csv: append semantics keyed by
+  (feature, train_window, test_season); 02a re-runs displace only their own
+  rows, never 02b-g's.
+
+Spec extension documented in the sidecar (not patched into BUILD_SPEC.md):
+dog_def_epa_per_play added for fav-side symmetry with the V5 DDL block.
+
+Budget invariant: 0 fresh CFBD calls. Cache-hit assertion in Phase 02a-b
+and final-cell budget assertion both fail loud on any uncached /plays
+lookup. Re-uses N01's cache (162 /plays files) verbatim.
+
+Deliverables (created at execution time, not in this commit):
+- research/results/feature_validation.csv (21 rows from 02a)
+- research/results/feature_validation.schema.md (sidecar)
+
+Per R22, the notebook lands unexecuted; execution is gated on explicit
+user go-ahead.
+
+Reconciliation policy documented in research/results/budget_reconciliation.md.
+
+CFBD quota update: new API key reports 3000 calls/cycle in the response
+header (up from documented 1000/cycle in BUILD_SPEC A.4). Lifetime tally
+after this commit per research/data/cache/cfbd_call_log.csv:
+253/3000 fresh CFBD calls used (N00 logged: 70, N01: 182, quota probe: 1).
+Note: N00's data_quality_report.md narrative documents 87 N00 calls
+including sample 2024 plays/drives that were subsequently re-fetched by N01
+and appear in the audit log as cached hits, not fresh N00 rows. The 17-call
+gap is a known documentation-vs-log artifact, not a budget reconciliation
+issue.

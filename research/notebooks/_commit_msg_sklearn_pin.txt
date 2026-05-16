@@ -1,0 +1,43 @@
+chore(deps): pin sklearn==1.7.2 to restore Phase 0 reproducibility
+
+Phase 0 notebooks 02a and 02b were executed under a sklearn version
+in the [1.6, 1.8) range (cv="prefit" was deprecated but not yet
+removed; the 02a executed copy emitted the deprecation warning).
+Their feature_validation.csv deliverables (committed at 9822cfc,
+2e17807, e1710a2) reflect that version's behavior. The sklearn 1.8
+release removed CalibratedClassifierCV(cv="prefit") (deprecated in
+1.6) and silently changed LogisticRegression(penalty="l1") to fall
+back to L2 via the new l1_ratio API.
+
+The N02c re-run today failed with a hard error on the calibrator
+API change. The L1->L2 silent fallback would have changed
+regularization behavior even if the calibrator hadn't failed first.
+Both issues block reproducing any Phase 0 notebook.
+
+Pinning sklearn to ==1.7.2 (held below 1.8 to retain
+CalibratedClassifierCV(cv="prefit") and L1 logreg semantics for
+Phase 0 reproducibility) restores the 02a/02b execution chain and
+lets 02c re-run with the registry/exclude work from beacef4. The
+deprecated APIs remain functional under this pin. 1.7.2 was the
+latest stable sklearn 1.7.x compatible with these Phase 0 API
+requirements at the time of pinning; version verified against
+pypi.org/pypi/scikit-learn/json on 2026-05-13 per R21 (released
+2025-09-09, not yanked, no 1.7.x successor available).
+
+Migration to FrozenEstimator + l1_ratio=1.0 parameterization is
+deferred to tech_debt.md Item 5 (production cleanup sweep before
+N03 begins). The current pin is research-correct; production
+migration is a separate deliberate event documented in Item 5
+with explicit verification steps for the L1 swap (Item 6).
+
+The pyproject.toml manifest is intent-only right now -- Phase 0
+notebooks run under the user's global Python 3.12, not against a
+manifest-installed venv. The sklearn install must therefore be
+applied manually via `pip install --force-reinstall` against the
+global environment after this commit lands. Divergence documented
+in new tech_debt Item 7; venv migration scheduled before N03.
+
+Co-resolves tech_debt Item 2 (cv="prefit" deprecation). Adds
+tech_debt Items 5, 6, and 7 (FrozenEstimator migration plan;
+L1->L2 silent fallback test; global-Python-vs-backend-venv
+divergence record).

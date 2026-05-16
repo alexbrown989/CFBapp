@@ -1,0 +1,11 @@
+chore(rules): add R24(f) — history rewrites require explicit authorization
+
+Adds R24(f) codifying halt-and-authorize gates for amend/rebase/reset/
+force-push workflows. Cosmetic prose errors in pushed commit bodies are
+explicitly deferred to follow-up commits or corrections_log entries;
+substantive problems require user choice between rewrite vs follow-up.
+
+Files in this commit:
+- .cursorrules — extend R24 with sub-rule (f).
+
+Supersedes: none.

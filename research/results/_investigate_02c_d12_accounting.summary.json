@@ -1,0 +1,121 @@
+{
+  "triggers_total": 11416,
+  "completed_dog_drive_count": 8940,
+  "positive_delta_count": 6498,
+  "zero_delta_count": 96,
+  "negative_delta_count": 2346,
+  "delta_histogram_top20": [
+    {
+      "delta": -5,
+      "count": 372
+    },
+    {
+      "delta": -2,
+      "count": 256
+    },
+    {
+      "delta": -3,
+      "count": 202
+    },
+    {
+      "delta": -11,
+      "count": 175
+    },
+    {
+      "delta": -8,
+      "count": 174
+    },
+    {
+      "delta": -4,
+      "count": 159
+    },
+    {
+      "delta": -1,
+      "count": 155
+    },
+    {
+      "delta": -9,
+      "count": 124
+    },
+    {
+      "delta": -14,
+      "count": 87
+    },
+    {
+      "delta": -7,
+      "count": 79
+    },
+    {
+      "delta": -17,
+      "count": 72
+    },
+    {
+      "delta": -10,
+      "count": 61
+    },
+    {
+      "delta": -15,
+      "count": 58
+    },
+    {
+      "delta": -6,
+      "count": 56
+    },
+    {
+      "delta": -12,
+      "count": 49
+    },
+    {
+      "delta": -20,
+      "count": 40
+    },
+    {
+      "delta": -13,
+      "count": 35
+    },
+    {
+      "delta": -16,
+      "count": 25
+    },
+    {
+      "delta": -23,
+      "count": 21
+    },
+    {
+      "delta": -21,
+      "count": 19
+    }
+  ],
+  "by_deficit_threshold": [
+    {
+      "deficit": 3,
+      "total_triggers": 4311,
+      "negative_delta": 1123,
+      "pct": 26.049640454650895
+    },
+    {
+      "deficit": 7,
+      "total_triggers": 3183,
+      "negative_delta": 604,
+      "pct": 18.975808985234057
+    },
+    {
+      "deficit": 10,
+      "total_triggers": 2025,
+      "negative_delta": 414,
+      "pct": 20.444444444444443
+    },
+    {
+      "deficit": 14,
+      "total_triggers": 1348,
+      "negative_delta": 169,
+      "pct": 12.537091988130564
+    },
+    {
+      "deficit": 21,
+      "total_triggers": 549,
+      "negative_delta": 36,
+      "pct": 6.557377049180328
+    }
+  ]
+}

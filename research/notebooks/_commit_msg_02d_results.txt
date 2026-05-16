@@ -1,0 +1,33 @@
+feat(n02d): turnover & short-field validated set (4/4 PASS) + cross-notebook correlation diagnostic
+
+Lands the empirical deliverables for the Phase-0 02d (turnover and short-field) feature pass, built on top of the scaffold commit a1ff1a4. All four 02d candidates passed R6 walk-forward stability under the corrected `_chrono_key` filter: `fav_turnovers_so_far` 3/3 Brier, `dog_points_off_turnovers` 3/3 Brier, `dog_avg_starting_field_pos` 3/3 Brier, `short_field_tds_allowed` 2/3 Brier (positive 2015-2020 and 2015-2022 test folds, negative 2015-2021 test fold). D10 diff-vs-leaky verification confirmed all four extractors are byte-identical under the leaky `playNumber < trig_pn` and the corrected `_chrono_key < trig_chrono_key` filters across all 11,416 triggers (empirical confirmation of the plan-time Category-A claim). D11 overlap diagnostic for `dog_points_off_turnovers` vs `dog_points_from_returns` showed 2.67% trigger-level co-occurrence -- cleanly separable. D12 cumulative validated-set context: 21 features total after 02d (4 new + 17 carried from corrected 02a/02b/02c).
+
+Supersedes: nothing direct. Extends a1ff1a4 (02d scaffold). The cumulative validated-set count of 21 supersedes the leak-era projection of 22 (the 02a leak-era set claimed 5 PASS; corrected set is 4 PASS, with `dog_off_epa_per_play` retained as the byte-identical pair member). All Brier values reported below are from the corrected `_chrono_key` execution; no leak-era baselines remain in scope.
+
+Pre-commit cross-notebook correlation diagnostic. Both the plan-time prediction (2/4 PASS) and the reviewer's independent hypothesis-watch (also implicit ~2/4 with a different relative ordering) were 2x off the observed 4/4 result. Computed Pearson correlations between each of the 4 new 02d features and the 16 carried-validated features (the 17-feature post-correction set after dropping `dog_off_epa_per_play` as byte-identical to `fav_def_epa_per_play`). On the non-null intersection of each pair. Full matrix in `research/results/_02d_correlations.csv` (untracked, diagnostic-only). Zero pairs with `|rho| >= 0.6`; no `redundant_with` tags applied. Four pairs in the meaningful (0.3-0.6) band, all flagged in the 02d schema sidecar for N03 L1 down-weighting awareness:
+
+  - `fav_turnovers_so_far` <-> `plays_so_far`: rho=+0.501 (n=11,416). Game-length proxy partially overlaps with cumulative-turnover count.
+  - `short_field_tds_allowed` <-> `dog_points_from_sustained`: rho=+0.425 (n=9,502). Short-field TDs are often sustained-style scoring (no explosive play in the scoring drive).
+  - `short_field_tds_allowed` <-> `plays_so_far`: rho=+0.349 (n=11,416). Game-length proxy.
+  - `fav_turnovers_so_far` <-> `dog_explosive_play_count`: rho=+0.320 (n=11,416). Longer games -> more of everything.
+
+User-watch pairs confirmed: `dog_points_off_turnovers` <-> `dog_points_from_returns` measured at rho=+0.042 (n=8,426) -- consistent with the D11 2.67% co-occurrence in both diagnostics. `dog_avg_starting_field_pos` <-> `dog_avg_drive_yards` rho=-0.210 -- below threshold, mechanism is "better field position -> fewer yards per drive to score". `short_field_tds_allowed` <-> `dog_points_from_explosives` rho=+0.268, <-> `dog_explosive_play_count` rho=+0.260 -- both below threshold; independent at the protocol bar.
+
+Per-feature verdict + correlation cross-classification (no verdict changes; R6 stability passed honestly):
+
+  - `fav_turnovers_so_far` PASS 3/3 Brier (+0.00725 / +0.00982 / +0.00241), max `|rho|` 0.501 vs `plays_so_far` -- real but partially correlated with game-length proxy.
+  - `dog_points_off_turnovers` PASS 3/3 Brier (+0.00593 / +0.00512 / +0.00555), max `|rho|` 0.257 vs `dog_points_from_sustained` -- independent signal, cleanly separable from `dog_points_from_returns` per both D11 (2.67% co-occurrence) and correlation (rho=+0.042).
+  - `dog_avg_starting_field_pos` PASS 3/3 Brier (+0.00095 / +0.00338 / +0.00085), max `|rho|` 0.244 vs `dog_points_from_sustained` -- cleanly independent of validated set but smallest Brier magnitudes (all three folds `< +0.005`); noise-fold-luck candidate per the methodological note.
+  - `short_field_tds_allowed` PASS 2/3 Brier (+0.00829 / -0.00409 / +0.00355), max `|rho|` 0.425 vs `dog_points_from_sustained` -- partial overlap with sustained-style scoring; L1 will likely down-weight when both are included. Middle test fold (2022) flipped negative; passes the R6 floor (2-of-3) but doesn't strengthen across all test seasons.
+
+Methodological note appended to `research/corrections_log.md` as section "02d prediction-vs-result calibration": two independent priors 2x off the observed result is a calibration signal. Open question for 02e/02f/02g: are R6's stability thresholds permissive enough that small-magnitude features (Brier improvements `< +0.005` per fold) pass when they're closer to noise than signal? `dog_avg_starting_field_pos` is the canonical case -- all three folds under `+0.005`, lowest validated-set correlations, yet still cleared the 2-of-3 PASS bar. Soft prior going forward: when a 4/4 PASS rate diverges sharply from a calibrated `<= 2/4` plan-time prior, run a correlation diagnostic before committing.
+
+Files in this commit:
+
+  - `research/results/feature_validation.csv` -- 12 new rows appended (4 features x 3 walk-forward windows) for the 02d set. 02a/02b/02c rows unchanged in content.
+  - `research/results/feature_validation.schema.md` -- 02d section emitted via sentinel-delimited splicing between `<!-- BEGIN: 02d turnover_short_field -->` and `<!-- END: 02d turnover_short_field -->`. Includes the four-feature interpretation block, D10/D11/D12 diagnostic summaries, plan-time redundancy audit, and the post-execution correlation diagnostic subsection with the meaningful-band pairs flagged.
+  - `research/corrections_log.md` -- appended "02d prediction-vs-result calibration" section documenting the prior-vs-result divergence, the correlation diagnostic findings, the verdict-vs-correlation cross-classification, and the open methodological question for 02e onwards.
+
+Known transitional state: `research/results/feature_validation.schema.md` retains the existing transitional note (tech_debt item 3) that re-running `_build_02a.py` in its current form will clobber 02b/02c/02d sections via overwrite-style writing. The other three sentinel-spliced writers (02b/02c/02d) refresh only their own sections. The 02a writer rewrite is deferred to the cleanup sweep before N03.
+
+No CFBD calls were fired in this commit's execution path (cache-only). No verdict changes induced by the correlation diagnostic -- correlation context informs N03 L1 down-weighting but does not invalidate the empirical walk-forward Brier improvements.

@@ -1,0 +1,105 @@
+﻿plays_by_game: 8,537 games
+broken triggers: 11,416 rows
+games triggering in broken run: 4,311
+fixed triggers (broken-game subset): 11,414
+games skipped (no cached plays)    : 0
+games failing dedup threshold     : 0
+sort dedup log entries             : 1
+KO Return TD verified by ▒2        : 375
+KO Return TD raised by ▒2          : 28
+
+========================================================================
+ROW COUNT  broken=11,416  fixed=11,414  delta=-2  (-0.02%)
+========================================================================
+
+Distribution by fav_deficit:
+  value                                 broken    fixed    delta      b%      f%
+  3                                          0    4,311   +4,311    0.0%   37.8%
+  3                                      4,311        0   -4,311   37.8%    0.0%
+  7                                          0    3,183   +3,183    0.0%   27.9%
+  7                                      3,183        0   -3,183   27.9%    0.0%
+  10                                     2,025        0   -2,025   17.7%    0.0%
+  10                                         0    2,024   +2,024    0.0%   17.7%
+  14                                         0    1,347   +1,347    0.0%   11.8%
+  14                                     1,348        0   -1,348   11.8%    0.0%
+  21                                         0      549     +549    0.0%    4.8%
+  21                                       549        0     -549    4.8%    0.0%
+
+Distribution by quarter:
+  value                                 broken    fixed    delta      b%      f%
+  1                                          0    5,867   +5,867    0.0%   51.4%
+  1                                      5,609        0   -5,609   49.1%    0.0%
+  2                                          0    3,102   +3,102    0.0%   27.2%
+  2                                      3,030        0   -3,030   26.5%    0.0%
+  3                                          0    1,403   +1,403    0.0%   12.3%
+  3                                      1,578        0   -1,578   13.8%    0.0%
+  4                                          0    1,042   +1,042    0.0%    9.1%
+  4                                      1,199        0   -1,199   10.5%    0.0%
+
+Distribution by play_type:
+  value                                 broken    fixed    delta      b%      f%
+  Kickoff                                8,732      275   -8,457   76.5%    2.4%
+  Kickoff Return (Offense)               1,482       29   -1,453   13.0%    0.3%
+  Rush                                     291       32     -259    2.5%    0.3%
+  Rushing Touchdown                        211    4,556   +4,345    1.8%   39.9%
+  Passing Touchdown                        204    4,287   +4,083    1.8%   37.6%
+  Pass Reception                           122       11     -111    1.1%    0.1%
+  Timeout                                   89        8      -81    0.8%    0.1%
+  Pass Incompletion                         85        3      -82    0.7%    0.0%
+  Penalty                                   44        6      -38    0.4%    0.1%
+  Kickoff Return Touchdown                  42       40       -2    0.4%    0.4%
+  Field Goal Good                           26    1,746   +1,720    0.2%   15.3%
+  Interception Return Touchdown             20      284     +264    0.2%    2.5%
+  Punt                                      17        0      -17    0.1%    0.0%
+  Sack                                      14        0      -14    0.1%    0.0%
+  Fumble Recovery (Opponent)                11        0      -11    0.1%    0.0%
+  Fumble Return Touchdown                    8       76      +68    0.1%    0.7%
+  Safety                                     5        7       +2    0.0%    0.1%
+  End of Game                                3        4       +1    0.0%    0.0%
+  End Period                                 2        4       +2    0.0%    0.0%
+  Field Goal Missed                          2        1       -1    0.0%    0.0%
+  Fumble Recovery (Own)                      2        0       -2    0.0%    0.0%
+  Blocked Field Goal Touchdown               1        8       +7    0.0%    0.1%
+  End of Half                                1        7       +6    0.0%    0.1%
+  Interception                               1        2       +1    0.0%    0.0%
+  Uncategorized                              1        0       -1    0.0%    0.0%
+  Blocked Punt Touchdown                     0       16      +16    0.0%    0.1%
+  Missed Field Goal Return Touchdown         0        1       +1    0.0%    0.0%
+  Punt Return Touchdown                      0       11      +11    0.0%    0.1%
+
+(game_id, fav_deficit) overlap:
+  in both                 : 11,414
+  only in broken (deleted): 2
+  only in fixed (added)   : 0
+  of overlapping rows: moved trigger_play_id : 10,630
+                       moved quarter         : 503
+                       moved actual_deficit  : 388
+                       identical everything  : 784
+
+Sample of 10 moved (game_id, fav_deficit) rows:
+  game=400603836 D=3: broken pNum=1 type='Kickoff'                         fav=7 dog=10 actD=3
+                        fixed  pNum=4 type='Field Goal Good'                 fav=0 dog=3 actD=3
+  game=400603839 D=3: broken pNum=1 type='Kickoff'                         fav=3 dog=7 actD=4
+                        fixed  pNum=2 type='Rushing Touchdown'               fav=3 dog=7 actD=4
+  game=400603839 D=7: broken pNum=1 type='Kickoff'                         fav=6 dog=14 actD=8
+                        fixed  pNum=10 type='Passing Touchdown'               fav=6 dog=14 actD=8
+  game=400603840 D=3: broken pNum=1 type='Kickoff'                         fav=0 dog=7 actD=7
+                        fixed  pNum=6 type='Passing Touchdown'               fav=0 dog=7 actD=7
+  game=400603840 D=7: broken pNum=1 type='Kickoff'                         fav=0 dog=7 actD=7
+                        fixed  pNum=6 type='Passing Touchdown'               fav=0 dog=7 actD=7
+  game=400603842 D=3: broken pNum=1 type='Kickoff Return (Offense)'        fav=0 dog=7 actD=7
+                        fixed  pNum=13 type='Passing Touchdown'               fav=0 dog=7 actD=7
+  game=400603842 D=7: broken pNum=1 type='Kickoff Return (Offense)'        fav=0 dog=7 actD=7
+                        fixed  pNum=13 type='Passing Touchdown'               fav=0 dog=7 actD=7
+  game=400603843 D=3: broken pNum=1 type='Kickoff'                         fav=0 dog=7 actD=7
+                        fixed  pNum=10 type='Passing Touchdown'               fav=0 dog=7 actD=7
+  game=400603843 D=7: broken pNum=1 type='Kickoff'                         fav=0 dog=7 actD=7
+                        fixed  pNum=10 type='Passing Touchdown'               fav=0 dog=7 actD=7
+  game=400603843 D=10: broken pNum=1 type='Kickoff'                         fav=0 dog=14 actD=14
+                        fixed  pNum=12 type='Passing Touchdown'               fav=0 dog=14 actD=14
+
+Sample of 10 'only in broken' (deleted by fix) rows:
+  game=401301021 D=10 pNum=4 type='Sack'                            fav=7 dog=21 actD=14
+  game=401301021 D=14 pNum=4 type='Sack'                            fav=7 dog=21 actD=14
+
+Sample of 10 'only in fixed' (added by fix) rows:

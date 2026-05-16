@@ -1,0 +1,46 @@
+feat(n02c): extend scoring-playType registry; add exclude category
+
+Resolves the 18-unknown-playType gate that halted N02c execution at
+Cell 6. Investigation script (research/notebooks/_investigate_02c_
+unknown_scoring.py, untracked) sampled n=10 to n=50 plays per unknown
+playType and produced per-row playText evidence at:
+  research/results/_investigate_02c_unknown_scoring.csv
+  research/results/_investigate_02c_unknown_scoring.summary.json
+  research/results/_investigate_02c_unknown_scoring_drive_attrib.csv
+
+Registry extensions (18 playTypes, 1,861 plays total):
+
+- return_td (265 plays): Fumble Recovery (Opponent), Pass Interception
+  Return, Kickoff Return (Offense). n=50 verification confirmed
+  UNIFORM patterns for Fumble Recovery (Opponent); full-pop for the
+  other two.
+- offensive_td (34 plays): Fumble Recovery (Own). Drive-attribution
+  check confirmed the existing points-bucket helper correctly routes
+  these via drive_had_dog_explosive lookup (8/9 dog-offense cases on
+  already-explosive drives).
+- exclude (1,562 plays, new sentinel category): Uncategorized, Punt,
+  Kickoff, Blocked Punt, Sack, Pass Reception, Interception, Blocked
+  Field Goal, Rush, Pass Incompletion, Penalty, End Period, Timeout,
+  placeholder. All have same-bucket-different-value, cross-bucket,
+  or anomalous-CFBD-flag issues that cannot be resolved by playType
+  alone. PlayText branching deferred per "exclude when uncertain"
+  research conservatism principle (see tech_debt.md item 4 for
+  revisit conditions).
+
+Code changes:
+- SCORING_PLAYTYPE_REGISTRY in Phase 02c-c gains 18 entries.
+- Points-bucket helper short-circuits `if cat == "exclude": continue`
+  before attribution.
+- Narrative cell updated to document 7 categories + exclude sentinel.
+
+84% of unknown-scoring volume excluded (1,562 / 1,861); 16% mapped
+into recognized categories. Total scoring classification coverage:
+~76,500 plays / 78,314 known scoring + 299 newly mapped = ~98% of
+CFBD scoring=True plays. 2% excluded as data-quality residue.
+
+Tech_debt item 4 added: revisit excluded 1,562 plays via text-
+branching registry extension if dog_points_from_returns fails
+stability in N03 or signal is otherwise insufficient.
+
+Notebook not yet re-executed under this registry; subsequent commit
+will pin sklearn<1.8 (tech_debt items 2/5/6) before re-execution.

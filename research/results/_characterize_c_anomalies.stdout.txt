@@ -1,0 +1,56 @@
+﻿category (c) cases: 749
+
+1. Negative play.id (CFBD placeholder rows): 17 / 749
+
+2. Top 15 (A.playType, B.playType) combinations:
+     106  A='Kickoff'                       B='Rushing Touchdown'
+     103  A='Kickoff'                       B='Passing Touchdown'
+      63  A='Kickoff'                       B='Field Goal Good'
+      34  A='Rush'                          B='Rush'
+      29  A='Rush'                          B='Punt'
+      21  A='Pass Incompletion'             B='Punt'
+      21  A='Pass Reception'                B='Rush'
+      15  A='Kickoff'                       B='Rush'
+      14  A='Kickoff'                       B='Kickoff'
+      11  A='Pass Incompletion'             B='Rush'
+      11  A='Sack'                          B='Rush'
+      11  A='Punt'                          B='Rush'
+      10  A='Timeout'                       B='Rush'
+       9  A='Rush'                          B='Pass Reception'
+       9  A='Penalty'                       B='Rush'
+
+3. Clock-bucket distribution:
+     555  other
+     181  0:00 (end of period)
+      13  15:00 (start of period)
+
+4. Drive-number gap (B.drive - A.drive) distribution:
+     274  1 (adjacent drives)
+     217  2-5
+     156  >10
+     102  6-10
+
+5. Per-game (c) anomaly concentration:
+   unique games with (c) anomalies: 303
+   median anomalies per affected game: 1.0
+   max anomalies in one game: 15
+   top 5 'anomaly-rich' games:
+     game_id=401309591  15 anomalies
+     game_id=401404094  13 anomalies
+     game_id=401415259  12 anomalies
+     game_id=401426571  11 anomalies
+     game_id=401404002  11 anomalies
+
+6. Trigger-impact upper bound:
+   total trigger rows: 11,416
+   unique (game, period, elapsed) trigger keys: 7,845
+   triggers sharing a clock with a (c) anomaly: 45
+   percentage potentially affected: 0.394%
+
+7. (c) sub-pattern by transition-shape:
+   A is last play of its drive, B is NOT first play of its drive:  220
+     -> B's drive has playNumbers < B.pn elsewhere; B isn't drive entry
+   A is NOT last play of its drive, B IS first play of its drive:  301
+     -> A's drive continues past A.pn but at LATER clock(s); A isn't drive exit
+   Neither A_is_last nor B_is_first:                                 228
+     -> both plays are interior to their respective drives

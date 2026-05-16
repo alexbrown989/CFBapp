@@ -1,0 +1,15 @@
+chore(rules): add R24 — process discipline for limited-context models
+
+Codifies five patterns that became increasingly important during the
+02e session under Composer 2: halt-and-surface gates between phases,
+structural-finding-first synthesis, pre-emptive surfacing of verification
+changes, run-state checks per turn, and the single-agent invariant.
+
+These were applied ad-hoc during 02e via per-turn user reminders;
+codifying them removes the need for per-turn reinforcement and lets
+the model read them fresh on every turn.
+
+Files in this commit:
+- .cursorrules — add R24 plus header update Rules 21-24.
+
+Supersedes: none.

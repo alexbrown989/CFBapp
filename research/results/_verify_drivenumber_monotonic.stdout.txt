@@ -1,0 +1,54 @@
+﻿trigger_events covers 4,311 unique game_ids
+sampling 50 games (random.seed=42):
+  [400935238, 400763605, 401239973, 401119300, 401114180, 400944888, 400933908, 400869631, 401520383, 400764907] ... (showing first 10)
+
+loading 44 cache shards for the sample
+loaded 9,243 plays across 50 games in the sample
+
+=== Test results (50 random games, random.seed=42) ===
+
+[FAIL] T0. play.id order is chronologically consistent with clock fields  (49/50 games pass)
+      game_id=401404092
+        play.id=401404092101989303 period=1 clock_elapsed=834 comes after play.id=401404092101989302 period=1 clock_elapsed=900 (clock went backwards within period)
+[FAIL] T1. driveNumber non-decreasing along play.id order  (39/50 games pass)
+      game_id=400944888
+        play.id=400944888102854905 has driveNumber=5, prior play in id-order had driveNumber=6 (drive went backwards)
+      game_id=400869631
+        play.id=400869631102999902 has driveNumber=13, prior play in id-order had driveNumber=14 (drive went backwards)
+      game_id=401520383
+        play.id=401520383104997106 has driveNumber=26, prior play in id-order had driveNumber=27 (drive went backwards)
+      game_id=401112517
+        play.id=401112517102999703 has driveNumber=9, prior play in id-order had driveNumber=10 (drive went backwards)
+      game_id=401531428
+        play.id=401531428104999001 has driveNumber=27, prior play in id-order had driveNumber=28 (drive went backwards)
+      ... and 6 more
+[PASS] T2. driveNumber values form contiguous {1..max} per game  (50/50 games pass)
+[FAIL] T3. playNumber per-drive starts at 1 and non-decreasing in id-order  (49/50 games pass)
+      game_id=401404092
+        drive 5 first play (by id) has playNumber=2 (expected 1); seq=[2, 1, 3, 4, 5, 6, 7]
+[FAIL] T4. sort by (driveNumber, playNumber) lex == sort by play.id  (39/50 games pass)
+      game_id=400944888
+        first divergence at index 42:
+              id-order[42]: id=400944888102854903 drive=6 pn=1 period=2 clock={'minutes': 14, 'seconds': 50}
+              lex-order[42]: id=400944888102854905 drive=5 pn=11 period=2 clock={'minutes': 14, 'seconds': 50}
+      game_id=400869631
+        first divergence at index 109:
+              id-order[109]: id=400869631102999901 drive=14 pn=1 period=2 clock={'minutes': 0, 'seconds': 0}
+              lex-order[109]: id=400869631102999902 drive=13 pn=26 period=2 clock={'minutes': 0, 'seconds': 0}
+      game_id=401520383
+        first divergence at index 189:
+              id-order[189]: id=401520383104997103 drive=27 pn=1 period=4 clock={'minutes': 0, 'seconds': 28}
+              lex-order[189]: id=401520383104997106 drive=26 pn=7 period=4 clock={'minutes': 0, 'seconds': 28}
+      game_id=401112517
+        first divergence at index 73:
+              id-order[73]: id=401112517102999702 drive=10 pn=1 period=2 clock={'minutes': 0, 'seconds': 2}
+              lex-order[73]: id=401112517102999703 drive=9 pn=11 period=2 clock={'minutes': 0, 'seconds': 0}
+      game_id=401531428
+        first divergence at index 168:
+              id-order[168]: id=401531428104998503 drive=28 pn=1 period=4 clock={'minutes': 0, 'seconds': 14}
+              lex-order[168]: id=401531428104999001 drive=27 pn=13 period=4 clock={'minutes': 0, 'seconds': 9}
+      ... and 6 more
+
+[fail] one or more tests failed.
+       T0 failed: play.id is NOT a reliable chronological ground truth.
+       Need a different verification approach.

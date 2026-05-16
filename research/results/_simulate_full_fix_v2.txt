@@ -1,0 +1,95 @@
+﻿plays_by_game: 8,537 games
+
+SCORING_PLAY_REGISTRY entries: 27
+
+playType                                 side     pts      n  POST%   verdict
+  blocked field goal                       offense    3     15  100.0%  BEST_EFFORT_LOW_N
+  blocked field goal touchdown             offense    6     11  100.0%  BEST_EFFORT_LOW_N
+  blocked punt                             offense    6     87  100.0%  POST_PLAY
+  blocked punt touchdown                   offense    3     46  100.0%  POST_PLAY
+  field goal good                          offense    3 18,793  100.0%  POST_PLAY
+  fumble recovery (opponent)               defense    6    246  100.0%  POST_PLAY
+  fumble recovery (own)                    offense    6     32  100.0%  POST_PLAY
+  fumble return touchdown                  offense    6    180  100.0%  POST_PLAY
+  interception                             offense    3     22  100.0%  POST_PLAY
+  interception return touchdown            offense    3    984  100.0%  POST_PLAY
+  kickoff                                  offense    6     73  100.0%  POST_PLAY
+  kickoff return (offense)                 offense    6      6  100.0%  BEST_EFFORT_LOW_N
+  kickoff return touchdown                 offense    3    291  100.0%  POST_BEST_EFFORT
+  missed field goal return touchdown       offense    3      3  100.0%  BEST_EFFORT_LOW_N
+  pass incompletion                        offense    6      2  100.0%  BEST_EFFORT_LOW_N
+  pass interception return                 offense    3      2  100.0%  BEST_EFFORT_LOW_N
+  pass reception                           defense    2      8  100.0%  BEST_EFFORT_LOW_N
+  passing touchdown                        offense    6 25,716  100.0%  POST_PLAY
+  penalty                                  offense    6      3  100.0%  BEST_EFFORT_LOW_N
+  punt                                     offense    3    176  100.0%  POST_PLAY
+  punt return touchdown                    offense    6     32  100.0%  POST_PLAY
+  rush                                     offense    6      7  100.0%  BEST_EFFORT_LOW_N
+  rushing touchdown                        offense    6 26,925  100.0%  POST_PLAY
+  sack                                     offense    3    106  100.0%  POST_PLAY
+  safety                                   offense    3    341  100.0%  POST_PLAY
+  timeout                                  offense    3      1  100.0%  BEST_EFFORT_LOW_N
+  uncategorized                            defense    2      4  100.0%  BEST_EFFORT_LOW_N
+
+broken triggers: 11,416
+games triggering in broken run: 4,311
+fixed triggers (broken-game subset): 11,416
+KO Return TD verified by ▒2 / raised: 387 / 17
+LOW_N subtype verified by ▒7 / raised: 84 / 1
+
+========================================================================
+ROW COUNT broken=11,416  fixed=11,416  delta=+0  (+0.00%)
+========================================================================
+
+Distribution by fav_deficit:
+  value                                 broken    fixed    delta      b%      f%
+  3                                      4,311    4,311       +0   37.8%   37.8%
+  7                                      3,183    3,183       +0   27.9%   27.9%
+  10                                     2,025    2,025       +0   17.7%   17.7%
+  14                                     1,348    1,348       +0   11.8%   11.8%
+  21                                       549      549       +0    4.8%    4.8%
+
+Distribution by quarter:
+  value                                 broken    fixed    delta      b%      f%
+  1                                      5,609    5,868     +259   49.1%   51.4%
+  2                                      3,030    3,104      +74   26.5%   27.2%
+  3                                      1,578    1,403     -175   13.8%   12.3%
+  4                                      1,199    1,041     -158   10.5%    9.1%
+
+Distribution by play_type:
+  value                                 broken    fixed    delta      b%      f%
+  Kickoff                                8,732       98   -8,634   76.5%    0.9%
+  Kickoff Return (Offense)               1,482       20   -1,462   13.0%    0.2%
+  Rush                                     291       32     -259    2.5%    0.3%
+  Rushing Touchdown                        211    4,555   +4,344    1.8%   39.9%
+  Passing Touchdown                        204    4,287   +4,083    1.8%   37.6%
+  Pass Reception                           122       11     -111    1.1%    0.1%
+  Timeout                                   89        6      -83    0.8%    0.1%
+  Pass Incompletion                         85        3      -82    0.7%    0.0%
+  Penalty                                   44        4      -40    0.4%    0.0%
+  Kickoff Return Touchdown                  42       41       -1    0.4%    0.4%
+  Field Goal Good                           26    1,746   +1,720    0.2%   15.3%
+  Interception Return Touchdown             20      284     +264    0.2%    2.5%
+  Punt                                      17       48      +31    0.1%    0.4%
+  Sack                                      14       37      +23    0.1%    0.3%
+  Fumble Recovery (Opponent)                11       72      +61    0.1%    0.6%
+  Fumble Return Touchdown                    8       76      +68    0.1%    0.7%
+  Safety                                     5        7       +2    0.0%    0.1%
+  End of Game                                3        3       +0    0.0%    0.0%
+  End Period                                 2        3       +1    0.0%    0.0%
+  Field Goal Missed                          2        1       -1    0.0%    0.0%
+  Fumble Recovery (Own)                      2        4       +2    0.0%    0.0%
+  Blocked Field Goal Touchdown               1        8       +7    0.0%    0.1%
+  End of Half                                1        7       +6    0.0%    0.1%
+  Interception                               1        1       +0    0.0%    0.0%
+  Uncategorized                              1        0       -1    0.0%    0.0%
+  Blocked Field Goal                         0        2       +2    0.0%    0.0%
+  Blocked Punt                               0       32      +32    0.0%    0.3%
+  Blocked Punt Touchdown                     0       16      +16    0.0%    0.1%
+  Missed Field Goal Return Touchdown         0        1       +1    0.0%    0.0%
+  Punt Return Touchdown                      0       11      +11    0.0%    0.1%
+
+(game_id, fav_deficit) overlap:
+  in both                 : 11,416
+  only in broken (deleted): 0
+  only in fixed (added)   : 0

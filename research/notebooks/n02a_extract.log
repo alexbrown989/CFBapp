@@ -1,0 +1,243 @@
+﻿=== cell 1 (id=c02a0001) ===
+[ok] paths resolved relative to C:\Users\Alexander\Documents\CFB\CFBapp\research\notebooks
+[ok] CFBD_API_KEY loaded from C:\Users\Alexander\Documents\CFB\CFBapp\backend\.env
+[ok] cache dir: C:\Users\Alexander\Documents\CFB\CFBapp\research\data\cache
+[ok] N01 deliverables present: trigger_events.csv, trigger_outcomes.csv
+
+=== cell 2 (id=c02a0002) ===
+[ok] cfbd_get defined
+[ok] sharing cache with Notebook 00/01 at C:\Users\Alexander\Documents\CFB\CFBapp\research\data\cache
+
+=== cell 4 (id=c02a0004) ===
+seasons: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]
+season types: ['regular', 'postseason']
+feature_set_version: v1_baseline_efficiency_only
+walk-forward windows:
+  train=2015-2020  val=2021  test=2022
+  train=2015-2021  val=2022  test=2023
+  train=2015-2022  val=2023  test=2024
+baseline pre-game features (6): ['pregame_spread', 'rating_gap', 'fav_pregame_rating', 'dog_pregame_rating', 'spread_movement', 'spread_movement_is_null']
+  always-present cols (4): ['pregame_spread', 'rating_gap', 'fav_pregame_rating', 'dog_pregame_rating']
+  R16-safe imputed col + indicator: ['spread_movement', 'spread_movement_is_null']
+candidate features (6): ['fav_off_epa_per_play', 'fav_def_epa_per_play', 'dog_off_epa_per_play', 'dog_def_epa_per_play', 'epa_divergence', 'plays_so_far']
+random state: 42
+
+=== cell 6 (id=c02a0006) ===
+trigger_events.csv:    11,416 rows x 45 cols
+trigger_outcomes.csv:  11,416 rows x 6 cols
+merged:                11,416 rows x 49 cols
+
+Dropped 0 rows with NaN final_fav_won (ties / unknown).
+In-scope rows for 02a: 11,416
+
+Rows per season:
+season
+2015     998
+2016    1129
+2017    1116
+2018    1104
+2019    1101
+2020     890
+2021    1221
+2022    1261
+2023    1300
+2024    1296
+
+[ok] always-present pre-game columns are non-null on the in-scope subset
+     spread_movement nulls (pre-impute): 6,352 (55.64% of in-scope)
+
+=== cell 8 (id=c02a0008) ===
+distinct (season, season_type, week) tuples to load from cache: 161
+[ok] /plays loaded from cache in 11.5s -- 8,536 games, 1,541,058 plays
+[info] CFBD negative-id encoding: 19,828 plays across 115 games carry the alternate (negative-int) id format. Retained; chrono_key orders them correctly without referencing play.id. See research/corrections_log.md.
+[ok] cache-hit assertion passed: 161 /plays lookups, all cached.
+[ok] plays_by_game sorted by composite _chrono_key (8,536 games)
+
+=== cell 10 (id=c02a000a) ===
+[ok] assert_no_lookahead defined (composite chrono_key gate)
+
+=== cell 11 (id=c02a000b) ===
+[ok] 6 feature functions registered
+
+=== cell 13 (id=c02a000d) ===
+feature_matrix_df:  11,416 rows x 23 cols
+  skipped (game not in plays_by_game): 0
+
+Null counts per candidate feature (this run):
+  total in-scope triggers: 11,416
+  fav_off_epa_per_play       1,839 null (16.11%)
+  fav_def_epa_per_play         215 null ( 1.88%)
+  dog_off_epa_per_play         215 null ( 1.88%)
+  dog_def_epa_per_play       1,839 null (16.11%)
+  epa_divergence             1,945 null (17.04%)
+  plays_so_far                   0 null ( 0.00%)
+
+R16-safe NaN handling for spread_movement:
+  spread_movement nulls AFTER impute:    0  (expected: 0)
+  spread_movement_is_null indicator sum: 6,352 (55.64% of in-scope)
+
+=== cell 15 (id=c02a000f) ===
+[ok] ece_10bin and fit_calibrate_evaluate defined
+
+=== cell 16 (id=c02a0010) ===
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+
+[ok] evaluation loop complete in 0.7s
+     rows: 18 (expected: 18 = 3 windows x 6 features)
+
+stability verdict per feature:
+  fav_off_epa_per_play       FAIL  (1/3 test seasons with positive Brier improvement)
+  fav_def_epa_per_play       PASS  (3/3 test seasons with positive Brier improvement)
+  dog_off_epa_per_play       PASS  (3/3 test seasons with positive Brier improvement)
+  dog_def_epa_per_play       FAIL  (1/3 test seasons with positive Brier improvement)
+  epa_divergence             PASS  (2/3 test seasons with positive Brier improvement)
+  plays_so_far               PASS  (3/3 test seasons with positive Brier improvement)
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\calibration.py:330: FutureWarning: The `cv='prefit'` option is deprecated in 1.6 and will be removed in 1.8. You can use CalibratedClassifierCV(FrozenEstimator(estimator)) instead.
+  warnings.warn(
+
+=== cell 18 (id=c02a0012) ===
+existing feature_validation.csv: 72 rows
+  displaced 18 row(s) matching this run's (feature, train_window, test_season) keys
+
+[ok] wrote feature_validation.csv: 72 rows (18 from this run, 54 retained from prior runs)
+     path: C:\Users\Alexander\Documents\CFB\CFBapp\research\results\feature_validation.csv
+
+=== cell 20 (id=c02a0014) ===
+[ok] wrote feature_validation.schema.md (17,867 chars)
+     path: C:\Users\Alexander\Documents\CFB\CFBapp\research\results\feature_validation.schema.md
+
+=== cell 22 (id=c02a0016) ===
+======================================================================
+Notebook 02a -- baseline efficiency features -- summary
+======================================================================
+
+In-scope corpus:
+  trigger rows (post NaN final_fav_won drop): 11,416
+  /plays cache hits this run:                 161 tuples, 1,541,058 plays across 8,536 games
+
+Per-feature x per-test-season results (v1_baseline_efficiency_only):
+  feature                    window->test         brier_b   brier_c    d_brier    ece_b    ece_c      d_ece   stab
+  dog_def_epa_per_play       2015-2020->2022      0.24685   0.24912   -0.00228  0.09607  0.10483   -0.00876   FAIL
+  dog_def_epa_per_play       2015-2021->2023      0.21328   0.21205   +0.00123  0.03493  0.08861   -0.05367   FAIL
+  dog_def_epa_per_play       2015-2022->2024      0.21676   0.21744   -0.00068  0.03342  0.04763   -0.01421   FAIL
+  dog_off_epa_per_play       2015-2020->2022      0.24871   0.24357   +0.00513  0.08427  0.08295   +0.00131   PASS
+  dog_off_epa_per_play       2015-2021->2023      0.21690   0.21405   +0.00285  0.10535  0.08885   +0.01650   PASS
+  dog_off_epa_per_play       2015-2022->2024      0.22559   0.22409   +0.00150  0.06377  0.06917   -0.00540   PASS
+  epa_divergence             2015-2020->2022      0.24717   0.24359   +0.00358  0.09116  0.08673   +0.00443   PASS
+  epa_divergence             2015-2021->2023      0.21246   0.21106   +0.00140  0.03418  0.04086   -0.00668   PASS
+  epa_divergence             2015-2022->2024      0.21675   0.21891   -0.00216  0.04619  0.05866   -0.01247   PASS
+  fav_def_epa_per_play       2015-2020->2022      0.24871   0.24357   +0.00513  0.08427  0.08295   +0.00131   PASS
+  fav_def_epa_per_play       2015-2021->2023      0.21690   0.21405   +0.00285  0.10535  0.08885   +0.01650   PASS
+  fav_def_epa_per_play       2015-2022->2024      0.22559   0.22409   +0.00150  0.06377  0.06917   -0.00540   PASS
+  fav_off_epa_per_play       2015-2020->2022      0.24685   0.24912   -0.00228  0.09607  0.10483   -0.00876   FAIL
+  fav_off_epa_per_play       2015-2021->2023      0.21328   0.21205   +0.00123  0.03493  0.08861   -0.05367   FAIL
+  fav_off_epa_per_play       2015-2022->2024      0.21676   0.21744   -0.00068  0.03342  0.04763   -0.01421   FAIL
+  plays_so_far               2015-2020->2022      0.24802   0.22566   +0.02236  0.08310  0.06454   +0.01856   PASS
+  plays_so_far               2015-2021->2023      0.21827   0.20540   +0.01287  0.10829  0.06742   +0.04087   PASS
+  plays_so_far               2015-2022->2024      0.22364   0.21470   +0.00894  0.05921  0.06081   -0.00159   PASS
+
+Feature stability verdicts:
+  fav_off_epa_per_play       FAIL  (1/3 brier-improving, 0/3 ece-improving)
+  fav_def_epa_per_play       PASS  (3/3 brier-improving, 2/3 ece-improving)
+  dog_off_epa_per_play       PASS  (3/3 brier-improving, 2/3 ece-improving)
+  dog_def_epa_per_play       FAIL  (1/3 brier-improving, 0/3 ece-improving)
+  epa_divergence             PASS  (2/3 brier-improving, 1/3 ece-improving)
+  plays_so_far               PASS  (3/3 brier-improving, 2/3 ece-improving)
+
+Null counts per feature (in-scope triggers: 11,416):
+  fav_off_epa_per_play       1,839 null (16.11%)
+  fav_def_epa_per_play         215 null ( 1.88%)
+  dog_off_epa_per_play         215 null ( 1.88%)
+  dog_def_epa_per_play       1,839 null (16.11%)
+  epa_divergence             1,945 null (17.04%)
+  plays_so_far                   0 null ( 0.00%)
+
+Deliverables (research/results/):
+  feature_validation.csv                       15,421 bytes
+  feature_validation.schema.md                 18,212 bytes
+
+=== cell 23 (id=c02a0017) ===
+================================================================
+CFBD call budget -- Notebook 02a
+================================================================
+
+This notebook run:
+  total calls this run:       161
+  fresh (uncached) this run:     0  (budget: 0)
+
+Cumulative across all notebooks (call log: 3,210 rows):
+  total fresh CFBD calls (lifetime):    253
+  monthly free-tier limit:              1,000
+  remaining this billing cycle:         747
+
+[ok] notebook 02a complete -- STOP per R22. Do not start Notebook 02b without approval.
+

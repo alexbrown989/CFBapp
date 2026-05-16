@@ -1,0 +1,690 @@
+
+========================================================================
+TOUCHDOWN  (points_expected=6, side=offense)
+========================================================================
+total_classified : 58,677
+  POST  : 47,710  (diff >= 6)
+  PRE   :  3,370  (diff == 0)
+  OTHER :  7,597  (everything else)
+skipped_team_mismatch : 0
+skipped_no_prev       : 53
+
+POST-bucket diff distribution (top 10):
+    diff=   7  n=33,145
+    diff=  14  n=5,019
+    diff=   6  n=2,457
+    diff=  10  n=1,864
+    diff=  21  n=947
+    diff=   8  n=918
+    diff=  13  n=571
+    diff=  17  n=526
+    diff=   9  n=282
+    diff=  28  n=248
+
+OTHER-bucket diff distribution (full):
+    diff= -73  n=1
+    diff= -72  n=1
+    diff= -71  n=1
+    diff= -70  n=12
+    diff= -69  n=2
+    diff= -66  n=6
+    diff= -65  n=3
+    diff= -64  n=4
+    diff= -63  n=14
+    diff= -62  n=10
+    diff= -61  n=1
+    diff= -60  n=1
+    diff= -59  n=17
+    diff= -58  n=14
+    diff= -57  n=1
+    diff= -56  n=44
+    diff= -55  n=17
+    diff= -54  n=7
+    diff= -53  n=3
+    diff= -52  n=48
+    diff= -51  n=19
+    diff= -50  n=8
+    diff= -49  n=95
+    diff= -48  n=53
+    diff= -47  n=17
+    diff= -46  n=10
+    diff= -45  n=120
+    diff= -44  n=35
+    diff= -43  n=21
+    diff= -42  n=158
+    diff= -41  n=89
+    diff= -40  n=27
+    diff= -39  n=11
+    diff= -38  n=208
+    diff= -37  n=68
+    diff= -36  n=36
+    diff= -35  n=233
+    diff= -34  n=193
+    diff= -33  n=44
+    diff= -32  n=28
+    diff= -31  n=298
+    diff= -30  n=101
+    diff= -29  n=46
+    diff= -28  n=310
+    diff= -27  n=189
+    diff= -26  n=77
+    diff= -25  n=23
+    diff= -24  n=384
+    diff= -23  n=131
+    diff= -22  n=37
+    diff= -21  n=464
+    diff= -20  n=232
+    diff= -19  n=69
+    diff= -18  n=28
+    diff= -17  n=465
+    diff= -16  n=111
+    diff= -15  n=36
+    diff= -14  n=594
+    diff= -13  n=232
+    diff= -12  n=50
+    diff= -11  n=20
+    diff= -10  n=430
+    diff=  -9  n=57
+    diff=  -8  n=40
+    diff=  -7  n=825
+    diff=  -6  n=160
+    diff=  -5  n=9
+    diff=  -4  n=2
+    diff=  -3  n=309
+    diff=  -2  n=8
+    diff=  -1  n=8
+    diff=   1  n=18
+    diff=   2  n=7
+    diff=   3  n=125
+    diff=   4  n=9
+    diff=   5  n=13
+
+OTHER rows where period(prev) != period(trigger) : 7,181 / 7,597
+OTHER rows where prev's playNumber has duplicates  : 7,591 / 7,597
+OTHER rows where trigger's playNumber has duplicates: 7,221 / 7,597
+  (baseline, POST bucket: period mismatch 15,445 / 47,710)
+
+-- 10 OTHER rows for TOUCHDOWN (raw CFBD fields) --
+  [01] game_id=401416616 season=2022 week=6
+        Akron @ Ohio  final=34-55
+        play_id=401416616101855101 playNumber=2 period=1  (n_dup_for_this_pn=20)
+        playType='Passing Touchdown' scoring=True yardsGained=75
+        offense='Ohio'  defense='Akron'
+        offenseScore=7 defenseScore=0
+        scoring_team='Ohio'
+        prev_play_id=401416616104985903 prev_playNumber=1 prev_period=4  (n_dup_for_prev_pn=20)
+        prev_playType='Rush'
+        prev_offense='Ohio'  prev_defense='Akron'
+        prev_offenseScore=55 prev_defenseScore=34
+        prev_team_score=55  this_team_score=7  diff=-48
+        playText: Kurtis Rourke pass complete to Sam Wiglusz for 75 yds for a TD, (Nathanial Vakos KICK)
+        prev_playText: [NHSG] Kneel down by ROURKE, Kurtis at OHI16 (team loss of 3).
+
+  [02] game_id=401531895 season=2023 week=8
+        App State @ Old Dominion  final=21-28
+        play_id=401531895102869701 playNumber=15 period=2  (n_dup_for_this_pn=2)
+        playType='Passing Touchdown' scoring=True yardsGained=3
+        offense='Old Dominion'  defense='App State'
+        offenseScore=7 defenseScore=7
+        scoring_team='Old Dominion'
+        prev_play_id=401531895104994501 prev_playNumber=14 prev_period=4  (n_dup_for_prev_pn=3)
+        prev_playType='Timeout'
+        prev_offense='Old Dominion'  prev_defense='App State'
+        prev_offenseScore=20 prev_defenseScore=21
+        prev_team_score=20  this_team_score=7  diff=-13
+        playText: Grant Wilson pass complete to Kadarius Calloway for 3 yds for a TD (Ethan Sanchez KICK)
+        prev_playText: Timeout Appalachian State, clock 00:54
+
+  [03] game_id=401082044 season=2018 week=14
+        Drake @ Iowa State  final=24-27
+        play_id=401082044101936101 playNumber=6 period=1  (n_dup_for_this_pn=15)
+        playType='Rushing Touchdown' scoring=True yardsGained=7
+        offense='Iowa State'  defense='Drake'
+        offenseScore=7 defenseScore=7
+        scoring_team='Iowa State'
+        prev_play_id=401082044104978402 prev_playNumber=6 prev_period=4  (n_dup_for_prev_pn=15)
+        prev_playType='Rush'
+        prev_offense='Iowa State'  prev_defense='Drake'
+        prev_offenseScore=27 prev_defenseScore=24
+        prev_team_score=27  this_team_score=7  diff=-20
+        playText: David Montgomery run for 7 yds for a TD (Connor Assalley KICK)
+        prev_playText: David Montgomery run for 5 yds to the IowSt 46
+
+  [04] game_id=401207132 season=2020 week=4
+        UAB @ South Alabama  final=42-10
+        play_id=401207132101947301 playNumber=13 period=1  (n_dup_for_this_pn=2)
+        playType='Rushing Touchdown' scoring=True yardsGained=1
+        offense='UAB'  defense='South Alabama'
+        offenseScore=14 defenseScore=0
+        scoring_team='UAB'
+        prev_play_id=401207132102938301 prev_playNumber=12 prev_period=2  (n_dup_for_prev_pn=2)
+        prev_playType='Timeout'
+        prev_offense='South Alabama'  prev_defense='UAB'
+        prev_offenseScore=10 prev_defenseScore=21
+        prev_team_score=21  this_team_score=14  diff=-7
+        playText: Spencer Brown 1 Yd Run (Matthew Quinn Kick)
+        prev_playText: Timeout SOUTH ALABAMA, clock 06:16
+
+  [05] game_id=400787355 season=2015 week=12
+        Ball State @ Ohio  final=31-48
+        play_id=400787355101978901 playNumber=15 period=1  (n_dup_for_this_pn=2)
+        playType='Rushing Touchdown' scoring=True yardsGained=6
+        offense='Ohio'  defense='Ball State'
+        offenseScore=14 defenseScore=3
+        scoring_team='Ohio'
+        prev_play_id=400787355104878301 prev_playNumber=14 prev_period=4  (n_dup_for_prev_pn=2)
+        prev_playType='Pass Incompletion'
+        prev_offense='Ball State'  prev_defense='Ohio'
+        prev_offenseScore=24 prev_defenseScore=41
+        prev_team_score=41  this_team_score=14  diff=-27
+        playText: A.J. Ouellette run for 6 yds for a TD, (Josiah Yazdani KICK)
+        prev_playText: Riley Neal pass incomplete to James Gilbert
+
+  [06] game_id=400937523 season=2017 week=12
+        Delaware State @ Florida State  final=6-77
+        play_id=400937523101887501 playNumber=8 period=1  (n_dup_for_this_pn=5)
+        playType='Rushing Touchdown' scoring=True yardsGained=14
+        offense='Florida State'  defense='Delaware State'
+        offenseScore=7 defenseScore=0
+        scoring_team='Florida State'
+        prev_play_id=400937523104969701 prev_playNumber=7 prev_period=4  (n_dup_for_prev_pn=6)
+        prev_playType='Rush'
+        prev_offense='Delaware State'  prev_defense='Florida State'
+        prev_offenseScore=6 prev_defenseScore=77
+        prev_team_score=77  this_team_score=7  diff=-70
+        playText: Jacques Patrick run for 14 yds for a TD, (Ricky Aguayo KICK)
+        prev_playText: Jack McDaniels run for 4 yds to the FlaSt 20
+
+  [07] game_id=401673466 season=2024 week=15
+        Western Kentucky @ Jacksonville State  final=12-52
+        play_id=401673466101926001 playNumber=8 period=1  (n_dup_for_this_pn=9)
+        playType='Passing Touchdown' scoring=True yardsGained=6
+        offense='Jacksonville State'  defense='Western Kentucky'
+        offenseScore=7 defenseScore=3
+        scoring_team='Jacksonville State'
+        prev_play_id=401673466104859301 prev_playNumber=8 prev_period=4  (n_dup_for_prev_pn=9)
+        prev_playType='Rush'
+        prev_offense='Jacksonville State'  prev_defense='Western Kentucky'
+        prev_offenseScore=38 prev_defenseScore=12
+        prev_team_score=38  this_team_score=7  diff=-31
+        playText: Tyler Huff pass complete to Sean Brown for 6 yds for a TD (Garrison Rippa KICK)
+        prev_playText: Tyler Huff run for 4 yds to the WKU 38
+
+  [08] game_id=401411137 season=2022 week=7
+        North Carolina @ Duke  final=38-35
+        play_id=401411137101916901 playNumber=10 period=1  (n_dup_for_this_pn=8)
+        playType='Rushing Touchdown' scoring=True yardsGained=2
+        offense='Duke'  defense='North Carolina'
+        offenseScore=7 defenseScore=3
+        scoring_team='Duke'
+        prev_play_id=401411137104995404 prev_playNumber=9 prev_period=4  (n_dup_for_prev_pn=9)
+        prev_playType='Pass Incompletion'
+        prev_offense='North Carolina'  prev_defense='Duke'
+        prev_offenseScore=31 prev_defenseScore=35
+        prev_team_score=35  this_team_score=7  diff=-28
+        playText: Jordan Waters run for 2 yds for a TD, (Charlie Ham KICK)
+        prev_playText: Drake Maye pass incomplete
+
+  [09] game_id=401282204 season=2021 week=4
+        Middle Tennessee @ Charlotte  final=39-42
+        play_id=401282204101967201 playNumber=13 period=1  (n_dup_for_this_pn=3)
+        playType='Passing Touchdown' scoring=True yardsGained=7
+        offense='Middle Tennessee'  defense='Charlotte'
+        offenseScore=6 defenseScore=7
+        scoring_team='Middle Tennessee'
+        prev_play_id=401282204104958502 prev_playNumber=12 prev_period=4  (n_dup_for_prev_pn=3)
+        prev_playType='Rush'
+        prev_offense='Charlotte'  prev_defense='Middle Tennessee'
+        prev_offenseScore=35 prev_defenseScore=32
+        prev_team_score=32  this_team_score=6  diff=-26
+        playText: Chase Cunningham pass complete to Jimmy Marshall for 7 yds for a TD
+        prev_playText: Chris Reynolds run for no gain to the MTnSt 2
+
+  [10] game_id=401013104 season=2018 week=2
+        Georgia State @ NC State  final=7-41
+        play_id=401013104101906701 playNumber=10 period=1  (n_dup_for_this_pn=7)
+        playType='Passing Touchdown' scoring=True yardsGained=5
+        offense='NC State'  defense='Georgia State'
+        offenseScore=7 defenseScore=7
+        scoring_team='NC State'
+        prev_play_id=401013104104889509 prev_playNumber=9 prev_period=4  (n_dup_for_prev_pn=9)
+        prev_playType='Rush'
+        prev_offense='Georgia State'  prev_defense='NC State'
+        prev_offenseScore=7 prev_defenseScore=27
+        prev_team_score=27  this_team_score=7  diff=-20
+        playText: Ryan Finley pass complete to N/A for 5 yds for a TD (Christopher Dunn KICK)
+        prev_playText: Dan Ellington run for no gain to the GeoSt 41
+
+
+========================================================================
+FIELD_GOAL  (points_expected=3, side=offense)
+========================================================================
+total_classified : 19,115
+  POST  : 14,879  (diff >= 3)
+  PRE   :    823  (diff == 0)
+  OTHER :  3,413  (everything else)
+skipped_team_mismatch : 0
+skipped_no_prev       : 1
+
+POST-bucket diff distribution (top 10):
+    diff=   3  n=9,924
+    diff=  10  n=2,196
+    diff=   6  n=995
+    diff=  17  n=494
+    diff=  13  n=320
+    diff=   9  n=150
+    diff=  24  n=126
+    diff=  20  n=118
+    diff=  16  n=78
+    diff=  27  n=49
+
+OTHER-bucket diff distribution (full):
+    diff= -76  n=1
+    diff= -67  n=1
+    diff= -66  n=1
+    diff= -63  n=1
+    diff= -61  n=1
+    diff= -59  n=6
+    diff= -58  n=1
+    diff= -56  n=6
+    diff= -55  n=5
+    diff= -54  n=1
+    diff= -52  n=14
+    diff= -51  n=2
+    diff= -49  n=17
+    diff= -48  n=7
+    diff= -47  n=5
+    diff= -45  n=31
+    diff= -44  n=8
+    diff= -43  n=2
+    diff= -42  n=38
+    diff= -41  n=26
+    diff= -40  n=9
+    diff= -39  n=10
+    diff= -38  n=44
+    diff= -37  n=22
+    diff= -36  n=13
+    diff= -35  n=87
+    diff= -34  n=43
+    diff= -33  n=12
+    diff= -32  n=11
+    diff= -31  n=92
+    diff= -30  n=34
+    diff= -29  n=18
+    diff= -28  n=119
+    diff= -27  n=85
+    diff= -26  n=32
+    diff= -25  n=29
+    diff= -24  n=152
+    diff= -23  n=62
+    diff= -22  n=29
+    diff= -21  n=203
+    diff= -20  n=105
+    diff= -19  n=35
+    diff= -18  n=34
+    diff= -17  n=211
+    diff= -16  n=63
+    diff= -15  n=22
+    diff= -14  n=314
+    diff= -13  n=108
+    diff= -12  n=23
+    diff= -11  n=19
+    diff= -10  n=267
+    diff=  -9  n=50
+    diff=  -8  n=26
+    diff=  -7  n=484
+    diff=  -6  n=119
+    diff=  -5  n=2
+    diff=  -4  n=6
+    diff=  -3  n=226
+    diff=  -2  n=7
+    diff=  -1  n=3
+    diff=   1  n=5
+    diff=   2  n=4
+
+OTHER rows where period(prev) != period(trigger) : 3,280 / 3,413
+OTHER rows where prev's playNumber has duplicates  : 3,410 / 3,413
+OTHER rows where trigger's playNumber has duplicates: 3,130 / 3,413
+  (baseline, POST bucket: period mismatch 5,735 / 14,879)
+
+-- 10 OTHER rows for FIELD_GOAL (raw CFBD fields) --
+  [01] game_id=401415629 season=2022 week=6
+        SMU @ UCF  final=19-41
+        play_id=401415629101899701 playNumber=12 period=1  (n_dup_for_this_pn=2)
+        playType='Field Goal Good' scoring=True yardsGained=41
+        offense='UCF'  defense='SMU'
+        offenseScore=3 defenseScore=0
+        scoring_team='UCF'
+        prev_play_id=401415629102967501 prev_playNumber=11 prev_period=2  (n_dup_for_prev_pn=4)
+        prev_playType='Field Goal Good'
+        prev_offense='SMU'  prev_defense='UCF'
+        prev_offenseScore=13 prev_defenseScore=10
+        prev_team_score=10  this_team_score=3  diff=-7
+        playText: Colton Boomer 41 yd FG GOOD
+        prev_playText: Collin Rogers 24 yd FG GOOD
+
+  [02] game_id=401117882 season=2019 week=7
+        Navy @ Tulsa  final=45-17
+        play_id=401117882101927001 playNumber=12 period=1  (n_dup_for_this_pn=2)
+        playType='Field Goal Good' scoring=True yardsGained=41
+        offense='Tulsa'  defense='Navy'
+        offenseScore=3 defenseScore=0
+        scoring_team='Tulsa'
+        prev_play_id=401117882104899511 prev_playNumber=11 prev_period=4  (n_dup_for_prev_pn=4)
+        prev_playType='Pass Incompletion'
+        prev_offense='Tulsa'  prev_defense='Navy'
+        prev_offenseScore=10 prev_defenseScore=35
+        prev_team_score=10  this_team_score=3  diff=-7
+        playText: Jacob Rainey 41 yd FG GOOD
+        prev_playText: Zach Smith pass incomplete to James Palmer, broken up by Elan Nash
+
+  [03] game_id=401416605 season=2022 week=4
+        Ball State @ Georgia Southern  final=23-34
+        play_id=401416605101929001 playNumber=17 period=1  (n_dup_for_this_pn=1)
+        playType='Field Goal Good' scoring=True yardsGained=25
+        offense='Georgia Southern'  defense='Ball State'
+        offenseScore=3 defenseScore=0
+        scoring_team='Georgia Southern'
+        prev_play_id=401416605103914301 prev_playNumber=16 prev_period=3  (n_dup_for_prev_pn=2)
+        prev_playType='Field Goal Good'
+        prev_offense='Ball State'  prev_defense='Georgia Southern'
+        prev_offenseScore=13 prev_defenseScore=13
+        prev_team_score=13  this_team_score=3  diff=-10
+        playText: Alex Raynor 25 yd FG GOOD
+        prev_playText: Ben VonGunten 27 yd FG GOOD
+
+  [04] game_id=401114253 season=2019 week=2
+        North Texas @ SMU  final=27-49
+        play_id=401114253103899801 playNumber=13 period=3  (n_dup_for_this_pn=3)
+        playType='Field Goal Good' scoring=True yardsGained=26
+        offense='North Texas'  defense='SMU'
+        offenseScore=17 defenseScore=28
+        scoring_team='North Texas'
+        prev_play_id=401114253104904611 prev_playNumber=12 prev_period=4  (n_dup_for_prev_pn=3)
+        prev_playType='Sack'
+        prev_offense='North Texas'  prev_defense='SMU'
+        prev_offenseScore=20 prev_defenseScore=49
+        prev_team_score=20  this_team_score=17  diff=-3
+        playText: Ethan Mooney 26 yd FG GOOD
+        prev_playText: Mason Fine sacked by Demerick Gary for a loss of 6 yards to the SMU 30
+
+  [05] game_id=400933889 season=2017 week=7
+        Auburn @ LSU  final=23-27
+        play_id=400933889102874901 playNumber=14 period=2  (n_dup_for_this_pn=1)
+        playType='Field Goal Good' scoring=True yardsGained=48
+        offense='Auburn'  defense='LSU'
+        offenseScore=20 defenseScore=0
+        scoring_team='Auburn'
+        prev_play_id=400933889103849914 prev_playNumber=13 prev_period=3  (n_dup_for_prev_pn=2)
+        prev_playType='Punt'
+        prev_offense='LSU'  prev_defense='Auburn'
+        prev_offenseScore=14 prev_defenseScore=23
+        prev_team_score=23  this_team_score=20  diff=-3
+        playText: Daniel Carlson 48 yd FG GOOD
+        prev_playText: Josh Growden punt for 30 yds, fair catch by Stephen Roberts at the Aub 10
+
+  [06] game_id=401249423 season=2020 week=14
+        Oregon @ California  final=17-21
+        play_id=401249423101919301 playNumber=10 period=1  (n_dup_for_this_pn=5)
+        playType='Field Goal Good' scoring=True yardsGained=21
+        offense='Oregon'  defense='California'
+        offenseScore=3 defenseScore=0
+        scoring_team='Oregon'
+        prev_play_id=401249423104979801 prev_playNumber=10 prev_period=4  (n_dup_for_prev_pn=5)
+        prev_playType='Pass Incompletion'
+        prev_offense='California'  prev_defense='Oregon'
+        prev_offenseScore=21 prev_defenseScore=17
+        prev_team_score=17  this_team_score=3  diff=-14
+        playText: Henry Katleman 21 yd FG GOOD
+        prev_playText: Chase Garbers pass incomplete to Makai Polk
+
+  [07] game_id=400869067 season=2016 week=13
+        LSU @ Texas A&M  final=54-39
+        play_id=400869067101978801 playNumber=11 period=1  (n_dup_for_this_pn=4)
+        playType='Field Goal Good' scoring=True yardsGained=23
+        offense='LSU'  defense='Texas A&M'
+        offenseScore=10 defenseScore=7
+        scoring_team='LSU'
+        prev_play_id=400869067104999901 prev_playNumber=10 prev_period=4  (n_dup_for_prev_pn=6)
+        prev_playType='Rush'
+        prev_offense='Texas A&M'  prev_defense='LSU'
+        prev_offenseScore=33 prev_defenseScore=54
+        prev_team_score=54  this_team_score=10  diff=-44
+        playText: Colby Delahoussaye 23 yd FG GOOD
+        prev_playText: TEAM run for 2 yds to the TexAM 42
+
+  [08] game_id=401426347 season=2022 week=7
+        Louisiana @ Marshall  final=23-13
+        play_id=401426347101929601 playNumber=8 period=1  (n_dup_for_this_pn=10)
+        playType='Field Goal Good' scoring=True yardsGained=42
+        offense='Louisiana'  defense='Marshall'
+        offenseScore=3 defenseScore=0
+        scoring_team='Louisiana'
+        prev_play_id=401426347104977001 prev_playNumber=7 prev_period=4  (n_dup_for_prev_pn=14)
+        prev_playType='Pass Reception'
+        prev_offense='Louisiana'  prev_defense='Marshall'
+        prev_offenseScore=23 prev_defenseScore=13
+        prev_team_score=23  this_team_score=3  diff=-20
+        playText: Kenneth Almendares 42 yd FG GOOD
+        prev_playText: Ben Wooldridge pass complete to Pearse Migl for 6 yds to the Marsh 23 for a 1ST down
+
+  [09] game_id=400756902 season=2015 week=1
+        Youngstown State @ Pittsburgh  final=37-45
+        play_id=400756902102925201 playNumber=11 period=2  (n_dup_for_this_pn=2)
+        playType='Field Goal Good' scoring=True yardsGained=45
+        offense='Pittsburgh'  defense='Youngstown State'
+        offenseScore=17 defenseScore=3
+        scoring_team='Pittsburgh'
+        prev_play_id=400756902104997301 prev_playNumber=10 prev_period=4  (n_dup_for_prev_pn=3)
+        prev_playType='Punt'
+        prev_offense='Pittsburgh'  prev_defense='Youngstown State'
+        prev_offenseScore=45 prev_defenseScore=37
+        prev_team_score=45  this_team_score=17  diff=-28
+        playText: Chris Blewitt 45 yd FG GOOD
+        prev_playText: Ryan Winslow punt for 34 yds, fair catch by Andre Stubbs at the YngSt 17
+
+  [10] game_id=401212518 season=2020 week=11
+        Temple @ UCF  final=13-38
+        play_id=401212518102857901 playNumber=13 period=2  (n_dup_for_this_pn=1)
+        playType='Field Goal Good' scoring=True yardsGained=30
+        offense='Temple'  defense='UCF'
+        offenseScore=3 defenseScore=21
+        scoring_team='Temple'
+        prev_play_id=401212518104924001 prev_playNumber=12 prev_period=4  (n_dup_for_prev_pn=2)
+        prev_playType='Field Goal Good'
+        prev_offense='Temple'  prev_defense='UCF'
+        prev_offenseScore=13 prev_defenseScore=38
+        prev_team_score=13  this_team_score=3  diff=-10
+        playText: Rory Bell 30 yd FG GOOD
+        prev_playText: Rory Bell 24 yd FG GOOD
+
+
+========================================================================
+SAFETY  (points_expected=2, side=defense)
+========================================================================
+total_classified : 458
+  POST  :    424  (diff >= 2)
+  PRE   :     21  (diff == 0)
+  OTHER :     13  (everything else)
+skipped_team_mismatch : 0
+skipped_no_prev       : 0
+
+POST-bucket diff distribution (top 10):
+    diff=   2  n=348
+    diff=   9  n=51
+    diff=   5  n=13
+    diff=  14  n=2
+    diff=  12  n=2
+    diff=  10  n=2
+    diff=   8  n=2
+    diff=  11  n=1
+    diff=   3  n=1
+    diff=  29  n=1
+
+OTHER-bucket diff distribution (full):
+    diff= -75  n=1
+    diff= -44  n=1
+    diff= -20  n=1
+    diff= -13  n=1
+    diff= -10  n=1
+    diff=  -7  n=4
+    diff=  -6  n=1
+    diff=  -4  n=1
+    diff=  -3  n=1
+    diff=  -1  n=1
+
+OTHER rows where period(prev) != period(trigger) : 5 / 13
+OTHER rows where prev's playNumber has duplicates  : 13 / 13
+OTHER rows where trigger's playNumber has duplicates: 13 / 13
+  (baseline, POST bucket: period mismatch 58 / 424)
+
+-- 10 OTHER rows for SAFETY (raw CFBD fields) --
+  [01] game_id=401413216 season=2022 week=3
+        Jacksonville State @ Tulsa  final=17-54
+        play_id=401413216101968201 playNumber=7 period=1  (n_dup_for_this_pn=14)
+        playType='Safety' scoring=True yardsGained=7
+        offense='Jacksonville State'  defense='Tulsa'
+        offenseScore=0 defenseScore=9
+        scoring_team='Tulsa'
+        prev_play_id=401413216101948301 prev_playNumber=7 prev_period=1  (n_dup_for_prev_pn=14)
+        prev_playType='Punt'
+        prev_offense='Tulsa'  prev_defense='Jacksonville State'
+        prev_offenseScore=13 prev_defenseScore=0
+        prev_team_score=13  this_team_score=9  diff=-4
+        playText: run for 7 yds for a SAFETY
+        prev_playText: Lachlan Wilson punt for 50 yds
+
+  [02] game_id=401012801 season=2018 week=13
+        Stanford @ UCLA  final=49-42
+        play_id=401012801103977801 playNumber=1 period=3  (n_dup_for_this_pn=32)
+        playType='Safety' scoring=True yardsGained=-3
+        offense='Stanford'  defense='UCLA'
+        offenseScore=41 defenseScore=29
+        scoring_team='UCLA'
+        prev_play_id=401012801103979001 prev_playNumber=1 prev_period=3  (n_dup_for_prev_pn=32)
+        prev_playType='Kickoff'
+        prev_offense='Stanford'  prev_defense='UCLA'
+        prev_offenseScore=41 prev_defenseScore=36
+        prev_team_score=36  this_team_score=29  diff=-7
+        playText: Bryce Love run for a loss of 3 yards for a SAFETY
+        prev_playText: Jake Bailey kickoff for 73 yds , Darnay Holmes return for 93 yds for a TD (JJ Molson KICK)
+
+  [03] game_id=401012799 season=2018 week=13
+        Arizona State @ Arizona  final=41-40
+        play_id=401012799103868501 playNumber=2 period=3  (n_dup_for_this_pn=27)
+        playType='Safety' scoring=True yardsGained=-4
+        offense='Arizona State'  defense='Arizona'
+        offenseScore=14 defenseScore=24
+        scoring_team='Arizona'
+        prev_play_id=401012799103878203 prev_playNumber=2 prev_period=3  (n_dup_for_prev_pn=27)
+        prev_playType='Rush'
+        prev_offense='Arizona State'  prev_defense='Arizona'
+        prev_offenseScore=14 prev_defenseScore=27
+        prev_team_score=27  this_team_score=24  diff=-3
+        playText: Eno Benjamin run for a loss of 4 yards for a SAFETY
+        prev_playText: Eno Benjamin run for a loss of 4 yards to the ArzSt 31
+
+  [04] game_id=400869347 season=2016 week=1
+        Rice @ Western Kentucky  final=14-46
+        play_id=400869347101867501 playNumber=6 period=1  (n_dup_for_this_pn=17)
+        playType='Safety' scoring=True yardsGained=0
+        offense='Rice'  defense='Western Kentucky'
+        offenseScore=0 defenseScore=2
+        scoring_team='Western Kentucky'
+        prev_play_id=400869347104948706 prev_playNumber=5 prev_period=4  (n_dup_for_prev_pn=19)
+        prev_playType='Pass Reception'
+        prev_offense='Rice'  prev_defense='Western Kentucky'
+        prev_offenseScore=14 prev_defenseScore=46
+        prev_team_score=46  this_team_score=2  diff=-44
+        playText: Team Safety
+        prev_playText: Tyler Stehling pass complete to Zach Wright for 8 yds to the Rice 37
+
+  [05] game_id=401282218 season=2021 week=5
+        Southern Miss @ Rice  final=19-24
+        play_id=401282218104999904 playNumber=7 period=4  (n_dup_for_this_pn=13)
+        playType='Safety' scoring=True yardsGained=0
+        offense='Rice'  defense='Southern Miss'
+        offenseScore=24 defenseScore=19
+        scoring_team='Southern Miss'
+        prev_play_id=401282218104968811 prev_playNumber=7 prev_period=4  (n_dup_for_prev_pn=13)
+        prev_playType='Pass Reception'
+        prev_offense='Southern Miss'  prev_defense='Rice'
+        prev_offenseScore=32 prev_defenseScore=49
+        prev_team_score=32  this_team_score=19  diff=-13
+        playText: Team Safety
+        prev_playText: Jake Lange pass complete to Jason Brownlee for 9 yds to the Rice 40
+
+  [06] game_id=401262493 season=2020 week=14
+        UL Monroe @ Arkansas State  final=15-48
+        play_id=401262493103897001 playNumber=3 period=3  (n_dup_for_this_pn=25)
+        playType='Safety' scoring=True yardsGained=0
+        offense='Arkansas State'  defense='UL Monroe'
+        offenseScore=35 defenseScore=9
+        scoring_team='UL Monroe'
+        prev_play_id=401262493104906003 prev_playNumber=3 prev_period=4  (n_dup_for_prev_pn=25)
+        prev_playType='Pass Incompletion'
+        prev_offense='Arkansas State'  prev_defense='UL Monroe'
+        prev_offenseScore=45 prev_defenseScore=15
+        prev_team_score=15  this_team_score=9  diff=-6
+        playText: ARKANSAS ST Penalty, intentional grounding (-9 Yards) to the ArkSt 0 for a SAFETY
+        prev_playText: Logan Bonner pass incomplete to Jeff Foreman
+
+  [07] game_id=400933901 season=2017 week=9
+        Missouri @ UConn  final=52-12
+        play_id=400933901101865901 playNumber=6 period=1  (n_dup_for_this_pn=16)
+        playType='Safety' scoring=True yardsGained=-27
+        offense='Missouri'  defense='UConn'
+        offenseScore=0 defenseScore=2
+        scoring_team='UConn'
+        prev_play_id=400933901104958807 prev_playNumber=5 prev_period=4  (n_dup_for_prev_pn=24)
+        prev_playType='Rush'
+        prev_offense='UConn'  prev_defense='Missouri'
+        prev_offenseScore=12 prev_defenseScore=52
+        prev_team_score=12  this_team_score=2  diff=-10
+        playText: TEAM run for -27 yds for a SAFETY
+        prev_playText: Kevin Mensah run for 1 yd to the Misso 30
+
+  [08] game_id=401426609 season=2022 week=12
+        Florida International @ UTEP  final=6-40
+        play_id=401426609104948501 playNumber=1 period=4  (n_dup_for_this_pn=25)
+        playType='Safety' scoring=True yardsGained=-1
+        offense='Florida International'  defense='UTEP'
+        offenseScore=6 defenseScore=40
+        scoring_team='UTEP'
+        prev_play_id=401426609104938801 prev_playNumber=1 prev_period=4  (n_dup_for_prev_pn=25)
+        prev_playType='Rush'
+        prev_offense='UTEP'  prev_defense='Florida International'
+        prev_offenseScore=41 prev_defenseScore=12
+        prev_team_score=41  this_team_score=40  diff=-1
+        playText: Team Safety
+        prev_playText: Calvin Brownholtz run for 2 yds to the FlaIn 1
+
+  [09] game_id=401282644 season=2021 week=4
+        New Hampshire @ Pittsburgh  final=7-77
+        play_id=401282644101865402 playNumber=4 period=1  (n_dup_for_this_pn=26)
+        playType='Safety' scoring=True yardsGained=0
+        offense='New Hampshire'  defense='Pittsburgh'
+        offenseScore=0 defenseScore=2
+        scoring_team='Pittsburgh'
+        prev_play_id=401282644104999901 prev_playNumber=3 prev_period=4  (n_dup_for_prev_pn=28)
+        prev_playType='Rush'
+        prev_offense='New Hampshire'  prev_defense='Pittsburgh'
+        prev_offenseScore=7 prev_defenseScore=77
+        prev_team_score=77  this_team_score=2  diff=-75
+        playText: Bret Edwards sacked by Phil Campbell III for 0 yards for a SAFETY
+        prev_playText: Isaac Seide run for no gain to the NHamp 24
+
+  [10] game_id=400934556 season=2017 week=13
+        Baylor @ TCU  final=22-45
+        play_id=400934556101858901 playNumber=3 period=1  (n_dup_for_this_pn=29)
+        playType='Safety' scoring=True yardsGained=0
+        offense='TCU'  defense='Baylor'
+        offenseScore=0 defenseScore=2
+        scoring_team='Baylor'
+        prev_play_id=400934556104999902 prev_playNumber=2 prev_period=4  (n_dup_for_prev_pn=31)
+        prev_playType='End of Game'
+        prev_offense='Baylor'  prev_defense='TCU'
+        prev_offenseScore=22 prev_defenseScore=45
+        prev_team_score=22  this_team_score=2  diff=-20
+        playText: Kenny Hill sacked by Lenoy Jones Jr. for a loss of 8 yards for a SAFETY Kenny Hill fumbled, , return for 0 yards for a SAFETY
+        prev_playText: End of 4th Quarter

@@ -1,0 +1,71 @@
+feat(n02b): opening-drive shock validation results (7 PASS / 3 FAIL)
+
+Regenerates feature_validation.csv (48 rows: 18 retained from 02a +
+30 from 02b -- 10 candidates x 3 walk-forward test seasons) and
+splices the 02b section into feature_validation.schema.md via the
+sentinel-delimited pattern landed in bfddc16. Notebook source
+unchanged since bfddc16; executed copy (*.executed.ipynb) is
+gitignored.
+
+Also folds in a new Scheduled entry in research/future_features.md:
+home-field advantage and neutral-site effects (target 02g, two
+binary features fav_is_home + is_neutral_site). Documented now to
+park the hypothesis before 02g plan time; not active in the current
+validated set.
+
+Findings worth surfacing in git log:
+
+(1) opening_drive_was_explosive_td passes 3/3 Brier-improving. This
+    is the empirical instantiation of the core project hypothesis --
+    a single explosive scoring play on the underdog's opening drive
+    carries signal about subsequent comeback equity, distinct from
+    a generic dog-scored or generic-TD effect.
+
+(2) fav_def_epa_first_drive is the only feature across 02a + 02b to
+    pass 3/3 on BOTH Brier AND ECE. Structurally important for N03:
+    Kelly stake sizing reads directly off calibrated probabilities,
+    so a feature that improves ranking AND calibration is rarer and
+    more valuable than one that improves ranking alone.
+
+(3) Drive-volume features all FAIL stability:
+      opening_drive_yards   1/3 Brier-improving
+      opening_drive_plays   0/3 Brier-improving
+      opening_drive_seconds 0/3 Brier-improving
+    Meaningful negative result: once the binary outcome of the
+    opening drive is known (dog_scored, TD, explosive TD), the
+    drive's *shape* (yards / play count / clock) carries no
+    independent predictive value. N03 can drop drive-shape features
+    from consideration entirely.
+
+Null-handling caveats (per-feature null drop applied per the policy
+documented in 02a's schema-sidecar section; rows are not dropped
+globally; per-feature evaluable Ns documented in the 02b splice):
+
+- fav_def_epa_first_drive: 5,887 / 11,416 (51.57%) null. Trigger
+  fires before the favorite's defense has seen drive 1. Passed
+  stability on the evaluable 5,529-trigger subset.
+  defense_stabilized_flag inherits the same 51.57% null rate
+  (depends on the same input).
+
+- 1,860 / 11,416 (16.29%) of triggers have drive_number_in_game == 1
+  and null out the six drive-summary features per D4 policy
+  (dog_scored_on_opening_drive, opening_drive_was_td,
+  opening_drive_was_explosive_td, opening_drive_yards,
+  opening_drive_plays, opening_drive_seconds).
+
+Stability tally across 02a + 02b: 12 PASS / 4 FAIL of 16 candidate
+features. 02a contributed 5 PASS (fav_off_epa_per_play,
+fav_def_epa_per_play, epa_divergence + dog_off/dog_def_epa_per_play
+tagged redundant with their fav-side mirrors via the redundant_with
+column from 2e17807) and 1 FAIL (plays_so_far). 02b contributes 7
+PASS / 3 FAIL as detailed in finding (3) and the schema sidecar.
+
+For N03 feature-set assembly: the seven PASS features from 02b plus
+the three non-redundant PASS features from 02a (fav_off_epa_per_play,
+fav_def_epa_per_play, epa_divergence; plays_so_far dropped per its
+FAIL; dog-side EPA mirrors tagged redundant_with their fav-side
+counterparts) form the current validated set pending 02c-g additions.
+Total: 10 candidate features for the N03 production model.
+
+CFBD budget: 0 fresh calls this run (181 cache hits: 161 /plays +
+20 /drives). Cumulative lifetime fresh calls: 253 / 3,000.

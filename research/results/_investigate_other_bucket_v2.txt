@@ -1,0 +1,663 @@
+
+================================================================================
+TOUCHDOWN  total=58,687  POST=40,272 PRE=10,943  OTHER=7,472
+================================================================================
+
+Cross-tab playType sub-string -> bucket counts:
+  sub-type                                    POST     PRE   OTHER  POST%   PRE%
+  Rushing Touchdown                         20,166   4,894   3,619   70.3%   17.1%
+  Passing Touchdown                         19,859   4,278   3,531   71.8%   15.5%
+  Interception Return Touchdown                 37   1,226     180    2.6%   85.0%
+  Fumble Return Touchdown                        9     296      41    2.6%   85.5%
+  Kickoff Return Touchdown                     193      64      79   57.4%   19.0%
+  Punt Return Touchdown                          3      83       7    3.2%   89.2%
+  Blocked Punt Touchdown                         2      70      11    2.4%   84.3%
+  Blocked Field Goal Touchdown                   3      27       4    8.8%   79.4%
+  Missed Field Goal Return Touchdown             0       5       0    0.0%  100.0%
+
+PRE rows where next play d_next >= points_expected (6): 449/10,943 (4.1%)
+  -> if high, confirms PRE truly is pre-play and the post-state lives on the next play
+POST rows where next play's d_next == 0 (no further jump): 26,328/40,272 (65.4%)
+
+OTHER rows: distribution of d_next (next-play minus this-play, scoring team):
+    d_next= -56  n=1
+    d_next= -32  n=1
+    d_next= -28  n=1
+    d_next= -25  n=1
+    d_next= -24  n=1
+    d_next= -21  n=2
+    d_next= -20  n=1
+    d_next= -19  n=1
+    d_next= -18  n=1
+    d_next= -17  n=2
+    d_next= -16  n=2
+    d_next= -14  n=10
+    d_next= -13  n=4
+    d_next= -11  n=1
+    d_next= -10  n=4
+    d_next=  -9  n=1
+    d_next=  -8  n=6
+    d_next=  -7  n=61
+    d_next=  -6  n=9
+    d_next=  -5  n=3
+    d_next=  -4  n=3
+    d_next=  -3  n=9
+    d_next=  -2  n=3
+    d_next=  -1  n=15
+    d_next=   0  n=4,363
+    d_next=   1  n=23
+    d_next=   2  n=24
+    d_next=   3  n=396
+    d_next=   4  n=4
+    d_next=   5  n=3
+
+-- 10 PRE samples for TOUCHDOWN --
+  [01] game_id=401416616 season=2022 week=6 final=Akron 34-55 Ohio
+        play_id=401416616103954501 pNum=3 per=3 type='Fumble Return Touchdown'
+        scoring_team='Akron'  off='Akron' def='Ohio'
+        offenseScore=20 defenseScore=48
+        prev_score=20 this_score=20 next_score=20  d_pre=0 d_next=0
+        prev: id=401416616103927305 per=3 pNum=3 type='Pass Reception'
+        next: id=401416616103955104 per=3 pNum=3 type='Pass Reception'  offScore=20 defScore=48
+        playText: Jack McCrory 13 Yd Fumble Return (Nathanial Vakos Kick)
+
+  [02] game_id=401114281 season=2019 week=7 final=Massachusetts 21-69 Louisiana Tech
+        play_id=401114281104887101 pNum=13 per=4 type='Passing Touchdown'
+        scoring_team='Louisiana Tech'  off='Louisiana Tech' def='Massachusetts'
+        offenseScore=69 defenseScore=21
+        prev_score=69 this_score=69 next_score=None  d_pre=0 d_next=None
+        prev: id=401114281104887114 per=4 pNum=12 type='Punt'
+        next: id=None per=None pNum=None type='None'  offScore=None defScore=None
+        playText: Tahj Magee 13 Yd pass from Aaron Allen (Bailey Hale Kick)
+
+  [03] game_id=401019497 season=2018 week=5 final=Cincinnati 49-7 UConn
+        play_id=401019497101869301 pNum=6 per=1 type='Passing Touchdown'
+        scoring_team='UConn'  off='UConn' def='Cincinnati'
+        offenseScore=7 defenseScore=0
+        prev_score=7 this_score=7 next_score=7  d_pre=0 d_next=0
+        prev: id=401019497101956805 per=1 pNum=5 type='Rush'
+        next: id=401019497101869308 per=1 pNum=6 type='Pass Reception'  offScore=0 defScore=7
+        playText: David Pindell pass complete to Kyle Buss for 5 yds for a TD (Michael Tarbutt KICK) CINCINNATI Penalty, offside defense ( Yards) declined
+
+  [04] game_id=401112439 season=2019 week=2 final=North Carolina A&T 13-45 Duke
+        play_id=401112439102887901 pNum=2 per=2 type='Rushing Touchdown'
+        scoring_team='North Carolina A&T'  off='North Carolina A&T' def='Duke'
+        offenseScore=10 defenseScore=7
+        prev_score=10 this_score=10 next_score=10  d_pre=0 d_next=0
+        prev: id=401112439102996503 per=2 pNum=1 type='Kickoff'
+        next: id=401112439102888501 per=2 pNum=2 type='Rush'  offScore=7 defScore=10
+        playText: Jah-Maine Martin 66 Yd Run (Noel Ruiz Kick)
+
+  [05] game_id=400868910 season=2016 week=1 final=Army 28-13 Temple
+        play_id=400868910103918101 pNum=15 per=3 type='Rushing Touchdown'
+        scoring_team='Army'  off='Army' def='Temple'
+        offenseScore=14 defenseScore=10
+        prev_score=14 this_score=14 next_score=14  d_pre=0 d_next=0
+        prev: id=400868910103918116 per=3 pNum=14 type='Rush'
+        next: id=400868910103918117 per=3 pNum=15 type='Pass Incompletion'  offScore=10 defScore=14
+        playText: Andy Davidson run for 3 yds for a TD, (Mitchell Howard KICK)
+
+  [06] game_id=400933923 season=2017 week=12 final=UL Monroe 14-42 Auburn
+        play_id=400933923101879101 pNum=10 per=1 type='Rushing Touchdown'
+        scoring_team='Auburn'  off='Auburn' def='UL Monroe'
+        offenseScore=7 defenseScore=0
+        prev_score=7 this_score=7 next_score=7  d_pre=0 d_next=0
+        prev: id=400933923101966201 per=1 pNum=9 type='Pass Interception Return'
+        next: id=400933923101915601 per=1 pNum=10 type='Rush'  offScore=0 defScore=7
+        playText: Kerryon Johnson run for 8 yds for a TD, (Daniel Carlson KICK)
+
+  [07] game_id=400869572 season=2016 week=13 final=Navy 75-31 SMU
+        play_id=400869572102906801 pNum=6 per=2 type='Rushing Touchdown'
+        scoring_team='Navy'  off='Navy' def='SMU'
+        offenseScore=21 defenseScore=10
+        prev_score=21 this_score=21 next_score=21  d_pre=0 d_next=0
+        prev: id=400869572102969304 per=2 pNum=5 type='Pass Incompletion'
+        next: id=400869572102907605 per=2 pNum=6 type='Rush'  offScore=10 defScore=21
+        playText: Toneo Gulley run for 4 yds for a TD, (Bennett Moehring KICK)
+
+  [08] game_id=401426577 season=2022 week=5 final=UAB 24-28 Rice
+        play_id=401426577103925601 pNum=3 per=3 type='Fumble Return Touchdown'
+        scoring_team='UAB'  off='UAB' def='Rice'
+        offenseScore=17 defenseScore=21
+        prev_score=17 this_score=17 next_score=17  d_pre=0 d_next=0
+        prev: id=401426577103875305 per=3 pNum=3 type='Rush'
+        next: id=401426577103926304 per=3 pNum=3 type='Rush'  offScore=17 defScore=21
+        playText: Treshawn Chamberlain 4 Yd Fumble Return (Christian VanSickle Kick)
+
+  [09] game_id=401114227 season=2019 week=10 final=Utah 33-28 Washington
+        play_id=401114227103969301 pNum=2 per=3 type='Interception Return Touchdown'
+        scoring_team='Washington'  off='Washington' def='Utah'
+        offenseScore=21 defenseScore=19
+        prev_score=21 this_score=21 next_score=21  d_pre=0 d_next=0
+        prev: id=401114227103954001 per=3 pNum=2 type='Pass Reception'
+        next: id=401114227103974001 per=3 pNum=2 type='Rush'  offScore=21 defScore=19
+        playText: Jacob Eason pass intercepted for a TD Jaylon Johnson return for 39 yds for a TD
+
+  [10] game_id=401635578 season=2024 week=7 final=Louisville 24-20 Virginia
+        play_id=401635578101906001 pNum=13 per=1 type='Rushing Touchdown'
+        scoring_team='Virginia'  off='Virginia' def='Louisville'
+        offenseScore=7 defenseScore=0
+        prev_score=7 this_score=7 next_score=7  d_pre=0 d_next=0
+        prev: id=401635578101947101 per=1 pNum=12 type='Rush'
+        next: id=401635578101954701 per=1 pNum=13 type='Rush'  offScore=0 defScore=7
+        playText: Grady Brosterhous run for 1 yd for a TD (Will Bettridge KICK)
+
+-- 10 OTHER samples for TOUCHDOWN --
+  [01] game_id=401416616 season=2022 week=6 final=Akron 34-55 Ohio
+        play_id=401416616101855101 pNum=2 per=1 type='Passing Touchdown'
+        scoring_team='Ohio'  off='Ohio' def='Akron'
+        offenseScore=7 defenseScore=0
+        prev_score=14 this_score=7 next_score=7  d_pre=-7 d_next=0
+        prev: id=401416616101967402 per=1 pNum=1 type='Kickoff Return (Offense)'
+        next: id=401416616101855603 per=1 pNum=2 type='Timeout'  offScore=0 defScore=7
+        playText: Kurtis Rourke pass complete to Sam Wiglusz for 75 yds for a TD, (Nathanial Vakos KICK)
+
+  [02] game_id=401114168 season=2019 week=7 final=Washington 51-27 Arizona
+        play_id=401114168104904501 pNum=6 per=4 type='Rushing Touchdown'
+        scoring_team='Washington'  off='Washington' def='Arizona'
+        offenseScore=41 defenseScore=20
+        prev_score=51 this_score=41 next_score=44  d_pre=-10 d_next=3
+        prev: id=401114168104978707 per=4 pNum=5 type='Punt'
+        next: id=401114168104934605 per=4 pNum=6 type='Pass Reception'  offScore=20 defScore=44
+        playText: Salvon Ahmed run for 3 yds for a TD, (Peyton Henry KICK)
+
+  [03] game_id=401020688 season=2018 week=5 final=Northern Illinois 26-23 Eastern Michigan
+        play_id=401020688105000251 pNum=2 per=5 type='Rushing Touchdown'
+        scoring_team='Eastern Michigan'  off='Eastern Michigan' def='Northern Illinois'
+        offenseScore=20 defenseScore=13
+        prev_score=23 this_score=20 next_score=20  d_pre=-3 d_next=0
+        prev: id=401020688105000285 per=5 pNum=1 type='Rush'
+        next: id=401020688105000256 per=5 pNum=2 type='Rush'  offScore=13 defScore=20
+        playText: Shaq Vann run for 14 yds for a TD, (Chad Ryland KICK)
+
+  [04] game_id=401112123 season=2019 week=2 final=McNeese 14-56 Oklahoma State
+        play_id=401112123103855101 pNum=2 per=3 type='Passing Touchdown'
+        scoring_team='Oklahoma State'  off='Oklahoma State' def='McNeese'
+        offenseScore=35 defenseScore=0
+        prev_score=56 this_score=35 next_score=35  d_pre=-21 d_next=0
+        prev: id=401112123103989301 per=3 pNum=1 type='Pass Reception'
+        next: id=401112123103855104 per=3 pNum=2 type='Rush'  offScore=0 defScore=35
+        playText: Spencer Sanders pass complete to Tylan Wallace for 75 yds for a TD, (Matt Ammendola KICK)
+
+  [05] game_id=400869347 season=2016 week=1 final=Rice 14-46 Western Kentucky
+        play_id=400869347104859801 pNum=9 per=4 type='Passing Touchdown'
+        scoring_team='Western Kentucky'  off='Western Kentucky' def='Rice'
+        offenseScore=43 defenseScore=14
+        prev_score=46 this_score=43 next_score=46  d_pre=-3 d_next=3
+        prev: id=400869347104948713 per=4 pNum=8 type='Pass Incompletion'
+        next: id=400869347104948714 per=4 pNum=9 type='Pass Reception'  offScore=14 defScore=46
+        playText: Mike White pass complete to Nicholas Norris for 19 yds for a TD, (Skyler Simcox KICK)
+
+  [06] game_id=401114215 season=2019 week=4 final=UCLA 67-63 Washington State
+        play_id=401114215103919001 pNum=8 per=3 type='Passing Touchdown'
+        scoring_team='Washington State'  off='Washington State' def='UCLA'
+        offenseScore=42 defenseScore=17
+        prev_score=49 this_score=42 next_score=49  d_pre=-7 d_next=7
+        prev: id=401114215103985801 per=3 pNum=7 type='Timeout'
+        next: id=401114215103956901 per=3 pNum=8 type='Pass Reception'  offScore=17 defScore=49
+        playText: Renard Bell 35 Yd pass from Anthony Gordon (Blake Mazza Kick)
+
+  [07] game_id=401415619 season=2022 week=2 final=Kennesaw State 10-63 Cincinnati
+        play_id=401415619103924905 pNum=3 per=4 type='Rushing Touchdown'
+        scoring_team='Cincinnati'  off='Cincinnati' def='Kennesaw State'
+        offenseScore=49 defenseScore=3
+        prev_score=63 this_score=49 next_score=42  d_pre=-14 d_next=-7
+        prev: id=401415619104966312 per=4 pNum=2 type='Rush'
+        next: id=401415619104849902 per=4 pNum=3 type='Penalty'  offScore=42 defScore=3
+        playText: Corey Kiner 12 Yd Run (Ryan Coe Kick)
+
+  [08] game_id=401404094 season=2022 week=7 final=Kansas 42-52 Oklahoma
+        play_id=401404094101878501 pNum=2 per=1 type='Rushing Touchdown'
+        scoring_team='Oklahoma'  off='Oklahoma' def='Kansas'
+        offenseScore=7 defenseScore=0
+        prev_score=14 this_score=7 next_score=13  d_pre=-7 d_next=6
+        prev: id=401404094101000042 per=1 pNum=2 type='Rush'
+        next: id=401404094101000011 per=1 pNum=3 type='Rush'  offScore=12 defScore=13
+        playText: J. Barnes run for 1 yd for a TD, (Z. Schmit KICK)
+
+  [09] game_id=401114171 season=2019 week=10 final=Oregon State 56-38 Arizona
+        play_id=401114171102859501 pNum=12 per=2 type='Rushing Touchdown'
+        scoring_team='Oregon State'  off='Oregon State' def='Arizona'
+        offenseScore=14 defenseScore=6
+        prev_score=35 this_score=14 next_score=35  d_pre=-21 d_next=21
+        prev: id=401114171102999504 per=2 pNum=11 type='End of Half'
+        next: id=401114171103849902 per=3 pNum=1 type='Kickoff'  offScore=35 defScore=19
+        playText: Jermar Jefferson run for 1 yd for a TD (Everett Hayes KICK)
+
+  [10] game_id=401256136 season=2020 week=1 final=Tulane 27-38 Nevada
+        play_id=401256136102854701 pNum=9 per=2 type='Passing Touchdown'
+        scoring_team='Nevada'  off='Nevada' def='Tulane'
+        offenseScore=13 defenseScore=0
+        prev_score=26 this_score=13 next_score=26  d_pre=-13 d_next=13
+        prev: id=401256136102999901 per=2 pNum=8 type='Punt'
+        next: id=401256136102925501 per=2 pNum=9 type='Rushing Touchdown'  offScore=26 defScore=7
+        playText: Carson Strong pass complete to Justin Lockhart for 23 yds for a TD Strong, Carson pass attempt to Horton, Tory failed, PENALTY TULANE pass interference 2 yards 
+
+
+================================================================================
+FIELD_GOAL  total=19,116  POST=13,621 PRE=3,523  OTHER=1,972
+================================================================================
+
+Cross-tab playType sub-string -> bucket counts:
+  sub-type                                    POST     PRE   OTHER  POST%   PRE%
+  Field Goal Good                           13,621   3,523   1,972   71.3%   18.4%
+
+PRE rows where next play d_next >= points_expected (3): 267/3,523 (7.6%)
+  -> if high, confirms PRE truly is pre-play and the post-state lives on the next play
+POST rows where next play's d_next == 0 (no further jump): 7,102/13,621 (52.1%)
+
+OTHER rows: distribution of d_next (next-play minus this-play, scoring team):
+    d_next= -11  n=1
+    d_next= -10  n=2
+    d_next=  -3  n=18
+    d_next=  -2  n=3
+    d_next=  -1  n=1
+    d_next=   0  n=873
+    d_next=   1  n=1
+    d_next=   2  n=6
+    d_next=   3  n=173
+    d_next=   4  n=3
+    d_next=   5  n=1
+    d_next=   6  n=52
+    d_next=   7  n=559
+    d_next=   8  n=18
+    d_next=   9  n=9
+    d_next=  10  n=43
+    d_next=  11  n=3
+    d_next=  12  n=2
+    d_next=  13  n=16
+    d_next=  14  n=91
+    d_next=  15  n=6
+    d_next=  16  n=2
+    d_next=  17  n=7
+    d_next=  20  n=1
+    d_next=  21  n=15
+    d_next=  22  n=1
+    d_next=  24  n=1
+    d_next=  25  n=1
+    d_next=  28  n=2
+    d_next=  38  n=1
+
+-- 10 PRE samples for FIELD_GOAL --
+  [01] game_id=401415630 season=2022 week=6 final=Houston 33-32 Memphis
+        play_id=401415630104959501 pNum=11 per=4 type='Field Goal Good'
+        scoring_team='Memphis'  off='Memphis' def='Houston'
+        offenseScore=32 defenseScore=19
+        prev_score=32 this_score=32 next_score=32  d_pre=0 d_next=0
+        prev: id=401415630104985701 per=4 pNum=10 type='Pass Reception'
+        next: id=401415630104986201 per=4 pNum=11 type='Pass Incompletion'  offScore=19 defScore=32
+        playText: Chris Howard 39 yd FG GOOD
+
+  [02] game_id=401525871 season=2023 week=8 final=UCF 29-31 Oklahoma
+        play_id=401525871103947101 pNum=10 per=3 type='Field Goal Good'
+        scoring_team='UCF'  off='UCF' def='Oklahoma'
+        offenseScore=23 defenseScore=17
+        prev_score=23 this_score=23 next_score=23  d_pre=0 d_next=0
+        prev: id=401525871103994501 per=3 pNum=9 type='Pass Incompletion'
+        next: id=401525871103995301 per=3 pNum=10 type='Punt'  offScore=23 defScore=17
+        playText: Colton Boomer 46 yd FG GOOD
+
+  [03] game_id=401426564 season=2022 week=4 final=Charlotte 20-56 South Carolina
+        play_id=401426564101904501 pNum=14 per=1 type='Field Goal Good'
+        scoring_team='South Carolina'  off='South Carolina' def='Charlotte'
+        offenseScore=3 defenseScore=0
+        prev_score=3 this_score=3 next_score=3  d_pre=0 d_next=0
+        prev: id=401426564101975101 per=1 pNum=13 type='Passing Touchdown'
+        next: id=401426564101975104 per=1 pNum=14 type='Timeout'  offScore=3 defScore=0
+        playText: Mitch Jeter 25 yd FG GOOD
+
+  [04] game_id=401114248 season=2019 week=2 final=Western Kentucky 20-14 Florida International
+        play_id=401114248104877301 pNum=9 per=4 type='Field Goal Good'
+        scoring_team='Western Kentucky'  off='Western Kentucky' def='Florida International'
+        offenseScore=20 defenseScore=14
+        prev_score=20 this_score=20 next_score=20  d_pre=0 d_next=0
+        prev: id=401114248104877309 per=4 pNum=8 type='Rush'
+        next: id=401114248104877310 per=4 pNum=9 type='Rush'  offScore=14 defScore=20
+        playText: Cory Munson 44 yd FG GOOD
+
+  [05] game_id=400941832 season=2017 week=7 final=Cincinnati 3-33 South Florida
+        play_id=400941832102854301 pNum=14 per=2 type='Field Goal Good'
+        scoring_team='South Florida'  off='South Florida' def='Cincinnati'
+        offenseScore=6 defenseScore=3
+        prev_score=6 this_score=6 next_score=9  d_pre=0 d_next=3
+        prev: id=400941832102885514 per=2 pNum=13 type='Pass Incompletion'
+        next: id=400941832102928701 per=2 pNum=14 type='Field Goal Good'  offScore=9 defScore=3
+        playText: Emilio Nadelman 28 yd FG GOOD
+
+  [06] game_id=401114235 season=2019 week=4 final=Washington 45-19 BYU
+        play_id=401114235101906801 pNum=10 per=1 type='Field Goal Good'
+        scoring_team='BYU'  off='BYU' def='Washington'
+        offenseScore=3 defenseScore=7
+        prev_score=3 this_score=3 next_score=3  d_pre=0 d_next=0
+        prev: id=401114235101978201 per=1 pNum=9 type='Fumble Return Touchdown'
+        next: id=401114235101947501 per=1 pNum=10 type='Pass Reception'  offScore=7 defScore=3
+        playText: Jake Oldroyd 43 Yd Field Goal 
+
+  [07] game_id=401426552 season=2022 week=2 final=New Mexico State 13-20 UTEP
+        play_id=401426552103999401 pNum=2 per=3 type='Field Goal Good'
+        scoring_team='UTEP'  off='UTEP' def='New Mexico State'
+        offenseScore=20 defenseScore=6
+        prev_score=20 this_score=20 next_score=20  d_pre=0 d_next=0
+        prev: id=401426552103908703 per=3 pNum=2 type='Rush'
+        next: id=401426552103999403 per=3 pNum=2 type='End Period'  offScore=6 defScore=20
+        playText: Gavin Baechle 46 yd FG GOOD
+
+  [08] game_id=401405114 season=2022 week=7 final=Maryland 38-33 Indiana
+        play_id=401405114103914701 pNum=10 per=3 type='Field Goal Good'
+        scoring_team='Maryland'  off='Maryland' def='Indiana'
+        offenseScore=24 defenseScore=17
+        prev_score=24 this_score=24 next_score=24  d_pre=0 d_next=0
+        prev: id=401405114103914712 per=3 pNum=9 type='Rush'
+        next: id=401405114103914713 per=3 pNum=10 type='Pass Reception'  offScore=17 defScore=24
+        playText: Chad Ryland 36 yd FG GOOD
+
+  [09] game_id=400763588 season=2015 week=1 final=Old Dominion 38-34 Eastern Michigan
+        play_id=400763588102956101 pNum=17 per=2 type='Field Goal Good'
+        scoring_team='Eastern Michigan'  off='Eastern Michigan' def='Old Dominion'
+        offenseScore=17 defenseScore=7
+        prev_score=17 this_score=17 next_score=17  d_pre=0 d_next=0
+        prev: id=400763588102999901 per=2 pNum=16 type='Field Goal Good'
+        next: id=400763588102999902 per=2 pNum=17 type='End of Half'  offScore=10 defScore=17
+        playText: Dylan Mulder 19 yd FG GOOD
+
+  [10] game_id=401256108 season=2020 week=1 final=Cincinnati 21-24 Georgia
+        play_id=401256108102965301 pNum=7 per=2 type='Field Goal Good'
+        scoring_team='Georgia'  off='Georgia' def='Cincinnati'
+        offenseScore=7 defenseScore=10
+        prev_score=7 this_score=7 next_score=7  d_pre=0 d_next=0
+        prev: id=401256108102916001 per=2 pNum=7 type='Pass Reception'
+        next: id=401256108102994701 per=2 pNum=7 type='Rush'  offScore=10 defScore=7
+        playText: Jack Podlesny 37 yd FG GOOD
+
+-- 10 OTHER samples for FIELD_GOAL --
+  [01] game_id=401416616 season=2022 week=6 final=Akron 34-55 Ohio
+        play_id=401416616102937101 pNum=9 per=2 type='Field Goal Good'
+        scoring_team='Akron'  off='Akron' def='Ohio'
+        offenseScore=6 defenseScore=21
+        prev_score=13 this_score=6 next_score=6  d_pre=-7 d_next=0
+        prev: id=401416616102999904 per=2 pNum=8 type='End of Half'
+        next: id=401416616102937610 per=2 pNum=9 type='Pass Reception'  offScore=21 defScore=6
+        playText: Noah Perez 42 yd FG GOOD
+
+  [02] game_id=401110820 season=2019 week=7 final=Ole Miss 27-38 Missouri
+        play_id=401110820103906901 pNum=9 per=3 type='Field Goal Good'
+        scoring_team='Missouri'  off='Missouri' def='Ole Miss'
+        offenseScore=21 defenseScore=7
+        prev_score=28 this_score=21 next_score=28  d_pre=-7 d_next=7
+        prev: id=401110820103974801 per=3 pNum=8 type='Passing Touchdown'
+        next: id=401110820103949201 per=3 pNum=9 type='Rushing Touchdown'  offScore=28 defScore=7
+        playText: Tucker McCann 39 yd FG GOOD
+
+  [03] game_id=401282680 season=2021 week=10 final=Clemson 30-24 Louisville
+        play_id=401282680104898201 pNum=9 per=4 type='Field Goal Good'
+        scoring_team='Clemson'  off='Clemson' def='Louisville'
+        offenseScore=20 defenseScore=24
+        prev_score=30 this_score=20 next_score=20  d_pre=-10 d_next=0
+        prev: id=401282680104996001 per=4 pNum=8 type='Rush'
+        next: id=401282680104958201 per=4 pNum=9 type='Timeout'  offScore=20 defScore=24
+        playText: B.T. Potter 34 yd FG GOOD
+
+  [04] game_id=401237035 season=2020 week=4 final=Mississippi State 44-34 LSU
+        play_id=401237035104927201 pNum=9 per=4 type='Field Goal Good'
+        scoring_team='Mississippi State'  off='Mississippi State' def='LSU'
+        offenseScore=37 defenseScore=34
+        prev_score=44 this_score=37 next_score=44  d_pre=-7 d_next=7
+        prev: id=401237035104966010 per=4 pNum=8 type='Pass Reception'
+        next: id=401237035104966011 per=4 pNum=9 type='Pass Reception'  offScore=34 defScore=44
+        playText: Brandon Ruiz 43 yd FG GOOD
+
+  [05] game_id=400935377 season=2017 week=7 final=Northwestern 37-21 Maryland
+        play_id=400935377104869701 pNum=9 per=4 type='Field Goal Good'
+        scoring_team='Northwestern'  off='Northwestern' def='Maryland'
+        offenseScore=30 defenseScore=21
+        prev_score=37 this_score=30 next_score=30  d_pre=-7 d_next=0
+        prev: id=400935377104984607 per=4 pNum=8 type='Pass Reception'
+        next: id=400935377104938802 per=4 pNum=9 type='Pass Incompletion'  offScore=21 defScore=30
+        playText: Charlie Kuhbander 32 yd FG GOOD
+
+  [06] game_id=401635567 season=2024 week=6 final=Boston College 14-24 Virginia
+        play_id=401635567104867001 pNum=10 per=4 type='Field Goal Good'
+        scoring_team='Virginia'  off='Virginia' def='Boston College'
+        offenseScore=9 defenseScore=14
+        prev_score=17 this_score=9 next_score=24  d_pre=-8 d_next=15
+        prev: id=401635567104935101 per=4 pNum=9 type='Pass Reception'
+        next: id=401635567104939701 per=4 pNum=10 type='Fumble Return Touchdown'  offScore=14 defScore=24
+        playText: Will Bettridge 27 yd FG GOOD
+
+  [07] game_id=401309850 season=2021 week=3 final=Stony Brook 7-48 Oregon
+        play_id=401309850104869101 pNum=5 per=4 type='Field Goal Good'
+        scoring_team='Oregon'  off='Oregon' def='Stony Brook'
+        offenseScore=34 defenseScore=7
+        prev_score=48 this_score=34 next_score=34  d_pre=-14 d_next=0
+        prev: id=401309850104987001 per=4 pNum=4 type='Timeout'
+        next: id=401309850104889201 per=4 pNum=5 type='Rush'  offScore=7 defScore=34
+        playText: Camden Lewis 35 yd FG GOOD
+
+  [08] game_id=401426370 season=2022 week=11 final=Georgia Southern 17-36 Louisiana
+        play_id=401426370104859001 pNum=13 per=4 type='Field Goal Good'
+        scoring_team='Louisiana'  off='Louisiana' def='Georgia Southern'
+        offenseScore=33 defenseScore=14
+        prev_score=36 this_score=33 next_score=36  d_pre=-3 d_next=3
+        prev: id=401426370104939301 per=4 pNum=12 type='Pass Reception'
+        next: id=401426370104944801 per=4 pNum=13 type='Pass Incompletion'  offScore=17 defScore=36
+        playText: Kenneth Almendares 42 yd FG GOOD
+
+  [09] game_id=400869724 season=2016 week=11 final=Miami 34-14 Virginia
+        play_id=400869724102868301 pNum=14 per=2 type='Field Goal Good'
+        scoring_team='Miami'  off='Miami' def='Virginia'
+        offenseScore=10 defenseScore=7
+        prev_score=17 this_score=10 next_score=17  d_pre=-7 d_next=7
+        prev: id=400869724102907115 per=2 pNum=13 type='Pass Reception'
+        next: id=400869724102907116 per=2 pNum=14 type='Penalty'  offScore=7 defScore=17
+        playText: Michael Badgley 40 yd FG GOOD
+
+  [10] game_id=401636892 season=2024 week=7 final=Utah 19-27 Arizona State
+        play_id=401636892101904201 pNum=13 per=1 type='Field Goal Good'
+        scoring_team='Utah'  off='Utah' def='Arizona State'
+        offenseScore=3 defenseScore=0
+        prev_score=6 this_score=3 next_score=6  d_pre=-3 d_next=3
+        prev: id=401636892101969901 per=1 pNum=12 type='Rush'
+        next: id=401636892101979501 per=1 pNum=13 type='Passing Touchdown'  offScore=6 defScore=6
+        playText: Cole Becker 48 yd FG GOOD
+
+
+================================================================================
+SAFETY  total=458  POST=386 PRE=33  OTHER=39
+================================================================================
+
+Cross-tab playType sub-string -> bucket counts:
+  sub-type                                    POST     PRE   OTHER  POST%   PRE%
+  Safety                                       386      33      39   84.3%    7.2%
+
+PRE rows where next play d_next >= points_expected (2): 8/33 (24.2%)
+  -> if high, confirms PRE truly is pre-play and the post-state lives on the next play
+POST rows where next play's d_next == 0 (no further jump): 331/386 (85.8%)
+
+OTHER rows: distribution of d_next (next-play minus this-play, scoring team):
+    d_next=  -2  n=1
+    d_next=   0  n=32
+    d_next=   7  n=3
+    d_next=   8  n=2
+    d_next=  10  n=1
+
+-- 10 PRE samples for SAFETY --
+  [01] game_id=400787327 season=2015 week=7 final=Northern Illinois 45-12 Miami (OH)
+        play_id=400787327103854201 pNum=1 per=3 type='Safety'
+        scoring_team='Northern Illinois'  off='Miami (OH)' def='Northern Illinois'
+        offenseScore=5 defenseScore=21
+        prev_score=21 this_score=21 next_score=21  d_pre=0 d_next=0
+        prev: id=400787327102905008 per=2 pNum=13 type='Pass Incompletion'
+        next: id=400787327103854202 per=3 pNum=1 type='Kickoff'  offScore=21 defScore=5
+        playText: Team Safety
+
+  [02] game_id=401409235 season=2022 week=1 final=Nevada 23-12 New Mexico State
+        play_id=401409235102866101 pNum=4 per=2 type='Safety'
+        scoring_team='New Mexico State'  off='Nevada' def='New Mexico State'
+        offenseScore=0 defenseScore=2
+        prev_score=2 this_score=2 next_score=2  d_pre=0 d_next=0
+        prev: id=401409235102996302 per=2 pNum=3 type='End of Half'
+        next: id=401409235102876101 per=2 pNum=4 type='Rush'  offScore=2 defScore=0
+        playText: TEAM run for a loss of 16 yards for a SAFETY TEAM fumbled, recovered by Nevad Shane Illingworth for a SAFETY
+
+  [03] game_id=401643819 season=2024 week=9 final=UL Monroe 17-46 South Alabama
+        play_id=401643819102956603 pNum=5 per=2 type='Safety'
+        scoring_team='UL Monroe'  off='South Alabama' def='UL Monroe'
+        offenseScore=9 defenseScore=14
+        prev_score=14 this_score=14 next_score=14  d_pre=0 d_next=0
+        prev: id=401643819102914101 per=2 pNum=5 type='Pass Reception'
+        next: id=401643819102968801 per=2 pNum=5 type='Pass Incompletion'  offScore=9 defScore=14
+        playText: Team Safety
+
+  [04] game_id=401237033 season=2020 week=4 final=Georgia 37-10 Arkansas
+        play_id=401237033102856901 pNum=6 per=2 type='Safety'
+        scoring_team='Georgia'  off='Arkansas' def='Georgia'
+        offenseScore=7 defenseScore=2
+        prev_score=2 this_score=2 next_score=2  d_pre=0 d_next=0
+        prev: id=401237033102989905 per=2 pNum=5 type='Pass Incompletion'
+        next: id=401237033102856907 per=2 pNum=6 type='Rush'  offScore=2 defScore=7
+        playText: T.J. Hammonds run for a loss of 14 yards for a SAFETY T.J. Hammonds fumbled, recovered by Ark for a SAFETY
+
+  [05] game_id=401012862 season=2018 week=1 final=Northern Illinois 7-33 Iowa
+        play_id=401012862104926301 pNum=2 per=4 type='Safety'
+        scoring_team='Iowa'  off='Northern Illinois' def='Iowa'
+        offenseScore=0 defenseScore=26
+        prev_score=26 this_score=26 next_score=33  d_pre=0 d_next=7
+        prev: id=401012862104924002 per=4 pNum=2 type='Rush'
+        next: id=401012862104934703 per=4 pNum=2 type='Rush'  offScore=0 defScore=33
+        playText: Jordan Nettles run for a loss of 1 yard for a SAFETY
+
+  [06] game_id=400869428 season=2016 week=1 final=Liberty 13-36 Virginia Tech
+        play_id=400869428103874901 pNum=7 per=3 type='Safety'
+        scoring_team='Liberty'  off='Virginia Tech' def='Liberty'
+        offenseScore=26 defenseScore=13
+        prev_score=13 this_score=13 next_score=27  d_pre=0 d_next=14
+        prev: id=400869428103968501 per=3 pNum=6 type='Pass Incompletion'
+        next: id=400869428103886703 per=3 pNum=7 type='Rush'  offScore=53 defScore=27
+        playText: Team Safety
+
+  [07] game_id=400933901 season=2017 week=9 final=Missouri 52-12 UConn
+        play_id=400933901101865901 pNum=6 per=1 type='Safety'
+        scoring_team='UConn'  off='Missouri' def='UConn'
+        offenseScore=0 defenseScore=2
+        prev_score=2 this_score=2 next_score=2  d_pre=0 d_next=0
+        prev: id=400933901101989107 per=1 pNum=5 type='Pass Incompletion'
+        next: id=400933901101865907 per=1 pNum=6 type='Punt'  offScore=2 defScore=0
+        playText: TEAM run for -27 yds for a SAFETY
+
+  [08] game_id=401628362 season=2024 week=3 final=Vanderbilt 32-36 Georgia State
+        play_id=401628362102926001 pNum=1 per=2 type='Safety'
+        scoring_team='Vanderbilt'  off='Georgia State' def='Vanderbilt'
+        offenseScore=12 defenseScore=3
+        prev_score=3 this_score=3 next_score=3  d_pre=0 d_next=0
+        prev: id=401628362102877102 per=2 pNum=1 type='Kickoff'
+        next: id=401628362102984201 per=2 pNum=1 type='Rush'  offScore=3 defScore=14
+        playText: Team Safety
+
+  [09] game_id=401114287 season=2019 week=8 final=UTEP 17-32 Florida International
+        play_id=401114287102859001 pNum=2 per=2 type='Safety'
+        scoring_team='Florida International'  off='UTEP' def='Florida International'
+        offenseScore=7 defenseScore=12
+        prev_score=12 this_score=12 next_score=15  d_pre=0 d_next=3
+        prev: id=401114287102858404 per=2 pNum=2 type='Pass Incompletion'
+        next: id=401114287102898003 per=2 pNum=2 type='Penalty'  offScore=7 defScore=15
+        playText: TEAM run for no gain for a SAFETY TEAM fumbled, recovered by UTEP for a SAFETY
+
+  [10] game_id=400756951 season=2015 week=6 final=Virginia 19-26 Pittsburgh
+        play_id=400756951104867601 pNum=4 per=4 type='Safety'
+        scoring_team='Pittsburgh'  off='Virginia' def='Pittsburgh'
+        offenseScore=13 defenseScore=26
+        prev_score=26 this_score=26 next_score=26  d_pre=0 d_next=0
+        prev: id=400756951104965503 per=4 pNum=3 type='Penalty'
+        next: id=400756951104867606 per=4 pNum=4 type='Rush'  offScore=26 defScore=13
+        playText: Matt Johns sacked by Mike Caprara for a loss of 2 yards for a SAFETY
+
+-- 10 OTHER samples for SAFETY --
+  [01] game_id=401415629 season=2022 week=6 final=SMU 19-41 UCF
+        play_id=401415629104875801 pNum=2 per=4 type='Safety'
+        scoring_team='UCF'  off='SMU' def='UCF'
+        offenseScore=13 defenseScore=26
+        prev_score=41 this_score=26 next_score=34  d_pre=-15 d_next=8
+        prev: id=401415629104987103 per=4 pNum=1 type='Pass Reception'
+        next: id=401415629104884801 per=4 pNum=2 type='Passing Touchdown'  offScore=34 defScore=13
+        playText: Tanner Mordecai sacked for a loss of 6 yards for a SAFETY
+
+  [02] game_id=400869316 season=2016 week=8 final=Miami (OH) 40-26 Bowling Green
+        play_id=400869316102894601 pNum=2 per=2 type='Safety'
+        scoring_team='Miami (OH)'  off='Bowling Green' def='Miami (OH)'
+        offenseScore=10 defenseScore=12
+        prev_score=19 this_score=12 next_score=12  d_pre=-7 d_next=0
+        prev: id=400869316102994501 per=2 pNum=1 type='Penalty'
+        next: id=400869316102895001 per=2 pNum=2 type='Pass Reception'  offScore=12 defScore=10
+        playText: James Morgan run for a loss of 7 yards for a SAFETY James Morgan fumbled, for a SAFETY
+
+  [03] game_id=401282710 season=2021 week=10 final=Navy 6-34 Notre Dame
+        play_id=401282710104867901 pNum=2 per=4 type='Safety'
+        scoring_team='Notre Dame'  off='Navy' def='Notre Dame'
+        offenseScore=6 defenseScore=19
+        prev_score=34 this_score=19 next_score=19  d_pre=-15 d_next=0
+        prev: id=401282710104968603 per=4 pNum=1 type='Kickoff Return (Offense)'
+        next: id=401282710104869101 per=4 pNum=2 type='Pass Incompletion'  offScore=19 defScore=6
+        playText: Xavier Arline run for a loss of 1 yard, Xavier Arline fumbled, recovered by Navy Xavier Arline for a SAFETY
+
+  [04] game_id=401235993 season=2020 week=4 final=Kansas 14-47 Baylor
+        play_id=401235993104874901 pNum=2 per=4 type='Safety'
+        scoring_team='Baylor'  off='Kansas' def='Baylor'
+        offenseScore=7 defenseScore=33
+        prev_score=47 this_score=33 next_score=40  d_pre=-14 d_next=7
+        prev: id=401235993104959903 per=4 pNum=1 type='Kickoff'
+        next: id=401235993104874903 per=4 pNum=2 type='Pass Incompletion'  offScore=7 defScore=40
+        playText: Jalon Daniels sacked by Terrel Bernard for a loss of 2 yards for a SAFETY
+
+  [05] game_id=401301004 season=2021 week=2 final=Air Force 23-3 Navy
+        play_id=401301004104866601 pNum=6 per=4 type='Safety'
+        scoring_team='Air Force'  off='Navy' def='Air Force'
+        offenseScore=3 defenseScore=16
+        prev_score=23 this_score=16 next_score=16  d_pre=-7 d_next=0
+        prev: id=401301004104957203 per=4 pNum=5 type='Rush'
+        next: id=401301004104866607 per=4 pNum=6 type='Rush'  offScore=16 defScore=3
+        playText: TEAM run for a loss of 23 yards for a SAFETY
+
+  [06] game_id=401282218 season=2021 week=5 final=Southern Miss 19-24 Rice
+        play_id=401282218104999904 pNum=7 per=4 type='Safety'
+        scoring_team='Southern Miss'  off='Rice' def='Southern Miss'
+        offenseScore=24 defenseScore=19
+        prev_score=32 this_score=19 next_score=29  d_pre=-13 d_next=10
+        prev: id=401282218104968811 per=4 pNum=7 type='Pass Reception'
+        next: id=401282218104849903 per=4 pNum=8 type='Pass Reception'  offScore=29 defScore=49
+        playText: Team Safety
+
+  [07] game_id=400935411 season=2017 week=12 final=Purdue 24-15 Iowa
+        play_id=400935411102895501 pNum=2 per=2 type='Safety'
+        scoring_team='Iowa'  off='Purdue' def='Iowa'
+        offenseScore=7 defenseScore=2
+        prev_score=9 this_score=2 next_score=2  d_pre=-7 d_next=0
+        prev: id=400935411102985601 per=2 pNum=1 type='Rush'
+        next: id=400935411102895503 per=2 pNum=2 type='Rush'  offScore=2 defScore=7
+        playText: Nathan Bazata Safety
+
+  [08] game_id=401677092 season=2024 week=1 final=Texas Tech 26-39 Arkansas
+        play_id=401677092104857801 pNum=2 per=4 type='Safety'
+        scoring_team='Arkansas'  off='Texas Tech' def='Arkansas'
+        offenseScore=19 defenseScore=36
+        prev_score=39 this_score=36 next_score=36  d_pre=-3 d_next=0
+        prev: id=401677092104969303 per=4 pNum=1 type='Kickoff'
+        next: id=401677092104858901 per=4 pNum=2 type='Pass Incompletion'  offScore=36 defScore=19
+        playText: Will Hammond sacked by Anton Juncaj for a loss of 7 yards for a SAFETY
+
+  [09] game_id=401636944 season=2024 week=14 final=Kansas State 21-29 Iowa State
+        play_id=401636944104867701 pNum=6 per=4 type='Safety'
+        scoring_team='Iowa State'  off='Kansas State' def='Iowa State'
+        offenseScore=21 defenseScore=26
+        prev_score=29 this_score=26 next_score=26  d_pre=-3 d_next=0
+        prev: id=401636944104978301 per=4 pNum=5 type='Timeout'
+        next: id=401636944104878701 per=4 pNum=6 type='Rush'  offScore=26 defScore=21
+        playText: Kansas State Penalty, intentional grounding (Avery Johnson) to the KSU 0 for a SAFETY
+
+  [10] game_id=401309596 season=2021 week=13 final=Ohio 10-21 Bowling Green
+        play_id=401309596104874401 pNum=2 per=4 type='Safety'
+        scoring_team='Bowling Green'  off='Ohio' def='Bowling Green'
+        offenseScore=10 defenseScore=15
+        prev_score=21 this_score=15 next_score=15  d_pre=-6 d_next=0
+        prev: id=401309596104988002 per=4 pNum=1 type='Kickoff'
+        next: id=401309596104875105 per=4 pNum=2 type='Penalty'  offScore=15 defScore=10
+        playText: Armani Rogers run for 2 yds for a SAFETY

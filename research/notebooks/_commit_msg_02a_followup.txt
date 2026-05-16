@@ -1,0 +1,70 @@
+docs(n02a): correct feature-count narrative; tag EPA redundancies in CSV
+
+Three follow-ups to commit 9822cfc. All documentation/data-tagging changes;
+no logic or scope changes to the 02a validation methodology, and the CSV's
+brier/ECE numbers are byte-identical to 9822cfc's run.
+
+(a) Feature-count narrative corrections (re: 9822cfc):
+- Commit message and sidecar provenance stated "21 rows from 02a (7
+  features x 3 test seasons)". Actual: 18 rows, 6 candidate features.
+- Sidecar's "Candidate features evaluated in 02a" line broke the 6 down
+  as "5 V5 DDL + dog_def_epa_per_play extension + plays_so_far".
+  plays_so_far is V5 DDL (BUILD_SPEC.md line 167), so the correct
+  breakdown is "5 V5 DDL + dog_def_epa_per_play extension".
+- A new "Corrections vs commit 9822cfc" section near the top of
+  feature_validation.schema.md documents both errors explicitly. Pushed
+  history is left as-is.
+
+(b) Structural redundancy in V5 DDL EPA features (per-row identity)
+    tagged in CSV, documented in sidecar:
+- 02a's execution surfaced that fav_off_epa_per_play and
+  dog_def_epa_per_play are per-row identical (same play subset, same
+  mean) -- not "highly correlated". Same for fav_def_epa_per_play and
+  dog_off_epa_per_play. Football mechanism: in a two-team game,
+  offense == fav iff defense == dog, so the per-trigger means coincide
+  bit-for-bit.
+- Added `redundant_with` column to feature_validation.csv. Empty string
+  on canonical rows; populated with the canonical-feature name on
+  duplicates (dog_def_* -> fav_off_*; dog_off_* -> fav_def_*).
+  Filtering `redundant_with == ''` (after a fillna or
+  keep_default_na=False read) cleanly drops only the duplicates.
+- New "Redundancy discoveries" section in feature_validation.schema.md
+  documents the football mechanism, V5 DDL implication (4 EPA features
+  listed in the DDL block but only 2 carry independent information),
+  N03 guidance with the recommended read pattern, and an honest
+  restatement of the per-feature stability table (2 independent EPA
+  features + epa_divergence all 3/3; plays_so_far 1/3; dog-side EPA
+  features tagged redundant in CSV for transparency).
+- Notebook source: REDUNDANT_WITH map added in config cell;
+  redundant_with key added to per-row eval dict and to CSV_COLUMNS.
+  Re-executed; 0 fresh CFBD calls asserted; sidecar provenance now
+  reads "4 independent; 2 duplicates tagged via redundant_with".
+
+(c) Phase 0 tech-debt log opened:
+- New file research/tech_debt.md tracks two items observed in 9822cfc's
+  execution and re-confirmed in this run:
+  1. Hardcoded "monthly free-tier limit: 1,000" in N01 and 02a budget
+     summary cells (actual quota 3000 per the current key's
+     x-calllimit-remaining header; display-only, no budget-enforcement
+     dependency).
+  2. sklearn CalibratedClassifierCV(cv='prefit') deprecation warning
+     (removed in sklearn 1.8; replace with FrozenEstimator wrapper once
+     we pin sklearn >= 1.7). Affects 02a and will recur in 02b-g + N03.
+- Both items batched for a single sweep before N03 begins.
+
+CFBD budget impact: 0 fresh calls this commit; cache-hit assertion passed
+on re-execution. Lifetime audited count unchanged at 253/3000 per
+research/data/cache/cfbd_call_log.csv.
+
+Files staged:
+- research/notebooks/02a_baseline_features.ipynb (REDUNDANT_WITH map +
+  redundant_with column + sidecar template updates; re-executed).
+- research/results/feature_validation.csv (regenerated; 18 rows x 16
+  cols; +redundant_with column).
+- research/results/feature_validation.schema.md (regenerated;
+  +Corrections section, +redundant_with column-dictionary entry,
+  +Redundancy discoveries section with N03 guidance and honest stability
+  restatement).
+- research/tech_debt.md (new).
+
+Per R22, stops after the commit. No 02b until explicit go-ahead.

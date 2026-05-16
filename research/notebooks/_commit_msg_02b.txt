@@ -1,0 +1,97 @@
+Phase 0 N02b scaffold: opening-drive shock features (unexecuted)
+
+Adds research/notebooks/02b_opening_drive_shock.ipynb -- the second
+per-feature stability-test notebook in the 02a-g series. Tests 10
+opening-drive-shock candidates from the V5 `trigger_features` DDL
+(lines 169-179) against the same pre-game baseline locked in 02a
+(decision alpha: pregame_spread, rating_gap, fav/dog pregame_rating,
+spread_movement + spread_movement_is_null indicator), under the same
+walk-forward windows (decision B: train from 2015, val/test 2022-2024).
+L1 logreg + StandardScaler, default C=1.0, seed 42; isotonic-calibrated
+on val; ECE 10 equal-width bins.
+
+Candidate features (10):
+  Drive-summary (D4 NULLs when drive_number_in_game <= 1):
+    dog_received_opening_kickoff (D4 exception -- drive-1 offense is
+      fixed at drive-1 start, lookahead-safe whenever drive 1 has
+      started),
+    dog_scored_on_opening_drive,
+    opening_drive_was_td (D3 generic: any team's TD),
+    opening_drive_was_explosive_td,
+    opening_drive_yards, opening_drive_plays, opening_drive_seconds
+  Drive-1 EPA (R3-safe via plays_before slice):
+    fav_def_epa_first_drive, fav_def_epa_after_first_drive
+  Derived flag:
+    defense_stabilized_flag (D2 option (i):
+      int(fav_def_epa_after_first_drive < fav_def_epa_first_drive))
+
+D1 (explosive-play thresholds, type-specific per 02b plan-approval
+pushback): EXPLOSIVE_PASS_YARDS = 20, EXPLOSIVE_RUSH_YARDS = 12.
+Pass types {Pass Reception, Passing Touchdown}; rush types
+{Rush, Rushing Touchdown}. Sack / Pass Incompletion / interception
+returns / non-pass-rush playTypes excluded from explosive consideration.
+Module-level constants so 02c-g can reuse one definition. Tuning lands
+in research/tech_debt.md per the 02b plan-approval policy, not
+mid-flight.
+
+Decisions inherited from 02a (binding for 02b-g):
+  Walk-forward windows: train from 2015, val/test 2022-2024 (decision B).
+  Baseline: 5 features + spread_movement_is_null indicator (alpha).
+  Per-feature null policy: drop nulls per-feature, never globally (B).
+  feature_validation.csv append semantics: defensive drop+concat keyed
+    by (feature, train_window, test_season); 02a's 18 rows preserved.
+
+Plan-time redundancy audit (new protocol from 02b plan-approval):
+  Verdict: zero structural duplicates among 02b's 10 candidates.
+  REDUNDANT_WITH = {} for v1_opening_drive_shock.
+  Two conditional identities flagged (subset-only equalities, not
+  bit-identical across the full corpus) and documented in the sidecar's
+  Redundancy discoveries section -- distinct from 02a's bit-identical
+  redundant_with tags:
+    1. fav_def_epa_after_first_drive == fav_def_epa_per_play on the
+       dog_received_opening_kickoff == 0 subset.
+    2. Within drive 1, the offense<->defense per-row identity from
+       02a's discovery still applies (forward note for 02c-g; no
+       actual duplicate emitted by 02b).
+
+Plan-time candidate-vs-trigger-fields audit (new protocol):
+  On the 9,556 drive-2+ triggers (the evaluable subset under D4),
+  zero 02b candidates are materially deducible from trigger_events.csv
+  fields alone -- drives JSON is required. dog_received_opening_kickoff
+  is partially deducible on the 1,860 drive-1 triggers (1,749 / 1,860 =
+  94% via possession_team), but that's exactly where D4 NULLs every
+  other drive-summary feature. Net: 02b's per-feature edge is not a
+  trivial re-derivation of trigger-row info.
+
+D4 plan-time scale check: 1,860 of 11,416 triggers (16.3%) fire on
+drive 1 (drive_number_in_game == 1). Larger than the "almost none"
+estimate in the plan response; surfaced upfront so the null-impact
+on drive-summary features is honest. EPA-based features and
+dog_received_opening_kickoff remain computable on the drive-1 subset.
+Sidecar splice template prints the explicit per-feature evaluation
+N for D4-affected features (in-scope minus drive-1 count) so N03
+doesn't need to back-derive.
+
+Sidecar splicing: 02b uses sentinel-delimited splicing
+(<!-- BEGIN: 02b opening_drive_shock --> / <!-- END: ... -->) to add
+its section to feature_validation.schema.md without clobbering 02a's
+content (Corrections, Redundancy discoveries, etc.). Known issue: 02a's
+sidecar writer does NOT use splicing -- re-running 02a after 02b will
+clobber 02b's section. Tracked as item 3 in research/tech_debt.md;
+fixed in the cleanup sweep before N03.
+
+Budget invariant: 0 fresh CFBD calls. Cache-hit assertion in Phase
+02b-b covers BOTH /plays and /drives lookups (extends 02a's plays-only
+assertion). Re-uses N01's cache (162 /plays files + ~20 /drives files)
+verbatim. Lifetime audited count remains 253/3000 per
+research/data/cache/cfbd_call_log.csv.
+
+Deliverables (created at execution time, not in this commit):
+  research/results/feature_validation.csv (+30 rows from 02b; 02a's 18
+    preserved; 48 total)
+  research/results/feature_validation.schema.md (+ "02b -- Opening-
+    drive shock" section spliced in; 02a content untouched)
+
+Per R22, the notebook lands unexecuted; execution gated on explicit
+user go-ahead. No fixes to research/tech_debt.md items in this commit
+(deferred to the pre-N03 sweep).
