@@ -1,0 +1,8 @@
+DDL validated set 4/4 PASS; dog_third_down_success_rate tagged redundant_with=dog_avg_drive_yards (ρ=+0.647); D10 disagreement scope largest in Phase 0 (~45%); negative-distance handling fix in build script.
+
+Schema follow-up (prose approved 2026-05-14): document corpus-wide build-time field audit (116 skipped plays with negative raw min(distance, yardsToGoal)), Kickoff/Kickoff Return dominance, _effective_distance clamp, and corrections_log cross-reference under 02f D7.
+
+Files in this commit:
+- research/results/feature_validation.schema.md — 02f sidecar: D7 build-time audit paragraph (116-play skip, clamp, ST exclusion rationale, corrections_log pointer).
+
+Supersedes: none.

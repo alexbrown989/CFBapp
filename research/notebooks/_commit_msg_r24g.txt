@@ -1,0 +1,11 @@
+chore(rules): add R24(g) — every commit requires explicit user authorization
+
+Codifies stricter-than-R23 discipline: no git commit without the user
+explicitly authorizing that specific commit (e.g. "commit" / "approved"
+in reply to a proposed commit). Covers cosmetic re-dos, follow-up
+"completion" commits, and stacked commits when only one was approved.
+
+Files in this commit:
+- .cursorrules — new R24(g) under process rule 24.
+
+Supersedes: none.
