@@ -109,7 +109,23 @@ consideration:
 
 ## Deferred / not currently scheduled
 
-(none yet)
+### Weather and venue features -- deferred from 02g pending Open-Meteo cache backfill + venue lat/lon source resolution
+
+- **Deferred from:** 02g context notebook.
+- **Deferred on:** 2026-05-17.
+- **Original 02g candidates:** `is_dome`, `wind_mph`, `temp_f`.
+- **Reason:** the only Open-Meteo cache entry currently present is the
+  Notebook 00 reachability probe, not a per-game weather backfill. The
+  reduced 02g scope can proceed without delaying N03; weather has the
+  lowest prior among the 02g candidates and introduces a systematic
+  venue-coordinate coverage problem that would complicate interpretation.
+- **Required before revival:** full Open-Meteo cache backfill for the
+  trigger-game corpus, an authoritative venue-coordinate source covering
+  every trigger game, and cache-state hygiene that prevents partial
+  weather backfills from being mistaken for complete coverage.
+- **Target notebook:** extension notebook after N03 if the model needs
+  additional context variance or if weather-specific hypotheses become
+  important.
 
 ---
 

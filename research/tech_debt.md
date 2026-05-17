@@ -380,6 +380,52 @@ schema write (deliverables commit pending user authorization).
 
 ---
 
+## 9. Weather / venue feature plumbing deferred from 02g
+
+**Locations:**
+
+- `research/future_features.md` -- "Weather and venue features" entry.
+- Future extension notebook that would own `is_dome`, `wind_mph`, and
+  `temp_f`.
+- `research/data/cache/` -- Open-Meteo archive cache and any future
+  venue-coordinate cache.
+
+**Symptom:** At the start of 02g, only one Open-Meteo cache artifact was
+present: the Notebook 00 Bryant-Denny reachability probe. There is no
+complete per-game Open-Meteo backfill for the 4,311 unique trigger games.
+Cached CFBD `/games` metadata has `startDate`, `venueId`, and
+`neutralSite`, but does not carry venue latitude / longitude. Mapping
+`venueId` to cached `/teams/fbs` location rows covers only 3,866 of
+4,311 trigger games by exact venue ID, leaving 445 games without an
+authoritative coordinate source under that approach.
+
+**Severity:** Non-blocking for 02g after weather deferral. Blocking for
+any future weather feature notebook because partial coordinate coverage
+would create systematic missingness, especially around neutral-site and
+renamed/relocated venues.
+
+**Fix path before weather revival:**
+
+1. Choose an authoritative venue-coordinate source that covers all 4,311
+   trigger games, including neutral sites, renamed venues, temporary
+   home venues, and historical stadium IDs.
+2. Build a full Open-Meteo archive backfill keyed by stable
+   `(game_id, kickoff_date/hour, venue_lat, venue_lon, weather_fields)`
+   metadata, not by ad hoc probe parameters.
+3. Add cache hygiene checks: manifest expected game IDs, actual cached
+   game IDs, missing IDs, stale/partial-run markers, and field/unit
+   validation for `temperature_2m`, `wind_speed_10m`, and any future
+   precipitation field.
+4. Make the future weather notebook fail fast unless the manifest shows
+   complete coverage or the missingness policy has been explicitly
+   approved.
+
+**Identified during:** 02g planning halt on 2026-05-17. Decision:
+defer `is_dome`, `wind_mph`, and `temp_f`; proceed with week-of-season
+plus home/away/neutral only.
+
+---
+
 ## Tracking
 
 When an item is fixed, move it under a `## Resolved` section with the

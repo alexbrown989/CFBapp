@@ -1598,3 +1598,185 @@ Historical cross-notebook identities / redundancy anecdotes mostly live in older
 - Notebook **02f** splice updates only the sentinel-delimited block.
 - Re-running stale **02a** writers can clobber sibling sections (**`research/tech_debt.md` item 3**).
 <!-- END: 02f down_distance_efficiency -->
+
+<!-- BEGIN: 02g context_week_home_neutral -->
+
+## 02g -- Context: week phase + home/away/neutral (`v1_context_week_home_neutral`)
+
+**Section last writer:** `research/notebooks/02g_context_week_home_neutral.ipynb`
+**Last writer commit:** `6a7edee8eefc88450b9f924a8e7668eb80c93440`
+**Last writer generation timestamp:** 2026-05-17 09:32:36 Pacific Daylight Time
+
+### Structural finding
+
+Notebook 02g tested **5** context features (**3** season-phase dummies plus
+**2** home/neutral flags). **2 of 5** passed R6 stability mechanically, but
+both passes have per-fold Brier magnitudes at the noise floor:
+
+- `season_phase_bowl`: **+0.00003 / -0.00070 / +0.00001** (mean dBrier
+  essentially zero).
+- `fav_is_home`: **-0.00153 / +0.00145 / +0.00015** (two folds with
+  `|dBrier| < 0.0002`).
+
+Per the `corrections_log.md` magnitude-skepticism threshold (**+0.005**),
+neither feature should be treated as load-bearing signal in N03. The honest
+finding is that pre-game-state context features (week-of-season,
+home/away/neutral site) do **not** carry meaningful comeback-equity signal at
+the trigger level. Both R6-pass features still enter N03 per the project's
+L1/ablation-based pruning policy; expect both to be zeroed out or contribute
+minimally.
+
+Mechanistic correlation note: `season_phase_bowl` and `is_neutral_site`
+correlate at **rho = +0.803**. This is structural rather than surprising:
+bowl/postseason games are predominantly neutral-site games.
+
+### Reduced scope
+
+Weather / venue candidates (`is_dome`, `wind_mph`, `temp_f`) were deferred
+before scaffold because the full Open-Meteo cache and authoritative venue
+coordinate source are not present locally. See `research/future_features.md`
+and `research/tech_debt.md` item 9.
+
+### Candidate features (all Category A)
+
+- `season_phase_mid`, `season_phase_late`, `season_phase_bowl`, `fav_is_home`, `is_neutral_site`
+
+Source map:
+
+- `season_phase_mid`, `season_phase_late`, `season_phase_bowl`: derived
+  directly from `trigger_events.csv` (`season_type`, `week`).
+- `fav_is_home`: derived directly from `trigger_events.csv` (`home_is_fav`).
+- `is_neutral_site`: cached `/games.neutralSite` joined by `game_id`.
+
+### D3/D4 week-of-season encoding
+
+Regular weeks `1-4` are the omitted early-season reference. Regular weeks
+`5-9` set `season_phase_mid = 1`; regular weeks `10-16` set
+`season_phase_late = 1`; postseason rows set `season_phase_bowl = 1`.
+
+### D5 home/away/neutral encoding
+
+`fav_is_home` and `is_neutral_site` are separate binary indicators; away
+favorite is the reference state.
+
+### Prevalence and null counts
+
+All five features have zero null rows on **11,416**
+in-scope triggers.
+
+| Feature | Rows == 1 | % |
+|---|---:|---:|
+| `season_phase_mid` | 4,016 | 35.18% |
+| `season_phase_late` | 4,116 | 36.05% |
+| `season_phase_bowl` | 767 | 6.72% |
+| `fav_is_home` | 6,536 | 57.25% |
+| `is_neutral_site` | 1,069 | 9.36% |
+
+### D10 diff-vs-leaky
+
+The extractor accepts a filter-mode label for notebook consistency but does
+not inspect plays or drives. Chrono and leaky builds are byte-identical:
+
+| Feature | Mismatches | Verdict |
+|---|---:|---|
+| `season_phase_mid` | 0 | Category A byte-identical |
+| `season_phase_late` | 0 | Category A byte-identical |
+| `season_phase_bowl` | 0 | Category A byte-identical |
+| `fav_is_home` | 0 | Category A byte-identical |
+| `is_neutral_site` | 0 | Category A byte-identical |
+
+### Candidate-vs-candidate Pearson matrix summary
+
+| Feature A | Feature B | Pearson rho |
+|---|---|---:|
+| `season_phase_mid` | `season_phase_late` | -0.5532 |
+| `season_phase_mid` | `season_phase_bowl` | -0.1977 |
+| `season_phase_mid` | `fav_is_home` | +0.0014 |
+| `season_phase_mid` | `is_neutral_site` | -0.2110 |
+| `season_phase_late` | `season_phase_bowl` | -0.2015 |
+| `season_phase_late` | `fav_is_home` | -0.0356 |
+| `season_phase_late` | `is_neutral_site` | -0.1393 |
+| `season_phase_bowl` | `fav_is_home` | -0.0135 |
+| `season_phase_bowl` | `is_neutral_site` | +0.8025 **HIGH** |
+| `fav_is_home` | `is_neutral_site` | -0.0347 |
+
+### Stability table per walk-forward folds (`feature_validation.csv`)
+
+| Feature | Train window -> test season | dBrier test | dECE test | R6 stab |
+|---|---|---:|---:|---|
+| `season_phase_mid` | 2015-2020 -> test 2022 | +0.00006 | -0.00099 | FAIL |
+| `season_phase_mid` | 2015-2021 -> test 2023 | -0.00171 | +0.01190 | FAIL |
+| `season_phase_mid` | 2015-2022 -> test 2024 | -0.00779 | -0.01723 | FAIL |
+| `season_phase_late` | 2015-2020 -> test 2022 | -0.00326 | -0.01204 | FAIL |
+| `season_phase_late` | 2015-2021 -> test 2023 | +0.00050 | +0.01237 | FAIL |
+| `season_phase_late` | 2015-2022 -> test 2024 | -0.00283 | -0.03201 | FAIL |
+| `season_phase_bowl` | 2015-2020 -> test 2022 | +0.00003 | -0.00136 | **PASS** |
+| `season_phase_bowl` | 2015-2021 -> test 2023 | -0.00070 | +0.00028 | **PASS** |
+| `season_phase_bowl` | 2015-2022 -> test 2024 | +0.00001 | +0.00243 | **PASS** |
+| `fav_is_home` | 2015-2020 -> test 2022 | -0.00153 | +0.00117 | **PASS** |
+| `fav_is_home` | 2015-2021 -> test 2023 | +0.00145 | +0.00728 | **PASS** |
+| `fav_is_home` | 2015-2022 -> test 2024 | +0.00015 | +0.00011 | **PASS** |
+| `is_neutral_site` | 2015-2020 -> test 2022 | +0.00046 | -0.00032 | FAIL |
+| `is_neutral_site` | 2015-2021 -> test 2023 | -0.00063 | -0.00024 | FAIL |
+| `is_neutral_site` | 2015-2022 -> test 2024 | -0.00036 | -0.00950 | FAIL |
+
+### D12 cumulative PASS rollup after 02g
+
+| Feature | Feature set version | Brier-positive folds | ECE-positive folds |
+|---|---|---:|---:|
+| `dog_off_epa_per_play` | v1_baseline_efficiency_only | 3/3 | 2/3 |
+| `epa_divergence` | v1_baseline_efficiency_only | 2/3 | 1/3 |
+| `fav_def_epa_per_play` | v1_baseline_efficiency_only | 3/3 | 2/3 |
+| `plays_so_far` | v1_baseline_efficiency_only | 3/3 | 2/3 |
+| `fav_is_home` | v1_context_week_home_neutral | 2/3 | 3/3 |
+| `season_phase_bowl` | v1_context_week_home_neutral | 2/3 | 2/3 |
+| `dog_early_down_success_rate` | v1_down_distance_efficiency | 3/3 | 1/3 |
+| `dog_third_down_success_rate` | v1_down_distance_efficiency | 3/3 | 3/3 |
+| `fav_early_down_success_rate` | v1_down_distance_efficiency | 3/3 | 2/3 |
+| `fav_third_down_success_rate` | v1_down_distance_efficiency | 3/3 | 2/3 |
+| `dog_avg_drive_plays` | v1_explosive_vs_sustained | 3/3 | 2/3 |
+| `dog_avg_drive_yards` | v1_explosive_vs_sustained | 2/3 | 2/3 |
+| `dog_explosive_play_count` | v1_explosive_vs_sustained | 3/3 | 2/3 |
+| `dog_points_from_explosives` | v1_explosive_vs_sustained | 3/3 | 1/3 |
+| `dog_points_from_returns` | v1_explosive_vs_sustained | 2/3 | 1/3 |
+| `dog_points_from_sustained` | v1_explosive_vs_sustained | 3/3 | 2/3 |
+| `seconds_since_last_dog_explosive_play` | v1_explosive_vs_sustained | 2/3 | 1/3 |
+| `defense_stabilized_flag` | v1_opening_drive_shock | 3/3 | 2/3 |
+| `dog_received_opening_kickoff` | v1_opening_drive_shock | 2/3 | 2/3 |
+| `dog_scored_on_opening_drive` | v1_opening_drive_shock | 2/3 | 2/3 |
+| `fav_def_epa_after_first_drive` | v1_opening_drive_shock | 3/3 | 2/3 |
+| `opening_drive_was_explosive_td` | v1_opening_drive_shock | 2/3 | 2/3 |
+| `opening_drive_was_td` | v1_opening_drive_shock | 2/3 | 2/3 |
+| `fav_red_zone_tds` | v1_red_zone_failure | 3/3 | 3/3 |
+| `fav_red_zone_trips` | v1_red_zone_failure | 2/3 | 2/3 |
+| `fav_yards_per_point` | v1_red_zone_failure | 2/3 | 1/3 |
+| `dog_avg_starting_field_pos` | v1_turnover_short_field | 3/3 | 1/3 |
+| `dog_points_off_turnovers` | v1_turnover_short_field | 3/3 | 2/3 |
+| `fav_turnovers_so_far` | v1_turnover_short_field | 3/3 | 1/3 |
+| `short_field_tds_allowed` | v1_turnover_short_field | 2/3 | 2/3 |
+
+**Rows in rollup:** **30**.
+
+### Cross-notebook Pearson redundancy diagnostic
+
+Artifact: `research\results\_02g_correlations.csv`. Full wide matrix: `research\results\_02g_full_correlation_matrix.csv`.
+
+New-vs-validated `|rho| >= 0.6` count: **0**.
+
+No new-vs-validated `|rho| >= 0.6` pairs were found; no 02g `redundant_with` tags apply.
+
+Top new-vs-validated correlations by absolute rho:
+
+| New feature | Validated feature | Pairwise n | Pearson rho |
+|---|---|---:|---:|
+| `is_neutral_site` | `seconds_since_last_dog_explosive_play` | 9,472 | -0.0803 |
+| `season_phase_bowl` | `seconds_since_last_dog_explosive_play` | 9,472 | -0.0777 |
+| `fav_is_home` | `fav_red_zone_trips` | 11,416 | -0.0699 |
+| `season_phase_bowl` | `dog_avg_starting_field_pos` | 8,434 | +0.0533 |
+| `is_neutral_site` | `dog_avg_starting_field_pos` | 8,434 | +0.0492 |
+| `fav_is_home` | `fav_yards_per_point` | 4,902 | +0.0491 |
+| `season_phase_mid` | `dog_points_off_turnovers` | 8,434 | +0.0440 |
+| `fav_is_home` | `defense_stabilized_flag` | 4,235 | -0.0425 |
+| `fav_is_home` | `dog_points_from_explosives` | 9,502 | -0.0367 |
+| `season_phase_late` | `dog_avg_drive_yards` | 8,434 | +0.0362 |
+<!-- END: 02g context_week_home_neutral -->
