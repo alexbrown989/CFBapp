@@ -1780,3 +1780,89 @@ Top new-vs-validated correlations by absolute rho:
 | `fav_is_home` | `dog_points_from_explosives` | 9,502 | -0.0367 |
 | `season_phase_late` | `dog_avg_drive_yards` | 8,434 | +0.0362 |
 <!-- END: 02g context_week_home_neutral -->
+
+<!-- BEGIN: N03 walk_forward_validation -->
+
+## N03 -- Walk-forward validation with calibration
+
+**Source notebook:** `research/notebooks/03_walk_forward_validation.ipynb`
+**Builder:** `research/notebooks/_build_n03.py`
+**Verifier:** `research/notebooks/_verify_n03.py`
+**Model spec artifact:** `research/results/n03_model_spec.json`
+
+### Honest structural finding
+
+N03 has real but modest discrimination. The locked production model is a
+unified L1 logistic regression at `C=1.0`, isotonic-calibrated per
+walk-forward validation slice, with **30** R6-validated Phase 0 features plus
+protected structural `fav_deficit` (**31** core model features before
+missingness indicators). Weighted held-out metrics are:
+
+| Scheme | Weighted Brier | Weighted ECE | Weighted AUC |
+|---|---:|---:|---:|
+| U | 0.218908 | 0.041820 | 0.689016 |
+| W2 | 0.219233 | 0.042243 | 0.685530 |
+
+The model does **not** beat the Phase 0 pre-game alpha baseline on the newest
+fold. Against the alpha model
+(`pregame_spread`, `rating_gap`, `fav_pregame_rating`, `dog_pregame_rating`,
+`spread_movement`, `spread_movement_is_null`), N03's 2024 Brier delta is
+**-0.00205**. The fold-level alpha comparison is:
+
+| Test fold | Alpha Brier | N03 Brier | Delta Brier (alpha - N03) | Alpha AUC | N03 AUC |
+|---:|---:|---:|---:|---:|---:|
+| 2022 | 0.245734 | 0.221332 | +0.024402 | 0.6092 | 0.6933 |
+| 2023 | 0.216000 | 0.215187 | +0.000812 | 0.7116 | 0.6986 |
+| 2024 | 0.218155 | 0.220206 | -0.002051 | 0.6854 | 0.6751 |
+
+Aggregate ECE near **0.042** hides material per-deficit mis-calibration:
+
+| Deficit | Event rows | ECE | Brier |
+|---:|---:|---:|---:|
+| D=3 | 1,451 | 0.0363 | 0.2472 |
+| D=7 | 1,072 | 0.0422 | 0.2431 |
+| D=10 | 698 | 0.0872 | 0.2264 |
+| D=14 | 458 | 0.0609 | 0.1819 |
+| D=21 | 178 | 0.0141 | 0.0546 |
+
+Discrimination is dominated by structural game-state variables rather than
+large independent effects from individual engineered features. Weighted signed
+standardized coefficients under Scheme U:
+
+| Feature | Weighted signed standardized coefficient |
+|---|---:|
+| `plays_so_far` | -0.687 |
+| `fav_deficit` | -0.629 |
+
+Most engineered features contribute marginally after those two structural
+variables. This does not invalidate the production model, but it narrows the
+interpretation: N03 is a calibrated game-state model with modest incremental
+feature signal, not an edge-grade result by itself.
+
+### Sensitivity diagnostics
+
+The locked production architecture remains defensible:
+
+- C sweep tested `C in {0.1, 0.5, 1.0, 2.0, 10.0}`. No C value strictly
+  dominated `C=1.0` under the locked criterion of better weighted ECE and
+  better per-fold Brier-vs-alpha on all three folds.
+- `C=2.0` slightly improved weighted U ECE (**0.04112** vs **0.04182**) but
+  did not improve Brier-vs-alpha on all folds.
+- `C=0.1` produced a non-empty three-signal pruning set
+  (`dog_explosive_play_count`, `dog_points_from_explosives`,
+  `opening_drive_was_explosive_td`, `fav_red_zone_tds`) but worsened the
+  2024 Brier-vs-alpha result and is not a production replacement.
+- Bin-specific models for D<=7 and D>=10 worsened calibration relative to the
+  unified model on the same event rows. Unified architecture remains the right
+  production choice.
+
+### N04 implications
+
+N03 should be carried into N04 as the locked production probability model, but
+the prior for a clean positive market-comparison result is low. Treat N04 as a
+predictive-edge validation, not as confirmation of deployable betting edge.
+Report per-deficit results prominently, be skeptical of high-confidence Kelly
+sizing, and expect deployment-class performance to look closer to the 2024
+fold than to the stronger 2022 fold.
+
+<!-- END: N03 walk_forward_validation -->

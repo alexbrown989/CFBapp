@@ -606,3 +606,197 @@ Rare `/plays` rows carry **negative `distance`** (especially **Kickoff**-typed r
 **`research/notebooks/_diag_02f_correlations.py`** emits **`research/results/_02f_correlations.csv`**: **four** 02f DDL rates × **twenty-four** other PASS numeric columns (**11,416** triggers).
 
 One pair clears **0.6**: **`dog_third_down_success_rate`** vs **`dog_avg_drive_yards`** (**ρ ≈ +0.647**). **`feature_validation.csv`** row tag: **`redundant_with=dog_avg_drive_yards`** (**02d**/**02e** precedent: strongest partner wins). **`dog_early_down_success_rate`** peaked at **ρ ≈ +0.581** vs the same partner — advisory only (below gate).
+
+---
+
+## N03 null handling decision (2026-05-17)
+
+Notebook 03 fits all Phase 0 R6-PASS features in a single walk-forward
+model matrix. Phase 0 evaluated features one at a time, so each 02x
+notebook could use a local null policy. N03 cannot complete-case drop
+every row with any missing value: high-null features such as
+`fav_yards_per_point`, `defense_stabilized_flag`, down-distance success
+rates, drive-volume features, and turnover/short-field features would
+remove a large share of the corpus.
+
+The locked N03 policy is **train-fold-only median imputation plus paired
+missingness indicators for every candidate feature with >5% full-corpus
+null rate**. Medians are computed on training years only and then applied
+to train, validation, and test slices. This preserves R16 no-leakage
+discipline while keeping the full trigger corpus available for fitting.
+
+Pure median imputation without indicators was rejected because some null
+states are themselves informative. The clearest example is
+`fav_yards_per_point`: the 02e/02f schema-sidecar work separated nulls
+into bucket (a) "no completed favorite drives yet" and bucket (b)
+"completed favorite drives exist but zero favorite offensive points."
+Bucket (b) is a real game-state signal, not merely absent data. Median
+imputing that state without an indicator would erase exactly the
+information the feature was meant to preserve.
+
+Existing Phase 0 indicator columns are reused rather than duplicated:
+
+- `seconds_since_last_dog_explosive_play_is_null`
+- `fav_yards_per_point_is_null`
+- `fav_early_down_success_rate_insufficient_sample`
+- `fav_third_down_success_rate_insufficient_sample`
+- `dog_early_down_success_rate_insufficient_sample`
+- `dog_third_down_success_rate_insufficient_sample`
+
+For any other R6-PASS feature above the 5% null threshold, N03 creates a
+fresh `{feature}_is_null` preprocessing column. These indicator columns
+do not change the semantic 30-feature Phase 0 candidate pool; they
+preserve information already present in the validated features' null
+structure. N03 reports core-feature pruning decisions separately from
+missingness-indicator diagnostics. A zeroed indicator does not, by
+itself, drop the underlying core feature.
+
+---
+
+## N03 trigger-play deduplication and structural `fav_deficit` decision (2026-05-18)
+
+During N03 verification, the first successful execution produced
+prediction rows that were not unique on `game_id + trigger_play_id +
+scheme + fold`. The verifier surfaced the issue before the artifacts
+were accepted as canonical. The root cause is the trigger design itself:
+one play can satisfy multiple deficit thresholds. For example, a play
+where the favorite trails by 10 qualifies at the D=3, D=7, and D=10
+thresholds. The natural trigger-event key is therefore
+`game_id + fav_deficit + trigger_sequence`, not `game_id +
+trigger_play_id`.
+
+The diagnostic count was substantial: **11,416** trigger events but only
+**7,854** unique trigger plays. The duplicate event rows were identical
+on all 30 Phase 0 feature values, labels, scores, and model
+probabilities; only the threshold identity differed. Training directly
+on all 11,416 rows would count the same observed play multiple times,
+inflate effective sample size, and over-weight multi-threshold game
+states.
+
+N03 therefore uses a mixed structure:
+
+- **Training/evaluation matrix:** one row per unique trigger play
+  (**7,854** rows), using the lowest qualifying deficit threshold as
+  `fav_deficit`.
+- **Model feature set:** **30** R6-validated Phase 0 features plus
+  `fav_deficit` as a protected structural conditioning variable
+  (**31** core model features before missingness indicators).
+- **Prediction output:** held-out plays are replicated back to their
+  qualifying deficit thresholds at scoring time. `fav_deficit` varies
+  across those replicated rows, while the 30 Phase 0 feature values stay
+  constant for the underlying play.
+
+This was chosen over pure event-row training because pure event training
+retains the duplicate-play weighting problem even if `fav_deficit`
+enters as a feature. It was chosen over pure play-row scoring because
+N04 needs deficit-threshold-specific probabilities: a market at D=3 is
+not the same bet state as a market at D=7 for the same play. It was
+chosen over dropping multi-threshold rows because those plays are real
+game states and are needed for N04 threshold sensitivity.
+
+`fav_deficit` is explicitly **not** a Phase 0 stability-tested feature.
+It is a structural conditioning variable that defines the trigger event.
+It is exempt from L1/permutation/ablation pruning; removing it would
+collapse N04's threshold-specific scoring back to identical predictions
+across deficit variants and reintroduce the duplicate-row ambiguity.
+N03 reports the exemption in the pruning matrix and records
+`structural_conditioning_variable: true` in `n03_model_spec.json`.
+
+---
+
+## N03 honest interpretation (2026-05-19)
+
+N03 produced a usable probability model, but not an edge-grade result by
+itself. The structural finding is: **the model has real but modest
+discrimination, calibration remains fragile, and the newest fold does not
+beat the Phase 0 pre-game alpha baseline on Brier**.
+
+The locked production model is the unified L1 logistic regression at
+`C=1.0`, with isotonic calibration per walk-forward validation slice. It uses
+30 R6-validated Phase 0 features plus protected structural `fav_deficit`.
+Weighted held-out performance:
+
+| Scheme | Weighted Brier | Weighted ECE | Weighted AUC |
+|---|---:|---:|---:|
+| U | 0.218908 | 0.041820 | 0.689016 |
+| W2 | 0.219233 | 0.042243 | 0.685530 |
+
+### Pre-game alpha comparison
+
+The key diagnostic is N03 versus the Phase 0 pre-game alpha baseline
+(`pregame_spread`, `rating_gap`, `fav_pregame_rating`, `dog_pregame_rating`,
+`spread_movement`, `spread_movement_is_null`). Positive Delta Brier means N03
+beat alpha.
+
+| Test fold | Alpha Brier | N03 Brier | Delta Brier | Alpha ECE | N03 ECE | Alpha AUC | N03 AUC |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 2022 | 0.245734 | 0.221332 | +0.024402 | 0.076677 | 0.055814 | 0.6092 | 0.6933 |
+| 2023 | 0.216000 | 0.215187 | +0.000812 | 0.094456 | 0.026130 | 0.7116 | 0.6986 |
+| 2024 | 0.218155 | 0.220206 | -0.002051 | 0.056951 | 0.043515 | 0.6854 | 0.6751 |
+
+This is the cold-water result. N03 improves calibration versus alpha on every
+fold, but it does **not** improve 2024 Brier or 2024 AUC. The project should
+not treat N03 as proof of deployable edge before N04 compares the model
+against market probabilities directly.
+
+### Calibration and structural dominance
+
+Aggregate ECE around **0.042** hides material per-deficit calibration
+weakness:
+
+| Deficit | Event rows | ECE | Brier |
+|---:|---:|---:|---:|
+| D=3 | 1,451 | 0.0363 | 0.2472 |
+| D=7 | 1,072 | 0.0422 | 0.2431 |
+| D=10 | 698 | 0.0872 | 0.2264 |
+| D=14 | 458 | 0.0609 | 0.1819 |
+| D=21 | 178 | 0.0141 | 0.0546 |
+
+Discrimination is also dominated by two structural game-state variables:
+`plays_so_far` (weighted signed standardized coefficient **-0.687**) and
+`fav_deficit` (**-0.629**). The engineered Phase 0 features contribute
+incrementally, but most are marginal after time/deficit structure.
+
+### Sensitivity diagnostics
+
+Two informational diagnostics were run before commit. They are documented as
+appendices, not production replacements.
+
+**C sweep:** tested `C in {0.1, 0.5, 1.0, 2.0, 10.0}`. No C value strictly
+dominated locked `C=1.0` by the pre-declared criterion of better weighted ECE
+and better per-fold Brier-vs-alpha on all three folds. `C=2.0` slightly
+improved weighted U ECE (**0.04112** vs **0.04182**) but did not improve
+Brier-vs-alpha on all folds. `C=0.1` produced a non-empty three-signal pruning
+set (`dog_explosive_play_count`, `dog_points_from_explosives`,
+`opening_drive_was_explosive_td`, `fav_red_zone_tds`) but worsened the 2024
+Brier-vs-alpha result.
+
+**Bin-specific models:** D<=7 and D>=10 separate L1 models were fit at
+`C=1.0`. They worsened event-level calibration relative to the unified model:
+
+| Bin | Event rows | Bin-specific ECE | Unified ECE on same rows | Bin-specific Brier | Unified Brier |
+|---|---:|---:|---:|---:|---:|
+| D<=7 | 2,523 | 0.04286 | 0.03399 | 0.24751 | 0.24545 |
+| D>=10 | 1,334 | 0.07195 | 0.06638 | 0.19468 | 0.18818 |
+
+The unified architecture remains the right production choice. The bin-specific
+negative result also suggests that D=10/D=14 mis-calibration is not solved by
+splitting the sample; the split loses useful sample size and does not recover
+calibration.
+
+### N04 implications
+
+N04 should be framed as a predictive-edge validation against pre-game market
+probabilities, not as a live-betting CLV proof. The honest prior for finding
+positive CLV/predictive edge is **10-20%**, not **40-50%**.
+
+Operational implications for N04:
+
+- Be skeptical of high-confidence Kelly sizing; report conservative sizing
+  and threshold sensitivity.
+- Report per-deficit CLV/probability-comparison results prominently,
+  especially D=10 and D=14.
+- Expect deployment-class behavior to look closer to the 2024 fold than the
+  stronger 2022 fold.
+- A clean negative N04 result should be treated as a meaningful project
+  finding, not as a failed implementation.
