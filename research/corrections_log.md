@@ -800,3 +800,47 @@ Operational implications for N04:
   stronger 2022 fold.
 - A clean negative N04 result should be treated as a meaningful project
   finding, not as a failed implementation.
+
+---
+
+## N04 honest interpretation (2026-05-19)
+
+N04 produced a defensible positive result on the locked primary validation
+gate: **N03's trigger-state probabilities beat pre-game market
+probabilities for the historical trigger-state subpopulation**. Under
+Scheme U, all-fold Brier improvement is **+0.05847** with cluster-bootstrap
+95% CI **[+0.04211, +0.07465]**. Scheme W2 is effectively identical at
+**+0.05847** with 95% CI **[+0.04210, +0.07429]**. Fold-level improvements
+are consistent: **2022 +0.06491**, **2023 +0.05418**, and **2024
++0.05651**. The comparable 2024 result is reassuring given the Phase 0 and
+N03 concerns about 2024-fold weakness.
+
+The win is **calibration, not ranking**. The pre-game market still ranks
+teams better overall (**market AUC 0.6812** vs **model AUC 0.6650**), but it
+is poorly calibrated for trigger-state rows because it does not condition on
+the favorite now trailing. N04's all-fold ECE comparison captures that
+shift: **model ECE 0.03484** versus **market ECE 0.24840**. The model wins
+by adjusting probabilities down to the observed in-game state, not by
+re-ordering teams better than the market.
+
+The deficit pattern is the strongest mechanistic validation. All-fold Brier
+improvement increases monotonically with deficit: **D=3 -0.00570**,
+**D=7 +0.03134**, **D=10 +0.09147**, **D=14 +0.16507**, and **D=21
++0.34131**. That is the expected signature of a useful in-game-state model:
+as the favorite's deficit deepens, the stale pre-game probability becomes
+increasingly over-optimistic and the trigger-state model corrects it.
+
+This result does **not** prove live betting edge. Historical live in-game
+line data is unavailable for the 2022-2024 corpus, so N04 can only compare
+trigger-state probabilities to pre-game market probabilities. The tertiary
+favorite-side betting simulation at the primary deployment-context setting
+(edge threshold **+0.08**, **25% Kelly**, no D=21 rows) produced **89** bets,
+**35.96%** win rate, and **-33.27% ROI**. That is honest evidence that this
+specific favorite-side policy failed in hindsight. It is also consistent
+with the primary result: a model can improve on stale pre-game probability
+without beating correctly priced live in-game markets.
+
+Project conclusion after N04: **predictive edge versus pre-game market
+consensus is validated; live-line betting edge remains untested**.
+Deployment-context profitability requires going-forward live market data
+collection and a separate validation pass against actual live prices.
