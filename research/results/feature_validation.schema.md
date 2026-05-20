@@ -68,7 +68,7 @@ uniqueness is asserted after the write.
 | `ece_test_candidate` | REAL | Test-season ECE of the candidate model. |
 | `calibration_improvement` | REAL | `ece_test_baseline - ece_test_candidate`. Positive = candidate improved calibration. Reported alongside Brier but NOT the stability gate. |
 | `passed_stability` | BOOLEAN | True iff `sum(brier_improvement > 0 across the 3 test seasons) >= 2` for this `(feature, feature_set_version)`. Same value on all 3 rows for a given feature. |
-| `redundant_with` | TEXT | Empty string for canonical features. For features that are per-row identical to another feature (structural redundancy, not statistical correlation), the name of the canonical feature this one duplicates. Filter `redundant_with == ''` to drop duplicates when assembling the production feature set, after a `fillna("")` or `keep_default_na=False` read (see "Redundancy discoveries" / "N03 guidance" below). |
+| `redundant_with` | TEXT | Empty string for canonical features. For features that are per-row identical to another feature (structural redundancy) or empirically redundant under the later Pearson-threshold protocol, the name of the canonical/reference feature. Note: this column historically contains both structural-identity tags (02a EPA duplicates with byte-identical values) and Pearson `|rho| >= 0.6` correlation tags (02d/02e/02f). Per N03 production policy, the column is informational only -- production models do not pre-prune based on it; L1 regularization handles correlated features. Future readers should inspect the per-row context to determine which semantic applies. Filter `redundant_with == ''` only for legacy non-redundant descriptive counts, after a `fillna("")` or `keep_default_na=False` read (see "Redundancy discoveries" / "N03 guidance" below). |
 
 ## Walk-forward windows (locked for 02a-g)
 
@@ -1760,6 +1760,8 @@ not inspect plays or drives. Chrono and leaky builds are byte-identical:
 ### Cross-notebook Pearson redundancy diagnostic
 
 Artifact: `research\results\_02g_correlations.csv`. Full wide matrix: `research\results\_02g_full_correlation_matrix.csv`.
+
+Some `redundant_with` tags apply to features that failed R6 stability and are not in the production validated set. Those tags reference historical structural or correlation relationships and may not be independently verifiable from `_02g_full_correlation_matrix.csv`, which covers only R6-pass features. Example: `dog_def_epa_per_play` has `redundant_with=fav_off_epa_per_play` but failed stability and is outside the canonical matrix.
 
 New-vs-validated `|rho| >= 0.6` count: **0**.
 

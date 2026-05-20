@@ -989,6 +989,21 @@ if passing_n07_features:
     y = expanded_eval[TARGET_LABEL].astype(int).to_numpy()
     n06_spec = json.loads(N06_MODEL_SPEC_JSON.read_text(encoding="utf-8"))
     expanded_model = {
+        "deployment_candidate": {
+            "candidate_for": "N08 live data deployment scaffold",
+            "model_version": "N07 expanded 33-feature model",
+            "semantic_feature_count": len(pass_features) + len(passing_n07_features) + len(STRUCTURAL_FEATURES),
+            "feature_count_breakdown": {
+                "phase0_r6_validated_features": len(pass_features),
+                "n07_expansion_features": len(passing_n07_features),
+                "protected_structural_conditioning_features": len(STRUCTURAL_FEATURES),
+            },
+            "n07_expansion_features": passing_n07_features,
+            "structural_conditioning_feature": STRUCTURAL_FEATURES[0],
+            "historical_validation_status": "not_edge_grade_vs_baseline_C",
+            "rationale": "Use the 33-feature N07 expanded model for N08 because it is the best historically tested specification and includes the possession-adjusted signal source surfaced by N07, even though it does not beat baseline_C with statistical support on historical deficit_erased validation.",
+            "live_data_caveat": "Deployment value must be validated against actual live market prices; historical baseline_C validation is exhausted at this methodology level.",
+        },
         "expanded_features": passing_n07_features,
         "expanded_model_columns": expanded_feature_cols,
         "metric_rows": metric_rows,
@@ -1022,7 +1037,7 @@ if passing_n07_features:
             for scheme, fits in fits_by_scheme.items()
         },
     }
-    N07_EXPANDED_MODEL_SPEC_JSON.write_text(json.dumps(expanded_model, indent=2), encoding="utf-8")
+    N07_EXPANDED_MODEL_SPEC_JSON.write_text(json.dumps(expanded_model, indent=2) + "\n", encoding="utf-8")
     print(f"[ok] expanded model written with {len(passing_n07_features)} N07 features")
 else:
     for path in [N07_EXPANDED_PREDICTIONS_PARQUET, N07_EXPANDED_MODEL_SPEC_JSON]:
@@ -1085,10 +1100,36 @@ else:
 lines: list[str] = []
 lines.append("# N07 feature pool expansion test")
 lines.append("")
-lines.append(f"**Primary finding:** {structural_finding} {pass_count} of 14 pre-registered features passed all three inclusion gates.")
 if expanded_model:
     o = expanded_model["overall_U"]
-    lines.append(f"Expanded Scheme U Brier improvement versus baseline_C on `deficit_erased` is **{fmt(o['brier_improvement_baseline_C_minus_model'], signed=True)}** with 95% CI **[{fmt(o['bootstrap_ci']['2.5'], signed=True)}, {fmt(o['bootstrap_ci']['97.5'], signed=True)}]**.")
+    lines.extend([
+        "**Primary finding:** N07 found a real but limited missing signal source:",
+        f"possession-adjusted deficit pressure. {pass_count} of 14 pre-registered features passed",
+        "all three inclusion gates: `deficit_per_remaining_possession` and",
+        "`clock_pressure_index`. Both are Category A possession-adjusted features.",
+        "However, the expanded 33-feature model still does **not** beat the strict",
+        "`fav_deficit x time_bucket` baseline_C on the comeback-erasure target.",
+        "Expanded Scheme U Brier improvement versus baseline_C on `deficit_erased` is",
+        f"**{fmt(o['brier_improvement_baseline_C_minus_model'], signed=True)}** with 95% CI **[{fmt(o['bootstrap_ci']['2.5'], signed=True)}, {fmt(o['bootstrap_ci']['97.5'], signed=True)}]**.",
+        "",
+        "This is the natural endpoint for the project's historical-data methodology.",
+        "Phase 0 built and stability-tested the original feature pool. N03 produced a",
+        "calibrated final-win model with modest discrimination. N04 showed that the",
+        "model beats stale pre-game market probabilities, validating that current game",
+        "state matters. N05 and N06 then showed that the model does not beat a simple",
+        "deficit x time lookup table on either final-win or deficit-erased labels. N07",
+        "tested the most plausible missing categories and found that possession",
+        "pressure helps at the feature level, while fluke-score and efficiency-gap",
+        "hypotheses do not clear the strict baseline_C gate. Historical data has now",
+        "been pushed about as far as this framework can push it; the next validation",
+        "question requires live market comparison.",
+        "",
+        "The 33-feature expanded model (30 original Phase 0 features + the 2 N07",
+        "passes + protected `fav_deficit`) is the recommended production candidate for",
+        "an N08 live-data scaffold. It is not edge-grade on historical baseline_C",
+        "validation, but it is the best historically tested model specification and it",
+        "includes the one new signal source N07 surfaced.",
+    ])
 else:
     lines.append("No expanded model was fit because no feature cleared all three gates.")
 lines.append("")
@@ -1136,10 +1177,25 @@ lines.append("- `dog_offensive_points_pct` treats `dog_points_from_returns` as n
 lines.append("")
 lines.append("## Honest interpretation")
 lines.append("")
-if structural_finding == "No expansion success.":
+if expanded_model and expanded_model["overall_U"]["bootstrap_ci"]["lower"] <= 0:
+    lines.extend([
+        "N07 is a mixed but clarifying result. The possession-adjusted hypothesis is",
+        "supported: the model was missing structural pressure from deficit relative to",
+        "remaining possessions. The fluke-score hypothesis, which was one of the",
+        "project's original mechanistic ideas, is not supported under this strict test:",
+        "0 of 5 Category B features passed. Efficiency-gap differentials also failed",
+        "to beat baseline_C.",
+        "",
+        "The expanded model is marginally better than N06 on Brier",
+        "(-0.00263 versus -0.00352 improvement against baseline_C), but the confidence",
+        "interval still crosses zero and the AUC remains slightly below baseline_C",
+        "(0.7637 versus 0.7659). This is not an edge-grade historical result. It is,",
+        "however, enough to justify carrying the 33-feature expanded model forward as",
+        "the live-data deployment candidate, where the relevant comparison becomes",
+        "actual live market prices rather than a historical deficit x time baseline.",
+    ])
+elif structural_finding == "No expansion success.":
     lines.append("N07 confirms that the newly pre-registered feature categories do not break the N05/N06 pattern. Under this methodology, the feature pool remains exhausted relative to baseline_C.")
-elif expanded_model and expanded_model["overall_U"]["bootstrap_ci"]["lower"] <= 0:
-    lines.append("Some feature-level gates cleared, but the combined expanded model did not produce supported Brier edge over baseline_C. This is not an edge-grade result.")
 else:
     lines.append("The expansion produced supported signal beyond baseline_C; this should be reviewed carefully for mechanism, multiplicity, and deployment relevance before changing production conclusions.")
 
