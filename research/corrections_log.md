@@ -894,3 +894,52 @@ model adds signal beyond the two structural dimensions N03 leaned on most
 heavily. Keeping that baseline strict surfaced the real negative finding
 instead of allowing the positive N04 market comparison to overstate the
 model's mechanism.
+
+---
+
+## N06 honest interpretation (2026-05-19)
+
+N06 completed the natural label-change test: keep the N03 feature pool,
+model class, null handling, play-level deduplication, walk-forward windows,
+and isotonic calibration structure fixed, but train on `deficit_erased`
+instead of `favorite_final_win`. This repaired the main N05 calibration
+failure. N03 under-predicted `deficit_erased` by roughly 15-30 percentage
+points across the middle probability deciles; N06 reduced the weighted mean
+absolute decile gap to **0.040** with max gap **0.106**.
+
+That calibration repair did **not** produce comeback-detection edge over the
+strict baseline_C. Scheme U Brier improvement (`baseline_C - model`) on
+`deficit_erased` is **-0.00352** with cluster-bootstrap 95% CI
+**[-0.00724, +0.00013]**. Model Brier is **0.17861** versus baseline_C Brier
+**0.17508**. The label change moved the model from "badly miscalibrated for
+the wrong label" to "approximately calibrated but flat against the simple
+baseline."
+
+The cleanest single diagnostic is the AUC tie: N06 AUC on `deficit_erased` is
+**0.7646**, while baseline_C AUC is **0.7659**. The 30 engineered features
+plus protected `fav_deficit` do not rank comeback-erasure outcomes better
+than the 20-cell `fav_deficit x time_bucket` lookup table. Whatever signal
+the engineered features carry appears to be absorbed by their correlation
+with deficit and time.
+
+The cross-label result confirms experimental cleanliness. N06 performs badly
+on `favorite_final_win`, with Brier improvement **-0.04137** and 95% CI
+**[-0.05153, -0.03086]**. This is the expected mirror image of N03's poor
+performance on `deficit_erased`: each model performs best on its trained
+label and poorly on the other, and neither model beats baseline_C on its own
+label.
+
+The per-deficit pattern is also flat against baseline_C. N06 has no supported
+positive edge at D=3, D=7, D=10, D=14, or D=21. D=3 is significantly worse;
+D=7, D=10, and D=14 are near-zero with CIs crossing zero; D=21 is a tiny
+positive estimate with CI crossing zero. This confirms N05's reframing of
+N04: the monotonic per-deficit improvement over pre-game market probability
+was about market staleness at deeper in-game deficits, not model
+deep-deficit insight beyond current deficit and time.
+
+Project implication: the validated Phase 0 feature pool is exhausted relative
+to baseline_C for this question. Future research needs either feature
+expansion or a different validation target. Candidate feature directions:
+possession-adjusted deficit, trajectory features, and fluke-score
+decomposition. Candidate validation direction: live market comparison once
+historical or go-forward live-line data is available.
