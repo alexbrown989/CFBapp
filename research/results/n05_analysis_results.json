@@ -1,0 +1,2365 @@
+{
+  "created_at": "2026-05-19T09:41:16.890493",
+  "source_commit": "40c8b43ecf75f96975298f68a7d51753af25be57",
+  "config": {
+    "bootstrap_resamples": 10000,
+    "bootstrap_seed": 42,
+    "training_baseline_seasons": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021
+    ],
+    "test_seasons": [
+      2022,
+      2023,
+      2024
+    ],
+    "time_bucket_policy": "Q1=period 1; Q2-first-half=period 2; Q3=period 3; Q4=period 4; period_seconds_elapsed=900-clock_seconds_in_period_total",
+    "baseline_C_policy": "label rate by fav_deficit x time_bucket computed on 2015-2021 only"
+  },
+  "data_quality": {
+    "deficit_label_quality": {
+      "unique_trigger_plays": 7854,
+      "missing_trigger_play_ids": 0,
+      "score_mismatch_count": 0,
+      "team_score_fail_count": 0,
+      "no_post_trigger_play_count": 2,
+      "deficit_erased_null_event_rows": 4
+    },
+    "feature_subset_quality": {
+      "games_with_neutral_site_metadata": 4311,
+      "neutral_site_missing_event_rows": 0,
+      "feature_subset_extract_summary": {
+        "notebook": "02b_opening_drive_shock.ipynb",
+        "cells": [
+          4,
+          6,
+          8,
+          10,
+          11,
+          13
+        ],
+        "rows": 11416,
+        "cols": 28,
+        "elapsed_sec": 21.876908300007926,
+        "stdout_tail": "2 (drive-summary features computable): 9,556 (83.7%)\n\n[ok] always-present pre-game columns are non-null on the in-scope subset\n     spread_movement nulls (pre-impute): 6,352 (55.64% of in-scope)\ndistinct (season, season_type, week) tuples to load from cache: 161\n[ok] /plays loaded from cache in 11.1s -- 8,536 games, 1,541,058 plays\n[info] CFBD negative-id encoding: 19,828 plays across 115 games carry the alternate (negative-int) id format. Retained; chrono_key orders them correctly without referencing play.id. See research/corrections_log.md.\n[ok] /drives loaded from cache in 3.9s -- 8,537 games, 214,313 drives\n[ok] cache-hit assertion passed: 0 /plays lookups, 0 /drives lookups, all cached.\n[ok] plays_by_game sorted by composite _chrono_key (8,536 games)\n[ok] drives_by_game sorted by driveNumber (8,537 games)\n[ok] assert_no_lookahead defined (composite chrono_key gate)\n[ok] 10 feature functions registered\nfeature_matrix_df:  11,416 rows x 28 cols\n  skipped (game not in plays_by_game): 0\n\nNull counts per candidate feature (this run):\n  total in-scope triggers: 11,416\n  dog_received_opening_kickoff         0 null ( 0.00%) \n  dog_scored_on_opening_drive      1,860 null (16.29%) (D4 drive-summary)\n  opening_drive_was_td             1,860 null (16.29%) (D4 drive-summary)\n  opening_drive_was_explosive_td   1,860 null (16.29%) (D4 drive-summary)\n  opening_drive_yards              1,860 null (16.29%) (D4 drive-summary)\n  opening_drive_plays              1,860 null (16.29%) (D4 drive-summary)\n  opening_drive_seconds            1,860 null (16.29%) (D4 drive-summary)\n  fav_def_epa_first_drive          5,377 null (47.10%) \n  fav_def_epa_after_first_drive    2,019 null (17.69%) \n  defense_stabilized_flag          7,181 null (62.90%) \n\n  drive-1 trigger count (expected null floor for drive-summary feats): 1,860\n\nR16-safe NaN handling for spread_movement:\n  spread_movement nulls AFTER impute:    0  (expected: 0)\n  spread_movement_is_null indicator sum: 6,352 (55.64% of in-scope)\n"
+      }
+    },
+    "n_descriptive_rows": 11416,
+    "n_model_validation_rows_scheme_U": 3857
+  },
+  "descriptive": {
+    "favorite_final_win": {
+      "overall": {
+        "successes": 4945,
+        "n": 11416,
+        "rate": 0.43316398037841625,
+        "wilson_low": 0.4240983384340779,
+        "wilson_high": 0.442274587538435,
+        "scope": "overall",
+        "bootstrap_rate_ci": {
+          "2.5": 0.41716824129467556,
+          "25": 0.42742375224626694,
+          "50": 0.4330185379503323,
+          "75": 0.43857537163566607,
+          "97.5": 0.44927033190417964
+        }
+      },
+      "by_deficit": [
+        {
+          "successes": 2459,
+          "n": 4311,
+          "rate": 0.5704012990025517,
+          "wilson_low": 0.5555682535666352,
+          "wilson_high": 0.5851089893385774,
+          "fav_deficit": 3
+        },
+        {
+          "successes": 1510,
+          "n": 3183,
+          "rate": 0.4743952246308514,
+          "wilson_low": 0.4570893122459888,
+          "wilson_high": 0.4917628656529648,
+          "fav_deficit": 7
+        },
+        {
+          "successes": 633,
+          "n": 2025,
+          "rate": 0.3125925925925926,
+          "wilson_low": 0.29277363622804464,
+          "wilson_high": 0.3331212326390456,
+          "fav_deficit": 10
+        },
+        {
+          "successes": 301,
+          "n": 1348,
+          "rate": 0.22329376854599406,
+          "wilson_low": 0.20186620440081332,
+          "wilson_high": 0.24629393661839472,
+          "fav_deficit": 14
+        },
+        {
+          "successes": 42,
+          "n": 549,
+          "rate": 0.07650273224043716,
+          "wilson_low": 0.05709422408334175,
+          "wilson_high": 0.1017966431249083,
+          "fav_deficit": 21
+        }
+      ],
+      "by_time_bucket": [
+        {
+          "successes": 3205,
+          "n": 5867,
+          "rate": 0.5462757797852394,
+          "wilson_low": 0.5335104372564111,
+          "wilson_high": 0.5589805631919428,
+          "time_bucket": "Q1"
+        },
+        {
+          "successes": 1226,
+          "n": 3104,
+          "rate": 0.3949742268041237,
+          "wilson_low": 0.3779169536168079,
+          "wilson_high": 0.4122911349748768,
+          "time_bucket": "Q2-first-half"
+        },
+        {
+          "successes": 370,
+          "n": 1403,
+          "rate": 0.2637205987170349,
+          "wilson_low": 0.24133071659042898,
+          "wilson_high": 0.2874008289273086,
+          "time_bucket": "Q3"
+        },
+        {
+          "successes": 144,
+          "n": 1042,
+          "rate": 0.1381957773512476,
+          "wilson_low": 0.1185671032698567,
+          "wilson_high": 0.16048232277773827,
+          "time_bucket": "Q4"
+        }
+      ],
+      "by_deficit_time": [
+        {
+          "successes": 1805,
+          "n": 3002,
+          "rate": 0.6012658227848101,
+          "wilson_low": 0.583631816362673,
+          "wilson_high": 0.6186409942061657,
+          "fav_deficit": 3,
+          "time_bucket": "Q1"
+        },
+        {
+          "successes": 455,
+          "n": 843,
+          "rate": 0.5397390272835113,
+          "wilson_low": 0.5059890759937611,
+          "wilson_high": 0.5731284486646371,
+          "fav_deficit": 3,
+          "time_bucket": "Q2-first-half"
+        },
+        {
+          "successes": 125,
+          "n": 272,
+          "rate": 0.45955882352941174,
+          "wilson_low": 0.40130771109001134,
+          "wilson_high": 0.5189363302007479,
+          "fav_deficit": 3,
+          "time_bucket": "Q3"
+        },
+        {
+          "successes": 74,
+          "n": 194,
+          "rate": 0.38144329896907214,
+          "wilson_low": 0.3160208886765937,
+          "wilson_high": 0.4514697056902305,
+          "fav_deficit": 3,
+          "time_bucket": "Q4"
+        },
+        {
+          "successes": 1064,
+          "n": 1948,
+          "rate": 0.5462012320328542,
+          "wilson_low": 0.5240232635492144,
+          "wilson_high": 0.5681973413500976,
+          "fav_deficit": 7,
+          "time_bucket": "Q1"
+        },
+        {
+          "successes": 305,
+          "n": 725,
+          "rate": 0.4206896551724138,
+          "wilson_low": 0.38526522415207304,
+          "wilson_high": 0.4569501182818269,
+          "fav_deficit": 7,
+          "time_bucket": "Q2-first-half"
+        },
+        {
+          "successes": 106,
+          "n": 307,
+          "rate": 0.34527687296416937,
+          "wilson_low": 0.29429878186253905,
+          "wilson_high": 0.4000791805868012,
+          "fav_deficit": 7,
+          "time_bucket": "Q3"
+        },
+        {
+          "successes": 35,
+          "n": 203,
+          "rate": 0.1724137931034483,
+          "wilson_low": 0.1266614249243267,
+          "wilson_high": 0.23033402096790867,
+          "fav_deficit": 7,
+          "time_bucket": "Q4"
+        },
+        {
+          "successes": 223,
+          "n": 573,
+          "rate": 0.38917975567190227,
+          "wilson_low": 0.3501229544838983,
+          "wilson_high": 0.4297125652104711,
+          "fav_deficit": 10,
+          "time_bucket": "Q1"
+        },
+        {
+          "successes": 301,
+          "n": 838,
+          "rate": 0.35918854415274465,
+          "wilson_low": 0.32741619237826236,
+          "wilson_high": 0.3922459868512994,
+          "fav_deficit": 10,
+          "time_bucket": "Q2-first-half"
+        },
+        {
+          "successes": 87,
+          "n": 367,
+          "rate": 0.23705722070844687,
+          "wilson_low": 0.1964114528697335,
+          "wilson_high": 0.2831505124678109,
+          "fav_deficit": 10,
+          "time_bucket": "Q3"
+        },
+        {
+          "successes": 22,
+          "n": 247,
+          "rate": 0.08906882591093117,
+          "wilson_low": 0.059555004492797256,
+          "wilson_high": 0.13116888559146522,
+          "fav_deficit": 10,
+          "time_bucket": "Q4"
+        },
+        {
+          "successes": 105,
+          "n": 313,
+          "rate": 0.3354632587859425,
+          "wilson_low": 0.2854311677520574,
+          "wilson_high": 0.3894851125119802,
+          "fav_deficit": 14,
+          "time_bucket": "Q1"
+        },
+        {
+          "successes": 138,
+          "n": 514,
+          "rate": 0.26848249027237353,
+          "wilson_low": 0.23199150540414798,
+          "wilson_high": 0.30840836805903676,
+          "fav_deficit": 14,
+          "time_bucket": "Q2-first-half"
+        },
+        {
+          "successes": 46,
+          "n": 286,
+          "rate": 0.16083916083916083,
+          "wilson_low": 0.12280134165284429,
+          "wilson_high": 0.2078672218116563,
+          "fav_deficit": 14,
+          "time_bucket": "Q3"
+        },
+        {
+          "successes": 12,
+          "n": 235,
+          "rate": 0.05106382978723404,
+          "wilson_low": 0.029448750508956147,
+          "wilson_high": 0.08712003515398686,
+          "fav_deficit": 14,
+          "time_bucket": "Q4"
+        },
+        {
+          "successes": 8,
+          "n": 31,
+          "rate": 0.25806451612903225,
+          "wilson_low": 0.13701705906393744,
+          "wilson_high": 0.43246135809433794,
+          "fav_deficit": 21,
+          "time_bucket": "Q1"
+        },
+        {
+          "successes": 27,
+          "n": 184,
+          "rate": 0.14673913043478262,
+          "wilson_low": 0.10284856499724362,
+          "wilson_high": 0.20507844527958377,
+          "fav_deficit": 21,
+          "time_bucket": "Q2-first-half"
+        },
+        {
+          "successes": 6,
+          "n": 171,
+          "rate": 0.03508771929824561,
+          "wilson_low": 0.016178397190256082,
+          "wilson_high": 0.07442630793829172,
+          "fav_deficit": 21,
+          "time_bucket": "Q3"
+        },
+        {
+          "successes": 1,
+          "n": 163,
+          "rate": 0.006134969325153374,
+          "wilson_low": 0.0010837948860926427,
+          "wilson_high": 0.03392823906508486,
+          "fav_deficit": 21,
+          "time_bucket": "Q4"
+        }
+      ],
+      "by_season": [
+        {
+          "successes": 493,
+          "n": 998,
+          "rate": 0.4939879759519038,
+          "wilson_low": 0.46305200031090904,
+          "wilson_high": 0.5249700565780863,
+          "season": 2015
+        },
+        {
+          "successes": 489,
+          "n": 1129,
+          "rate": 0.43312666076173606,
+          "wilson_low": 0.4044980072210674,
+          "wilson_high": 0.46220884851389715,
+          "season": 2016
+        },
+        {
+          "successes": 483,
+          "n": 1116,
+          "rate": 0.4327956989247312,
+          "wilson_low": 0.4040064114569553,
+          "wilson_high": 0.46204605622184886,
+          "season": 2017
+        },
+        {
+          "successes": 451,
+          "n": 1104,
+          "rate": 0.40851449275362317,
+          "wilson_low": 0.3798842143331549,
+          "wilson_high": 0.43777922623258214,
+          "season": 2018
+        },
+        {
+          "successes": 466,
+          "n": 1101,
+          "rate": 0.4232515894641235,
+          "wilson_low": 0.39438385396322584,
+          "wilson_high": 0.45265302300155574,
+          "season": 2019
+        },
+        {
+          "successes": 399,
+          "n": 890,
+          "rate": 0.44831460674157303,
+          "wilson_low": 0.4159331683120787,
+          "wilson_high": 0.4811403013819967,
+          "season": 2020
+        },
+        {
+          "successes": 479,
+          "n": 1221,
+          "rate": 0.3923013923013923,
+          "wilson_low": 0.3652930707247885,
+          "wilson_high": 0.41998526215167814,
+          "season": 2021
+        },
+        {
+          "successes": 573,
+          "n": 1261,
+          "rate": 0.4544012688342585,
+          "wilson_low": 0.42709925713314667,
+          "wilson_high": 0.4819802569845967,
+          "season": 2022
+        },
+        {
+          "successes": 561,
+          "n": 1300,
+          "rate": 0.43153846153846154,
+          "wilson_low": 0.40485527998690607,
+          "wilson_high": 0.45862505437752,
+          "season": 2023
+        },
+        {
+          "successes": 551,
+          "n": 1296,
+          "rate": 0.4251543209876543,
+          "wilson_low": 0.3984993964121211,
+          "wilson_high": 0.4522516327356873,
+          "season": 2024
+        }
+      ],
+      "by_feature_subset": {
+        "dog_scored_on_opening_drive": [
+          {
+            "successes": 3415,
+            "n": 8340,
+            "rate": 0.4094724220623501,
+            "wilson_low": 0.3989629241964635,
+            "wilson_high": 0.42006527672845906,
+            "dog_scored_on_opening_drive_bucket": "false"
+          },
+          {
+            "successes": 1137,
+            "n": 1860,
+            "rate": 0.6112903225806452,
+            "wilson_low": 0.5889298294806616,
+            "wilson_high": 0.633192067229346,
+            "dog_scored_on_opening_drive_bucket": "missing"
+          },
+          {
+            "successes": 393,
+            "n": 1216,
+            "rate": 0.32319078947368424,
+            "wilson_low": 0.2974959303845012,
+            "wilson_high": 0.34999924459035914,
+            "dog_scored_on_opening_drive_bucket": "true"
+          }
+        ],
+        "opening_drive_was_explosive_td": [
+          {
+            "successes": 3328,
+            "n": 8026,
+            "rate": 0.4146523797657613,
+            "wilson_low": 0.40391747909092707,
+            "wilson_high": 0.4254689406751731,
+            "opening_drive_was_explosive_td_bucket": "false"
+          },
+          {
+            "successes": 1137,
+            "n": 1860,
+            "rate": 0.6112903225806452,
+            "wilson_low": 0.5889298294806616,
+            "wilson_high": 0.633192067229346,
+            "opening_drive_was_explosive_td_bucket": "missing"
+          },
+          {
+            "successes": 480,
+            "n": 1530,
+            "rate": 0.3137254901960784,
+            "wilson_low": 0.29096628182087614,
+            "wilson_high": 0.3374177361478069,
+            "opening_drive_was_explosive_td_bucket": "true"
+          }
+        ],
+        "early_vs_late_season": [
+          {
+            "successes": 2838,
+            "n": 6462,
+            "rate": 0.4391829155060353,
+            "wilson_low": 0.42712223846871084,
+            "wilson_high": 0.4513158573296729,
+            "early_vs_late_season": "early_week_le_8"
+          },
+          {
+            "successes": 2107,
+            "n": 4954,
+            "rate": 0.4253128784820347,
+            "wilson_low": 0.4116089361791609,
+            "wilson_high": 0.43913255966205106,
+            "early_vs_late_season": "late_week_gt_8"
+          }
+        ],
+        "is_neutral_site": [
+          {
+            "successes": 4534,
+            "n": 10347,
+            "rate": 0.43819464579105055,
+            "wilson_low": 0.42865912207896184,
+            "wilson_high": 0.4477760445605511,
+            "is_neutral_site_bucket": "false"
+          },
+          {
+            "successes": 411,
+            "n": 1069,
+            "rate": 0.3844714686623012,
+            "wilson_low": 0.3557725801034013,
+            "wilson_high": 0.4139976893346281,
+            "is_neutral_site_bucket": "true"
+          }
+        ]
+      }
+    },
+    "deficit_erased": {
+      "overall": {
+        "successes": 7246,
+        "n": 11412,
+        "rate": 0.6349456712232737,
+        "wilson_low": 0.6260685089273704,
+        "wilson_high": 0.6437320144164581,
+        "scope": "overall",
+        "bootstrap_rate_ci": {
+          "2.5": 0.6195750330431705,
+          "25": 0.6297899150764774,
+          "50": 0.6351787275678263,
+          "75": 0.6405528934699654,
+          "97.5": 0.6507728799104525
+        }
+      },
+      "by_deficit": [
+        {
+          "successes": 3526,
+          "n": 4309,
+          "rate": 0.8182873056393595,
+          "wilson_low": 0.806491996128936,
+          "wilson_high": 0.8295156165297607,
+          "fav_deficit": 3
+        },
+        {
+          "successes": 2277,
+          "n": 3182,
+          "rate": 0.7155876807039597,
+          "wilson_low": 0.6996601648358716,
+          "wilson_high": 0.7309952892204876,
+          "fav_deficit": 7
+        },
+        {
+          "successes": 938,
+          "n": 2024,
+          "rate": 0.4634387351778656,
+          "wilson_low": 0.4418040279933814,
+          "wilson_high": 0.4852119626521248,
+          "fav_deficit": 10
+        },
+        {
+          "successes": 444,
+          "n": 1348,
+          "rate": 0.3293768545994065,
+          "wilson_low": 0.304803363858393,
+          "wilson_high": 0.3549200474939336,
+          "fav_deficit": 14
+        },
+        {
+          "successes": 61,
+          "n": 549,
+          "rate": 0.1111111111111111,
+          "wilson_low": 0.08747741241216042,
+          "wilson_high": 0.14014925489520036,
+          "fav_deficit": 21
+        }
+      ],
+      "by_time_bucket": [
+        {
+          "successes": 4624,
+          "n": 5867,
+          "rate": 0.7881370376683143,
+          "wilson_low": 0.7774941537297363,
+          "wilson_high": 0.7984028490619485,
+          "time_bucket": "Q1"
+        },
+        {
+          "successes": 1810,
+          "n": 3104,
+          "rate": 0.583118556701031,
+          "wilson_low": 0.5656813302859467,
+          "wilson_high": 0.6003503051230881,
+          "time_bucket": "Q2-first-half"
+        },
+        {
+          "successes": 575,
+          "n": 1403,
+          "rate": 0.4098360655737705,
+          "wilson_low": 0.38438204209686205,
+          "wilson_high": 0.43578248432242556,
+          "time_bucket": "Q3"
+        },
+        {
+          "successes": 237,
+          "n": 1038,
+          "rate": 0.22832369942196531,
+          "wilson_low": 0.20381747299945902,
+          "wilson_high": 0.25483336564309583,
+          "time_bucket": "Q4"
+        }
+      ],
+      "by_deficit_time": [
+        {
+          "successes": 2541,
+          "n": 3002,
+          "rate": 0.846435709526982,
+          "wilson_low": 0.833096721155501,
+          "wilson_high": 0.8588892097378945,
+          "fav_deficit": 3,
+          "time_bucket": "Q1"
+        },
+        {
+          "successes": 681,
+          "n": 843,
+          "rate": 0.8078291814946619,
+          "wilson_low": 0.7798591666101947,
+          "wilson_high": 0.833006434848142,
+          "fav_deficit": 3,
+          "time_bucket": "Q2-first-half"
+        },
+        {
+          "successes": 195,
+          "n": 272,
+          "rate": 0.7169117647058824,
+          "wilson_low": 0.6606419087539211,
+          "wilson_high": 0.7671400515956427,
+          "fav_deficit": 3,
+          "time_bucket": "Q3"
+        },
+        {
+          "successes": 109,
+          "n": 192,
+          "rate": 0.5677083333333334,
+          "wilson_low": 0.49698551032613225,
+          "wilson_high": 0.6357749386439948,
+          "fav_deficit": 3,
+          "time_bucket": "Q4"
+        },
+        {
+          "successes": 1568,
+          "n": 1948,
+          "rate": 0.8049281314168378,
+          "wilson_low": 0.7867384504037878,
+          "wilson_high": 0.8219175419316715,
+          "fav_deficit": 7,
+          "time_bucket": "Q1"
+        },
+        {
+          "successes": 474,
+          "n": 725,
+          "rate": 0.6537931034482759,
+          "wilson_low": 0.6184332244283762,
+          "wilson_high": 0.6875318071998003,
+          "fav_deficit": 7,
+          "time_bucket": "Q2-first-half"
+        },
+        {
+          "successes": 164,
+          "n": 307,
+          "rate": 0.5342019543973942,
+          "wilson_low": 0.4783240103587581,
+          "wilson_high": 0.589234545310335,
+          "fav_deficit": 7,
+          "time_bucket": "Q3"
+        },
+        {
+          "successes": 71,
+          "n": 202,
+          "rate": 0.35148514851485146,
+          "wilson_low": 0.288975751010361,
+          "wilson_high": 0.4195377800161304,
+          "fav_deficit": 7,
+          "time_bucket": "Q4"
+        },
+        {
+          "successes": 338,
+          "n": 573,
+          "rate": 0.5898778359511344,
+          "wilson_low": 0.5491366693944074,
+          "wilson_high": 0.6294219248692144,
+          "fav_deficit": 10,
+          "time_bucket": "Q1"
+        },
+        {
+          "successes": 432,
+          "n": 838,
+          "rate": 0.5155131264916468,
+          "wilson_low": 0.48168293424375713,
+          "wilson_high": 0.5492017409258675,
+          "fav_deficit": 10,
+          "time_bucket": "Q2-first-half"
+        },
+        {
+          "successes": 131,
+          "n": 367,
+          "rate": 0.3569482288828338,
+          "wilson_low": 0.30964577910010954,
+          "wilson_high": 0.4072143574824923,
+          "fav_deficit": 10,
+          "time_bucket": "Q3"
+        },
+        {
+          "successes": 37,
+          "n": 246,
+          "rate": 0.15040650406504066,
+          "wilson_low": 0.11113137116802929,
+          "wilson_high": 0.20043204664149966,
+          "fav_deficit": 10,
+          "time_bucket": "Q4"
+        },
+        {
+          "successes": 165,
+          "n": 313,
+          "rate": 0.5271565495207667,
+          "wilson_low": 0.47185253367725194,
+          "wilson_high": 0.5818020608422757,
+          "fav_deficit": 14,
+          "time_bucket": "Q1"
+        },
+        {
+          "successes": 190,
+          "n": 514,
+          "rate": 0.36964980544747084,
+          "wilson_low": 0.3290301820246078,
+          "wilson_high": 0.4122033601773533,
+          "fav_deficit": 14,
+          "time_bucket": "Q2-first-half"
+        },
+        {
+          "successes": 72,
+          "n": 286,
+          "rate": 0.2517482517482518,
+          "wilson_low": 0.2049642405597872,
+          "wilson_high": 0.30511274919257925,
+          "fav_deficit": 14,
+          "time_bucket": "Q3"
+        },
+        {
+          "successes": 17,
+          "n": 235,
+          "rate": 0.07234042553191489,
+          "wilson_low": 0.045653226104098533,
+          "wilson_high": 0.1127843374895107,
+          "fav_deficit": 14,
+          "time_bucket": "Q4"
+        },
+        {
+          "successes": 12,
+          "n": 31,
+          "rate": 0.3870967741935484,
+          "wilson_low": 0.23733101420380254,
+          "wilson_high": 0.5617589138033927,
+          "fav_deficit": 21,
+          "time_bucket": "Q1"
+        },
+        {
+          "successes": 33,
+          "n": 184,
+          "rate": 0.1793478260869565,
+          "wilson_low": 0.13065177711257656,
+          "wilson_high": 0.2411588937540821,
+          "fav_deficit": 21,
+          "time_bucket": "Q2-first-half"
+        },
+        {
+          "successes": 13,
+          "n": 171,
+          "rate": 0.07602339181286549,
+          "wilson_low": 0.04496403070717354,
+          "wilson_high": 0.12571321610816882,
+          "fav_deficit": 21,
+          "time_bucket": "Q3"
+        },
+        {
+          "successes": 3,
+          "n": 163,
+          "rate": 0.018404907975460124,
+          "wilson_low": 0.006278750696494414,
+          "wilson_high": 0.05270813955403271,
+          "fav_deficit": 21,
+          "time_bucket": "Q4"
+        }
+      ],
+      "by_season": [
+        {
+          "successes": 674,
+          "n": 998,
+          "rate": 0.6753507014028056,
+          "wilson_low": 0.6456757165653807,
+          "wilson_high": 0.703680957505583,
+          "season": 2015
+        },
+        {
+          "successes": 718,
+          "n": 1129,
+          "rate": 0.6359610274579274,
+          "wilson_low": 0.607477186111052,
+          "wilson_high": 0.6635227826926957,
+          "season": 2016
+        },
+        {
+          "successes": 682,
+          "n": 1116,
+          "rate": 0.6111111111111112,
+          "wilson_low": 0.5821750123014495,
+          "wilson_high": 0.6392849078029277,
+          "season": 2017
+        },
+        {
+          "successes": 649,
+          "n": 1104,
+          "rate": 0.5878623188405797,
+          "wilson_low": 0.5585713904790327,
+          "wilson_high": 0.6165439190766456,
+          "season": 2018
+        },
+        {
+          "successes": 723,
+          "n": 1101,
+          "rate": 0.6566757493188011,
+          "wilson_low": 0.6281277747225527,
+          "wilson_high": 0.6841342220061477,
+          "season": 2019
+        },
+        {
+          "successes": 560,
+          "n": 890,
+          "rate": 0.6292134831460674,
+          "wilson_low": 0.5969883428094267,
+          "wilson_high": 0.6603279829553848,
+          "season": 2020
+        },
+        {
+          "successes": 755,
+          "n": 1220,
+          "rate": 0.6188524590163934,
+          "wilson_low": 0.5912670235857257,
+          "wilson_high": 0.6456917735769777,
+          "season": 2021
+        },
+        {
+          "successes": 845,
+          "n": 1261,
+          "rate": 0.6701030927835051,
+          "wilson_low": 0.6436699755337809,
+          "wilson_high": 0.6955029674530726,
+          "season": 2022
+        },
+        {
+          "successes": 806,
+          "n": 1297,
+          "rate": 0.6214340786430224,
+          "wilson_low": 0.5947155386749179,
+          "wilson_high": 0.6474354151281458,
+          "season": 2023
+        },
+        {
+          "successes": 834,
+          "n": 1296,
+          "rate": 0.6435185185185185,
+          "wilson_low": 0.6170532622505653,
+          "wilson_high": 0.6691354859814722,
+          "season": 2024
+        }
+      ],
+      "by_feature_subset": {
+        "dog_scored_on_opening_drive": [
+          {
+            "successes": 5050,
+            "n": 8339,
+            "rate": 0.6055882000239837,
+            "wilson_low": 0.5950523852491287,
+            "wilson_high": 0.616026778689452,
+            "dog_scored_on_opening_drive_bucket": "false"
+          },
+          {
+            "successes": 1604,
+            "n": 1860,
+            "rate": 0.8623655913978494,
+            "wilson_low": 0.8459603397577299,
+            "wilson_high": 0.8772771403511835,
+            "dog_scored_on_opening_drive_bucket": "missing"
+          },
+          {
+            "successes": 592,
+            "n": 1213,
+            "rate": 0.4880461665292663,
+            "wilson_low": 0.4599987156229143,
+            "wilson_high": 0.5161690917855337,
+            "dog_scored_on_opening_drive_bucket": "true"
+          }
+        ],
+        "opening_drive_was_explosive_td": [
+          {
+            "successes": 4892,
+            "n": 8025,
+            "rate": 0.609595015576324,
+            "wilson_low": 0.5988715752433041,
+            "wilson_high": 0.6202135828111642,
+            "opening_drive_was_explosive_td_bucket": "false"
+          },
+          {
+            "successes": 1604,
+            "n": 1860,
+            "rate": 0.8623655913978494,
+            "wilson_low": 0.8459603397577299,
+            "wilson_high": 0.8772771403511835,
+            "opening_drive_was_explosive_td_bucket": "missing"
+          },
+          {
+            "successes": 750,
+            "n": 1527,
+            "rate": 0.4911591355599214,
+            "wilson_low": 0.46613838380955197,
+            "wilson_high": 0.5162242574395295,
+            "opening_drive_was_explosive_td_bucket": "true"
+          }
+        ],
+        "early_vs_late_season": [
+          {
+            "successes": 4117,
+            "n": 6458,
+            "rate": 0.6375038711675441,
+            "wilson_low": 0.6257008861684115,
+            "wilson_high": 0.6491433685719588,
+            "early_vs_late_season": "early_week_le_8"
+          },
+          {
+            "successes": 3129,
+            "n": 4954,
+            "rate": 0.6316108195397658,
+            "wilson_low": 0.6180814261028749,
+            "wilson_high": 0.644936262306665,
+            "early_vs_late_season": "late_week_gt_8"
+          }
+        ],
+        "is_neutral_site": [
+          {
+            "successes": 6638,
+            "n": 10343,
+            "rate": 0.6417867156530987,
+            "wilson_low": 0.6324952346132702,
+            "wilson_high": 0.6509729147415857,
+            "is_neutral_site_bucket": "false"
+          },
+          {
+            "successes": 608,
+            "n": 1069,
+            "rate": 0.568755846585594,
+            "wilson_low": 0.5388736386851078,
+            "wilson_high": 0.5981456746452958,
+            "is_neutral_site_bucket": "true"
+          }
+        ]
+      }
+    }
+  },
+  "baseline_tables": {
+    "favorite_final_win": {
+      "overall_training_rate": 0.4312739780394232,
+      "deficit_time": [
+        {
+          "fav_deficit": 3,
+          "time_bucket": "Q1",
+          "baseline_C_rate": 0.6085427135678392,
+          "successes": 1211,
+          "n": 1990
+        },
+        {
+          "fav_deficit": 3,
+          "time_bucket": "Q2-first-half",
+          "baseline_C_rate": 0.5401459854014599,
+          "successes": 296,
+          "n": 548
+        },
+        {
+          "fav_deficit": 3,
+          "time_bucket": "Q3",
+          "baseline_C_rate": 0.4153846153846154,
+          "successes": 81,
+          "n": 195
+        },
+        {
+          "fav_deficit": 3,
+          "time_bucket": "Q4",
+          "baseline_C_rate": 0.36220472440944884,
+          "successes": 46,
+          "n": 127
+        },
+        {
+          "fav_deficit": 7,
+          "time_bucket": "Q1",
+          "baseline_C_rate": 0.5565819861431871,
+          "successes": 723,
+          "n": 1299
+        },
+        {
+          "fav_deficit": 7,
+          "time_bucket": "Q2-first-half",
+          "baseline_C_rate": 0.4021505376344086,
+          "successes": 187,
+          "n": 465
+        },
+        {
+          "fav_deficit": 7,
+          "time_bucket": "Q3",
+          "baseline_C_rate": 0.3209302325581395,
+          "successes": 69,
+          "n": 215
+        },
+        {
+          "fav_deficit": 7,
+          "time_bucket": "Q4",
+          "baseline_C_rate": 0.1893939393939394,
+          "successes": 25,
+          "n": 132
+        },
+        {
+          "fav_deficit": 10,
+          "time_bucket": "Q1",
+          "baseline_C_rate": 0.4046997389033943,
+          "successes": 155,
+          "n": 383
+        },
+        {
+          "fav_deficit": 10,
+          "time_bucket": "Q2-first-half",
+          "baseline_C_rate": 0.33460803059273425,
+          "successes": 175,
+          "n": 523
+        },
+        {
+          "fav_deficit": 10,
+          "time_bucket": "Q3",
+          "baseline_C_rate": 0.21755725190839695,
+          "successes": 57,
+          "n": 262
+        },
+        {
+          "fav_deficit": 10,
+          "time_bucket": "Q4",
+          "baseline_C_rate": 0.08176100628930817,
+          "successes": 13,
+          "n": 159
+        },
+        {
+          "fav_deficit": 14,
+          "time_bucket": "Q1",
+          "baseline_C_rate": 0.34134615384615385,
+          "successes": 71,
+          "n": 208
+        },
+        {
+          "fav_deficit": 14,
+          "time_bucket": "Q2-first-half",
+          "baseline_C_rate": 0.2691131498470948,
+          "successes": 88,
+          "n": 327
+        },
+        {
+          "fav_deficit": 14,
+          "time_bucket": "Q3",
+          "baseline_C_rate": 0.12195121951219512,
+          "successes": 25,
+          "n": 205
+        },
+        {
+          "fav_deficit": 14,
+          "time_bucket": "Q4",
+          "baseline_C_rate": 0.04666666666666667,
+          "successes": 7,
+          "n": 150
+        },
+        {
+          "fav_deficit": 21,
+          "time_bucket": "Q1",
+          "baseline_C_rate": 0.3157894736842105,
+          "successes": 6,
+          "n": 19
+        },
+        {
+          "fav_deficit": 21,
+          "time_bucket": "Q2-first-half",
+          "baseline_C_rate": 0.175,
+          "successes": 21,
+          "n": 120
+        },
+        {
+          "fav_deficit": 21,
+          "time_bucket": "Q3",
+          "baseline_C_rate": 0.02608695652173913,
+          "successes": 3,
+          "n": 115
+        },
+        {
+          "fav_deficit": 21,
+          "time_bucket": "Q4",
+          "baseline_C_rate": 0.008547008547008548,
+          "successes": 1,
+          "n": 117
+        }
+      ],
+      "deficit": [
+        {
+          "fav_deficit": 3,
+          "baseline_deficit_rate": 0.5713286713286714,
+          "successes": 1634,
+          "n": 2860
+        },
+        {
+          "fav_deficit": 7,
+          "baseline_deficit_rate": 0.47560397915679775,
+          "successes": 1004,
+          "n": 2111
+        },
+        {
+          "fav_deficit": 10,
+          "baseline_deficit_rate": 0.30143180105501133,
+          "successes": 400,
+          "n": 1327
+        },
+        {
+          "fav_deficit": 14,
+          "baseline_deficit_rate": 0.21460674157303372,
+          "successes": 191,
+          "n": 890
+        },
+        {
+          "fav_deficit": 21,
+          "baseline_deficit_rate": 0.08355795148247978,
+          "successes": 31,
+          "n": 371
+        }
+      ]
+    },
+    "deficit_erased": {
+      "overall_training_rate": 0.6299285525271235,
+      "deficit_time": [
+        {
+          "fav_deficit": 3,
+          "time_bucket": "Q1",
+          "baseline_C_rate": 0.8467336683417085,
+          "successes": 1685,
+          "n": 1990
+        },
+        {
+          "fav_deficit": 3,
+          "time_bucket": "Q2-first-half",
+          "baseline_C_rate": 0.7974452554744526,
+          "successes": 437,
+          "n": 548
+        },
+        {
+          "fav_deficit": 3,
+          "time_bucket": "Q3",
+          "baseline_C_rate": 0.6666666666666666,
+          "successes": 130,
+          "n": 195
+        },
+        {
+          "fav_deficit": 3,
+          "time_bucket": "Q4",
+          "baseline_C_rate": 0.5079365079365079,
+          "successes": 64,
+          "n": 126
+        },
+        {
+          "fav_deficit": 7,
+          "time_bucket": "Q1",
+          "baseline_C_rate": 0.8052347959969207,
+          "successes": 1046,
+          "n": 1299
+        },
+        {
+          "fav_deficit": 7,
+          "time_bucket": "Q2-first-half",
+          "baseline_C_rate": 0.6387096774193548,
+          "successes": 297,
+          "n": 465
+        },
+        {
+          "fav_deficit": 7,
+          "time_bucket": "Q3",
+          "baseline_C_rate": 0.5069767441860465,
+          "successes": 109,
+          "n": 215
+        },
+        {
+          "fav_deficit": 7,
+          "time_bucket": "Q4",
+          "baseline_C_rate": 0.3484848484848485,
+          "successes": 46,
+          "n": 132
+        },
+        {
+          "fav_deficit": 10,
+          "time_bucket": "Q1",
+          "baseline_C_rate": 0.6031331592689295,
+          "successes": 231,
+          "n": 383
+        },
+        {
+          "fav_deficit": 10,
+          "time_bucket": "Q2-first-half",
+          "baseline_C_rate": 0.5124282982791587,
+          "successes": 268,
+          "n": 523
+        },
+        {
+          "fav_deficit": 10,
+          "time_bucket": "Q3",
+          "baseline_C_rate": 0.3282442748091603,
+          "successes": 86,
+          "n": 262
+        },
+        {
+          "fav_deficit": 10,
+          "time_bucket": "Q4",
+          "baseline_C_rate": 0.1320754716981132,
+          "successes": 21,
+          "n": 159
+        },
+        {
+          "fav_deficit": 14,
+          "time_bucket": "Q1",
+          "baseline_C_rate": 0.5288461538461539,
+          "successes": 110,
+          "n": 208
+        },
+        {
+          "fav_deficit": 14,
+          "time_bucket": "Q2-first-half",
+          "baseline_C_rate": 0.4036697247706422,
+          "successes": 132,
+          "n": 327
+        },
+        {
+          "fav_deficit": 14,
+          "time_bucket": "Q3",
+          "baseline_C_rate": 0.2146341463414634,
+          "successes": 44,
+          "n": 205
+        },
+        {
+          "fav_deficit": 14,
+          "time_bucket": "Q4",
+          "baseline_C_rate": 0.06666666666666667,
+          "successes": 10,
+          "n": 150
+        },
+        {
+          "fav_deficit": 21,
+          "time_bucket": "Q1",
+          "baseline_C_rate": 0.3157894736842105,
+          "successes": 6,
+          "n": 19
+        },
+        {
+          "fav_deficit": 21,
+          "time_bucket": "Q2-first-half",
+          "baseline_C_rate": 0.225,
+          "successes": 27,
+          "n": 120
+        },
+        {
+          "fav_deficit": 21,
+          "time_bucket": "Q3",
+          "baseline_C_rate": 0.0782608695652174,
+          "successes": 9,
+          "n": 115
+        },
+        {
+          "fav_deficit": 21,
+          "time_bucket": "Q4",
+          "baseline_C_rate": 0.02564102564102564,
+          "successes": 3,
+          "n": 117
+        }
+      ],
+      "deficit": [
+        {
+          "fav_deficit": 3,
+          "baseline_deficit_rate": 0.8100734522560336,
+          "successes": 2316,
+          "n": 2859
+        },
+        {
+          "fav_deficit": 7,
+          "baseline_deficit_rate": 0.709616295594505,
+          "successes": 1498,
+          "n": 2111
+        },
+        {
+          "fav_deficit": 10,
+          "baseline_deficit_rate": 0.4566691785983421,
+          "successes": 606,
+          "n": 1327
+        },
+        {
+          "fav_deficit": 14,
+          "baseline_deficit_rate": 0.3325842696629214,
+          "successes": 296,
+          "n": 890
+        },
+        {
+          "fav_deficit": 21,
+          "baseline_deficit_rate": 0.12129380053908356,
+          "successes": 45,
+          "n": 371
+        }
+      ]
+    }
+  },
+  "model_validation": {
+    "favorite_final_win": {
+      "overall_brier_vs_baseline_C": {
+        "n": 3857,
+        "n_games": 1451,
+        "brier_model": 0.22564592258643285,
+        "brier_baseline_C": 0.22261873490969772,
+        "brier_improvement_baseline_C_minus_model": -0.0030271876767351477,
+        "brier_improvement_bootstrap_ci": {
+          "2.5": -0.006767343709017204,
+          "25": -0.004293419139117481,
+          "50": -0.003042323268982185,
+          "75": -0.0018136776236636154,
+          "97.5": 0.0005091370142742346
+        }
+      },
+      "threshold_analysis": [
+        {
+          "successes": 721,
+          "n": 1666,
+          "rate": 0.4327731092436975,
+          "wilson_low": 0.40916329016508257,
+          "wilson_high": 0.45669223832431227,
+          "threshold": 0.0,
+          "mean_model_prob": 0.4626642614405727,
+          "mean_baseline_C": 0.40754698999878175,
+          "actual_minus_mean_model_prob": -0.029891152196875215,
+          "actual_minus_mean_baseline_C": 0.025226119244915746,
+          "bootstrap_rate_ci": {
+            "2.5": 0.39768091965046887,
+            "25": 0.4205173031508534,
+            "50": 0.43321513002364065,
+            "75": 0.4458128078817734,
+            "97.5": 0.47062386432465175
+          }
+        },
+        {
+          "successes": 398,
+          "n": 960,
+          "rate": 0.41458333333333336,
+          "wilson_low": 0.3838202314815879,
+          "wilson_high": 0.4460273036092332,
+          "threshold": 0.03,
+          "mean_model_prob": 0.46127792458042893,
+          "mean_baseline_C": 0.3771617995433984,
+          "actual_minus_mean_model_prob": -0.046694591247095574,
+          "actual_minus_mean_baseline_C": 0.03742153378993496,
+          "bootstrap_rate_ci": {
+            "2.5": 0.3701755945626243,
+            "25": 0.3993894653578814,
+            "50": 0.4144704363752156,
+            "75": 0.429769392033543,
+            "97.5": 0.4599375650364204
+          }
+        },
+        {
+          "successes": 268,
+          "n": 687,
+          "rate": 0.3901018922852984,
+          "wilson_low": 0.35433506728016584,
+          "wilson_high": 0.4270909052464894,
+          "threshold": 0.05,
+          "mean_model_prob": 0.454263033732259,
+          "mean_baseline_C": 0.35093809662864656,
+          "actual_minus_mean_model_prob": -0.06416114144696061,
+          "actual_minus_mean_baseline_C": 0.039163795656651845,
+          "bootstrap_rate_ci": {
+            "2.5": 0.34057971014492755,
+            "25": 0.37265506372194823,
+            "50": 0.3898809523809524,
+            "75": 0.4072414584562922,
+            "97.5": 0.44148245614035087
+          }
+        },
+        {
+          "successes": 166,
+          "n": 425,
+          "rate": 0.3905882352941176,
+          "wilson_low": 0.34538209023574434,
+          "wilson_high": 0.4377545489881118,
+          "threshold": 0.08,
+          "mean_model_prob": 0.46667880102270626,
+          "mean_baseline_C": 0.33798115980008764,
+          "actual_minus_mean_model_prob": -0.07609056572858863,
+          "actual_minus_mean_baseline_C": 0.05260707549402999,
+          "bootstrap_rate_ci": {
+            "2.5": 0.32790697674418606,
+            "25": 0.3695652173913043,
+            "50": 0.39069767441860465,
+            "75": 0.41244239631336405,
+            "97.5": 0.45455059646236107
+          }
+        },
+        {
+          "successes": 107,
+          "n": 265,
+          "rate": 0.4037735849056604,
+          "wilson_low": 0.34648156403404407,
+          "wilson_high": 0.4638155522525671,
+          "threshold": 0.1,
+          "mean_model_prob": 0.4835976025900937,
+          "mean_baseline_C": 0.33251978725018794,
+          "actual_minus_mean_model_prob": -0.07982401768443331,
+          "actual_minus_mean_baseline_C": 0.07125379765547246,
+          "bootstrap_rate_ci": {
+            "2.5": 0.3295008019246191,
+            "25": 0.377431906614786,
+            "50": 0.40370370370370373,
+            "75": 0.43014705882352944,
+            "97.5": 0.48
+          }
+        }
+      ],
+      "quintile_analysis": {
+        "spearman_model_prob_vs_actual": 0.2838867729143606,
+        "rows": [
+          {
+            "successes": 163,
+            "n": 829,
+            "rate": 0.19662243667068757,
+            "wilson_low": 0.17099299833252093,
+            "wilson_high": 0.22505051670544388,
+            "quintile": 1,
+            "model_prob_min": 0.0,
+            "model_prob_max": 0.23,
+            "mean_model_prob": 0.13865466813345104,
+            "mean_baseline_C": 0.18339683253008762,
+            "actual_minus_mean_model_prob": 0.057967768537236536,
+            "actual_minus_mean_baseline_C": 0.01322560414059995
+          },
+          {
+            "successes": 341,
+            "n": 833,
+            "rate": 0.40936374549819926,
+            "wilson_low": 0.3764620977764263,
+            "wilson_high": 0.4430975112649392,
+            "quintile": 2,
+            "model_prob_min": 0.23928831667376493,
+            "model_prob_max": 0.42028985507246375,
+            "mean_model_prob": 0.3506479035045175,
+            "mean_baseline_C": 0.38112881050786124,
+            "actual_minus_mean_model_prob": 0.05871584199368174,
+            "actual_minus_mean_baseline_C": 0.028234934990338023
+          },
+          {
+            "successes": 426,
+            "n": 906,
+            "rate": 0.47019867549668876,
+            "wilson_low": 0.4378930985745544,
+            "wilson_high": 0.502755901889776,
+            "quintile": 3,
+            "model_prob_min": 0.423728813559322,
+            "model_prob_max": 0.5242718446601942,
+            "mean_model_prob": 0.4746819694152259,
+            "mean_baseline_C": 0.4919144984481577,
+            "actual_minus_mean_model_prob": -0.0044832939185371345,
+            "actual_minus_mean_baseline_C": -0.021715822951468955
+          },
+          {
+            "successes": 442,
+            "n": 761,
+            "rate": 0.580814717477004,
+            "wilson_low": 0.5454373860017627,
+            "wilson_high": 0.6153802561140991,
+            "quintile": 4,
+            "model_prob_min": 0.5294822767626088,
+            "model_prob_max": 0.5892116182572614,
+            "mean_model_prob": 0.5683135183915454,
+            "mean_baseline_C": 0.5777334842695988,
+            "actual_minus_mean_model_prob": 0.012501199085458548,
+            "actual_minus_mean_baseline_C": 0.003081233207405165
+          },
+          {
+            "successes": 313,
+            "n": 528,
+            "rate": 0.5928030303030303,
+            "wilson_low": 0.5503717642370892,
+            "wilson_high": 0.6338936749735081,
+            "quintile": 5,
+            "model_prob_min": 0.592,
+            "model_prob_max": 1.0,
+            "mean_model_prob": 0.6391830730906741,
+            "mean_baseline_C": 0.5957096959883215,
+            "actual_minus_mean_model_prob": -0.04638004278764385,
+            "actual_minus_mean_baseline_C": -0.0029066656852911876
+          }
+        ]
+      },
+      "decile_analysis": [
+        {
+          "successes": 26,
+          "n": 293,
+          "rate": 0.08873720136518772,
+          "wilson_low": 0.06127553403405089,
+          "wilson_high": 0.12684326528240486,
+          "decile": 0,
+          "lo": 0.0,
+          "hi": 0.1,
+          "mean_model_prob": 0.04953132645428893,
+          "mean_baseline_C": 0.09841153501702032,
+          "actual_minus_mean_model_prob": 0.03920587491089878,
+          "actual_minus_mean_baseline_C": -0.009674333651832609,
+          "bootstrap_rate_ci": {
+            "2.5": 0.05693741891714969,
+            "25": 0.07666666666666666,
+            "50": 0.08833922261484099,
+            "75": 0.1,
+            "97.5": 0.12413793103448276
+          }
+        },
+        {
+          "successes": 42,
+          "n": 200,
+          "rate": 0.21,
+          "wilson_low": 0.15928412069979,
+          "wilson_high": 0.2716461685990246,
+          "decile": 1,
+          "lo": 0.1,
+          "hi": 0.2,
+          "mean_model_prob": 0.13956216232600338,
+          "mean_baseline_C": 0.18042412480324244,
+          "actual_minus_mean_model_prob": 0.07043783767399661,
+          "actual_minus_mean_baseline_C": 0.029575875196757556,
+          "bootstrap_rate_ci": {
+            "2.5": 0.14925373134328357,
+            "25": 0.18811881188118812,
+            "50": 0.20918367346938777,
+            "75": 0.23076923076923078,
+            "97.5": 0.2722772277227723
+          }
+        },
+        {
+          "successes": 205,
+          "n": 636,
+          "rate": 0.3223270440251572,
+          "wilson_low": 0.28716455628714177,
+          "wilson_high": 0.3596229457035144,
+          "decile": 2,
+          "lo": 0.2,
+          "hi": 0.30000000000000004,
+          "mean_model_prob": 0.24586873011966548,
+          "mean_baseline_C": 0.2931271387758579,
+          "actual_minus_mean_model_prob": 0.07645831390549174,
+          "actual_minus_mean_baseline_C": 0.02919990524929933,
+          "bootstrap_rate_ci": {
+            "2.5": 0.2807570977917981,
+            "25": 0.3081664098613251,
+            "50": 0.32222222222222224,
+            "75": 0.33699059561128525,
+            "97.5": 0.36438251106894365
+          }
+        },
+        {
+          "successes": 91,
+          "n": 201,
+          "rate": 0.4527363184079602,
+          "wilson_low": 0.3854521108094987,
+          "wilson_high": 0.5217932285403275,
+          "decile": 3,
+          "lo": 0.30000000000000004,
+          "hi": 0.4,
+          "mean_model_prob": 0.3616238971678381,
+          "mean_baseline_C": 0.4169666408681383,
+          "actual_minus_mean_model_prob": 0.09111242124012209,
+          "actual_minus_mean_baseline_C": 0.03576967753982191,
+          "bootstrap_rate_ci": {
+            "2.5": 0.38308457711442784,
+            "25": 0.42857142857142855,
+            "50": 0.45226130653266333,
+            "75": 0.4752475247524752,
+            "97.5": 0.5226130653266332
+          }
+        },
+        {
+          "successes": 339,
+          "n": 776,
+          "rate": 0.4368556701030928,
+          "wilson_low": 0.4023537428425507,
+          "wilson_high": 0.471979688790849,
+          "decile": 4,
+          "lo": 0.4,
+          "hi": 0.5,
+          "mean_model_prob": 0.41932950483008524,
+          "mean_baseline_C": 0.4260865383755017,
+          "actual_minus_mean_model_prob": 0.017526165273007543,
+          "actual_minus_mean_baseline_C": 0.010769131727591086,
+          "bootstrap_rate_ci": {
+            "2.5": 0.3961290322580645,
+            "25": 0.42312579415501905,
+            "50": 0.43693107932379716,
+            "75": 0.45108005082592123,
+            "97.5": 0.4782065217391304
+          }
+        },
+        {
+          "successes": 752,
+          "n": 1368,
+          "rate": 0.5497076023391813,
+          "wilson_low": 0.5232405611240704,
+          "wilson_high": 0.5758962590423887,
+          "decile": 5,
+          "lo": 0.5,
+          "hi": 0.6000000000000001,
+          "mean_model_prob": 0.554487771738593,
+          "mean_baseline_C": 0.5656428681988459,
+          "actual_minus_mean_model_prob": -0.004780169399411727,
+          "actual_minus_mean_baseline_C": -0.01593526585966465,
+          "bootstrap_rate_ci": {
+            "2.5": 0.5183283497873516,
+            "25": 0.5389090909090909,
+            "50": 0.5497803806734992,
+            "75": 0.5605282465150404,
+            "97.5": 0.5808609474429728
+          }
+        },
+        {
+          "successes": 201,
+          "n": 341,
+          "rate": 0.5894428152492669,
+          "wilson_low": 0.5365155269266579,
+          "wilson_high": 0.6403773565700388,
+          "decile": 6,
+          "lo": 0.6000000000000001,
+          "hi": 0.7000000000000001,
+          "mean_model_prob": 0.6410522831668537,
+          "mean_baseline_C": 0.6001472955384846,
+          "actual_minus_mean_model_prob": -0.051609467917586804,
+          "actual_minus_mean_baseline_C": -0.010704480289217666,
+          "bootstrap_rate_ci": {
+            "2.5": 0.5352889576883385,
+            "25": 0.5710144927536231,
+            "50": 0.5899705014749262,
+            "75": 0.6083086053412463,
+            "97.5": 0.6422287390029325
+          }
+        },
+        {
+          "successes": 16,
+          "n": 24,
+          "rate": 0.6666666666666666,
+          "wilson_low": 0.4670631683813174,
+          "wilson_high": 0.8202780967270225,
+          "decile": 7,
+          "lo": 0.7000000000000001,
+          "hi": 0.8,
+          "mean_model_prob": 0.7246688100685542,
+          "mean_baseline_C": 0.5956630619283207,
+          "actual_minus_mean_model_prob": -0.058002143401887585,
+          "actual_minus_mean_baseline_C": 0.07100360473834588,
+          "bootstrap_rate_ci": {
+            "2.5": 0.4583333333333333,
+            "25": 0.625,
+            "50": 0.6666666666666666,
+            "75": 0.75,
+            "97.5": 0.8333333333333334
+          }
+        },
+        {
+          "successes": 10,
+          "n": 15,
+          "rate": 0.6666666666666666,
+          "wilson_low": 0.41713547738519763,
+          "wilson_high": 0.8482367556028527,
+          "decile": 8,
+          "lo": 0.8,
+          "hi": 0.9,
+          "mean_model_prob": 0.8461841138233892,
+          "mean_baseline_C": 0.6005188831951038,
+          "actual_minus_mean_model_prob": -0.17951744715672258,
+          "actual_minus_mean_baseline_C": 0.0661477834715628,
+          "bootstrap_rate_ci": {
+            "2.5": 0.4,
+            "25": 0.5714285714285714,
+            "50": 0.6666666666666666,
+            "75": 0.75,
+            "97.5": 0.875
+          }
+        },
+        {
+          "successes": 3,
+          "n": 3,
+          "rate": 1.0,
+          "wilson_low": 0.4385029682449546,
+          "wilson_high": 1.0,
+          "decile": 9,
+          "lo": 0.9,
+          "hi": 1.0,
+          "mean_model_prob": 0.9883006271153296,
+          "mean_baseline_C": 0.6085427135678392,
+          "actual_minus_mean_model_prob": 0.011699372884670378,
+          "actual_minus_mean_baseline_C": 0.3914572864321608,
+          "bootstrap_rate_ci": {
+            "2.5": 1.0,
+            "25": 1.0,
+            "50": 1.0,
+            "75": 1.0,
+            "97.5": 1.0
+          }
+        }
+      ],
+      "per_deficit_analysis": [
+        {
+          "successes": 825,
+          "n": 1451,
+          "rate": 0.5685733976567884,
+          "wilson_low": 0.5429417348367874,
+          "wilson_high": 0.5938429290820638,
+          "fav_deficit": 3,
+          "mean_model_prob": 0.5557138884457211,
+          "mean_baseline_C": 0.573012145929795,
+          "brier_model": 0.24720516652988195,
+          "brier_baseline_C": 0.24559611524859334,
+          "brier_constant_training_overall": 0.2641488197610693,
+          "brier_improvement_baseline_C_minus_model": -0.0016090512812886274,
+          "brier_improvement_bootstrap_ci": {
+            "2.5": -0.0053204156478141055,
+            "25": -0.0028711044706702703,
+            "50": -0.0015983173233968743,
+            "75": -0.00029444701263846193,
+            "97.5": 0.0020676833264516308
+          }
+        },
+        {
+          "successes": 506,
+          "n": 1072,
+          "rate": 0.47201492537313433,
+          "wilson_low": 0.44228403821917295,
+          "wilson_high": 0.5019456626274832,
+          "fav_deficit": 7,
+          "mean_model_prob": 0.4486937330343348,
+          "mean_baseline_C": 0.47458339541435934,
+          "brier_model": 0.24308129892478525,
+          "brier_baseline_C": 0.24168589492081013,
+          "brier_constant_training_overall": 0.250876660387777,
+          "brier_improvement_baseline_C_minus_model": -0.001395404003975157,
+          "brier_improvement_bootstrap_ci": {
+            "2.5": -0.006673306743507658,
+            "25": -0.0032108182426957353,
+            "50": -0.0013835657222476953,
+            "75": 0.00041432297875460537,
+            "97.5": 0.0038190605728129685
+          }
+        },
+        {
+          "successes": 233,
+          "n": 698,
+          "rate": 0.333810888252149,
+          "wilson_low": 0.29982052940802095,
+          "wilson_high": 0.3696204859605636,
+          "fav_deficit": 10,
+          "mean_model_prob": 0.3124840052789375,
+          "mean_baseline_C": 0.3042019484701963,
+          "brier_model": 0.22638847913957091,
+          "brier_baseline_C": 0.21641729687178188,
+          "brier_constant_training_overall": 0.23188023300734256,
+          "brier_improvement_baseline_C_minus_model": -0.009971182267788961,
+          "brier_improvement_bootstrap_ci": {
+            "2.5": -0.016259274440872443,
+            "25": -0.01217787148037598,
+            "50": -0.009980687772602165,
+            "75": -0.007812781614693648,
+            "97.5": -0.003842264444308138
+          }
+        },
+        {
+          "successes": 110,
+          "n": 458,
+          "rate": 0.24017467248908297,
+          "wilson_low": 0.20331564314502015,
+          "wilson_high": 0.2813560002199352,
+          "fav_deficit": 14,
+          "mean_model_prob": 0.20333524602379913,
+          "mean_baseline_C": 0.21836292712316013,
+          "brier_model": 0.18188172254566393,
+          "brier_baseline_C": 0.17785038969390093,
+          "brier_constant_training_overall": 0.219009743765667,
+          "brier_improvement_baseline_C_minus_model": -0.0040313328517629626,
+          "brier_improvement_bootstrap_ci": {
+            "2.5": -0.011119826883002474,
+            "25": -0.006481250557246519,
+            "50": -0.004046086250491096,
+            "75": -0.001592755929041265,
+            "97.5": 0.00308462086573119
+          }
+        },
+        {
+          "successes": 11,
+          "n": 178,
+          "rate": 0.06179775280898876,
+          "wilson_low": 0.034853872292265935,
+          "wilson_high": 0.10725595782175248,
+          "fav_deficit": 21,
+          "mean_model_prob": 0.04769452566732666,
+          "mean_baseline_C": 0.09462643619432758,
+          "brier_model": 0.05459262341746278,
+          "brier_baseline_C": 0.05999138353694499,
+          "brier_constant_training_overall": 0.19449147156727856,
+          "brier_improvement_baseline_C_minus_model": 0.0053987601194822165,
+          "brier_improvement_bootstrap_ci": {
+            "2.5": -0.002647314680122125,
+            "25": 0.002769608675884684,
+            "50": 0.0055077503541507405,
+            "75": 0.008109176971088719,
+            "97.5": 0.012691765441317547
+          }
+        }
+      ]
+    },
+    "deficit_erased": {
+      "overall_brier_vs_baseline_C": {
+        "n": 3854,
+        "n_games": 1450,
+        "brier_model": 0.23631575505627112,
+        "brier_baseline_C": 0.17508255071773204,
+        "brier_improvement_baseline_C_minus_model": -0.06123320433853859,
+        "brier_improvement_bootstrap_ci": {
+          "2.5": -0.07243669530591616,
+          "25": -0.06499143884572436,
+          "50": -0.0612116121507296,
+          "75": -0.05744590195413268,
+          "97.5": -0.05028531878610455
+        }
+      },
+      "threshold_analysis": [
+        {
+          "successes": 52,
+          "n": 190,
+          "rate": 0.2736842105263158,
+          "wilson_low": 0.21524493484291832,
+          "wilson_high": 0.34109352585990216,
+          "threshold": 0.0,
+          "mean_model_prob": 0.26274709507863586,
+          "mean_baseline_C": 0.21170777490780684,
+          "actual_minus_mean_model_prob": 0.010937115447679946,
+          "actual_minus_mean_baseline_C": 0.06197643561850896,
+          "bootstrap_rate_ci": {
+            "2.5": 0.1989795918367347,
+            "25": 0.24736842105263157,
+            "50": 0.2736318407960199,
+            "75": 0.29896907216494845,
+            "97.5": 0.35051546391752575
+          }
+        },
+        {
+          "successes": 26,
+          "n": 116,
+          "rate": 0.22413793103448276,
+          "wilson_low": 0.15779761353649713,
+          "wilson_high": 0.3081634934977863,
+          "threshold": 0.03,
+          "mean_model_prob": 0.26496166694875223,
+          "mean_baseline_C": 0.18743444285024025,
+          "actual_minus_mean_model_prob": -0.040823735914269466,
+          "actual_minus_mean_baseline_C": 0.036703488184242516,
+          "bootstrap_rate_ci": {
+            "2.5": 0.14166666666666666,
+            "25": 0.19327731092436976,
+            "50": 0.2231404958677686,
+            "75": 0.2542372881355932,
+            "97.5": 0.3157894736842105
+          }
+        },
+        {
+          "successes": 23,
+          "n": 70,
+          "rate": 0.32857142857142857,
+          "wilson_low": 0.22998869307186084,
+          "wilson_high": 0.4449906426116592,
+          "threshold": 0.05,
+          "mean_model_prob": 0.3336990440465104,
+          "mean_baseline_C": 0.23446527578698592,
+          "actual_minus_mean_model_prob": -0.005127615475081837,
+          "actual_minus_mean_baseline_C": 0.09410615278444265,
+          "bootstrap_rate_ci": {
+            "2.5": 0.21052631578947367,
+            "25": 0.28378378378378377,
+            "50": 0.32857142857142857,
+            "75": 0.37142857142857144,
+            "97.5": 0.4594594594594595
+          }
+        },
+        {
+          "successes": 10,
+          "n": 35,
+          "rate": 0.2857142857142857,
+          "wilson_low": 0.16326536236434688,
+          "wilson_high": 0.45054934863182616,
+          "threshold": 0.08,
+          "mean_model_prob": 0.31476644187376035,
+          "mean_baseline_C": 0.18260730076584808,
+          "actual_minus_mean_model_prob": -0.02905215615947465,
+          "actual_minus_mean_baseline_C": 0.10310698494843762,
+          "bootstrap_rate_ci": {
+            "2.5": 0.14285714285714285,
+            "25": 0.23529411764705882,
+            "50": 0.2857142857142857,
+            "75": 0.3333333333333333,
+            "97.5": 0.45454545454545453
+          }
+        },
+        {
+          "successes": 5,
+          "n": 18,
+          "rate": 0.2777777777777778,
+          "wilson_low": 0.12499753379553993,
+          "wilson_high": 0.5087265656029746,
+          "threshold": 0.1,
+          "mean_model_prob": 0.38392199763249407,
+          "mean_baseline_C": 0.21943353915698383,
+          "actual_minus_mean_model_prob": -0.10614421985471628,
+          "actual_minus_mean_baseline_C": 0.058344238620793965,
+          "bootstrap_rate_ci": {
+            "2.5": 0.09523809523809523,
+            "25": 0.2,
+            "50": 0.2777777777777778,
+            "75": 0.35294117647058826,
+            "97.5": 0.5
+          }
+        }
+      ],
+      "quintile_analysis": {
+        "spearman_model_prob_vs_actual": 0.4212035378223202,
+        "rows": [
+          {
+            "successes": 237,
+            "n": 827,
+            "rate": 0.28657799274486095,
+            "wilson_low": 0.2568032845355666,
+            "wilson_high": 0.31832624679396987,
+            "quintile": 1,
+            "model_prob_min": 0.0,
+            "model_prob_max": 0.23,
+            "mean_model_prob": 0.13843376043848962,
+            "mean_baseline_C": 0.28252264379620845,
+            "actual_minus_mean_model_prob": 0.14814423230637133,
+            "actual_minus_mean_baseline_C": 0.004055348948652504
+          },
+          {
+            "successes": 499,
+            "n": 832,
+            "rate": 0.5997596153846154,
+            "wilson_low": 0.5660828920139759,
+            "wilson_high": 0.6325193647276469,
+            "quintile": 2,
+            "model_prob_min": 0.23928831667376493,
+            "model_prob_max": 0.42028985507246375,
+            "mean_model_prob": 0.35058858608084503,
+            "mean_baseline_C": 0.5773022438945825,
+            "actual_minus_mean_model_prob": 0.24917102930377039,
+            "actual_minus_mean_baseline_C": 0.022457371490032907
+          },
+          {
+            "successes": 663,
+            "n": 906,
+            "rate": 0.7317880794701986,
+            "wilson_low": 0.7020057778759582,
+            "wilson_high": 0.7596131074014721,
+            "quintile": 3,
+            "model_prob_min": 0.423728813559322,
+            "model_prob_max": 0.5242718446601942,
+            "mean_model_prob": 0.4746819694152259,
+            "mean_baseline_C": 0.7243738416968113,
+            "actual_minus_mean_model_prob": 0.25710611005497275,
+            "actual_minus_mean_baseline_C": 0.007414237773387344
+          },
+          {
+            "successes": 648,
+            "n": 761,
+            "rate": 0.8515111695137977,
+            "wilson_low": 0.8244836906534142,
+            "wilson_high": 0.8750076795253342,
+            "quintile": 4,
+            "model_prob_min": 0.5294822767626088,
+            "model_prob_max": 0.5892116182572614,
+            "mean_model_prob": 0.5683135183915454,
+            "mean_baseline_C": 0.8209630882991414,
+            "actual_minus_mean_model_prob": 0.28319765112225226,
+            "actual_minus_mean_baseline_C": 0.030548081214656242
+          },
+          {
+            "successes": 438,
+            "n": 528,
+            "rate": 0.8295454545454546,
+            "wilson_low": 0.7951185147693689,
+            "wilson_high": 0.8592118203866297,
+            "quintile": 5,
+            "model_prob_min": 0.592,
+            "model_prob_max": 1.0,
+            "mean_model_prob": 0.6391830730906741,
+            "mean_baseline_C": 0.8361429468534718,
+            "actual_minus_mean_model_prob": 0.19036238145478046,
+            "actual_minus_mean_baseline_C": -0.006597492308017205
+          }
+        ]
+      },
+      "decile_analysis": [
+        {
+          "successes": 40,
+          "n": 293,
+          "rate": 0.13651877133105803,
+          "wilson_low": 0.10188253301197958,
+          "wilson_high": 0.18056271285692116,
+          "decile": 0,
+          "lo": 0.0,
+          "hi": 0.1,
+          "mean_model_prob": 0.04953132645428893,
+          "mean_baseline_C": 0.15268448891014677,
+          "actual_minus_mean_model_prob": 0.0869874448767691,
+          "actual_minus_mean_baseline_C": -0.016165717579088745,
+          "bootstrap_rate_ci": {
+            "2.5": 0.09621993127147767,
+            "25": 0.12152777777777778,
+            "50": 0.13588850174216027,
+            "75": 0.1506849315068493,
+            "97.5": 0.17894736842105263
+          }
+        },
+        {
+          "successes": 58,
+          "n": 200,
+          "rate": 0.29,
+          "wilson_low": 0.23154025607067882,
+          "wilson_high": 0.3563747810077731,
+          "decile": 1,
+          "lo": 0.1,
+          "hi": 0.2,
+          "mean_model_prob": 0.13956216232600338,
+          "mean_baseline_C": 0.27562088424894937,
+          "actual_minus_mean_model_prob": 0.1504378376739966,
+          "actual_minus_mean_baseline_C": 0.014379115751050608,
+          "bootstrap_rate_ci": {
+            "2.5": 0.22279728620530445,
+            "25": 0.2653061224489796,
+            "50": 0.2893401015228426,
+            "75": 0.31313131313131315,
+            "97.5": 0.3588516746411483
+          }
+        },
+        {
+          "successes": 300,
+          "n": 634,
+          "rate": 0.47318611987381703,
+          "wilson_low": 0.43460042952141614,
+          "wilson_high": 0.5120947883421848,
+          "decile": 2,
+          "lo": 0.2,
+          "hi": 0.30000000000000004,
+          "mean_model_prob": 0.24591878920521648,
+          "mean_baseline_C": 0.45090703114502567,
+          "actual_minus_mean_model_prob": 0.22726733066860055,
+          "actual_minus_mean_baseline_C": 0.022279088728791363,
+          "bootstrap_rate_ci": {
+            "2.5": 0.4283513097072419,
+            "25": 0.4574880731168177,
+            "50": 0.4734375,
+            "75": 0.4887910113049889,
+            "97.5": 0.5185199518403852
+          }
+        },
+        {
+          "successes": 132,
+          "n": 201,
+          "rate": 0.6567164179104478,
+          "wilson_low": 0.5886899320422574,
+          "wilson_high": 0.7188649953767394,
+          "decile": 3,
+          "lo": 0.30000000000000004,
+          "hi": 0.4,
+          "mean_model_prob": 0.3616238971678381,
+          "mean_baseline_C": 0.627250788999775,
+          "actual_minus_mean_model_prob": 0.29509252074260967,
+          "actual_minus_mean_baseline_C": 0.029465628910672725,
+          "bootstrap_rate_ci": {
+            "2.5": 0.59,
+            "25": 0.635,
+            "50": 0.6582914572864321,
+            "75": 0.68,
+            "97.5": 0.7227722772277227
+          }
+        },
+        {
+          "successes": 506,
+          "n": 775,
+          "rate": 0.6529032258064517,
+          "wilson_low": 0.6187077214933321,
+          "wilson_high": 0.6855904091671243,
+          "decile": 4,
+          "lo": 0.4,
+          "hi": 0.5,
+          "mean_model_prob": 0.4193544461266402,
+          "mean_baseline_C": 0.6416546058511698,
+          "actual_minus_mean_model_prob": 0.23354877967981147,
+          "actual_minus_mean_baseline_C": 0.011248619955281813,
+          "bootstrap_rate_ci": {
+            "2.5": 0.61248296026292,
+            "25": 0.639205579138872,
+            "50": 0.6532988357050453,
+            "75": 0.6670967741935484,
+            "97.5": 0.6931079323797139
+          }
+        },
+        {
+          "successes": 1126,
+          "n": 1368,
+          "rate": 0.8230994152046783,
+          "wilson_low": 0.8019820542710457,
+          "wilson_high": 0.842407276810938,
+          "decile": 5,
+          "lo": 0.5,
+          "hi": 0.6000000000000001,
+          "mean_model_prob": 0.554487771738593,
+          "mean_baseline_C": 0.8082020228053265,
+          "actual_minus_mean_model_prob": 0.26861164346608535,
+          "actual_minus_mean_baseline_C": 0.014897392399351839,
+          "bootstrap_rate_ci": {
+            "2.5": 0.7983785610486999,
+            "25": 0.8145219266714594,
+            "50": 0.8232286340394448,
+            "75": 0.8314773570898293,
+            "97.5": 0.8479363729805519
+          }
+        },
+        {
+          "successes": 286,
+          "n": 341,
+          "rate": 0.8387096774193549,
+          "wilson_low": 0.7959342286099272,
+          "wilson_high": 0.8739388220087113,
+          "decile": 6,
+          "lo": 0.6000000000000001,
+          "hi": 0.7000000000000001,
+          "mean_model_prob": 0.6410522831668537,
+          "mean_baseline_C": 0.8402455456944742,
+          "actual_minus_mean_model_prob": 0.19765739425250117,
+          "actual_minus_mean_baseline_C": -0.001535868275119312,
+          "bootstrap_rate_ci": {
+            "2.5": 0.7970588235294118,
+            "25": 0.8245614035087719,
+            "50": 0.8391812865497076,
+            "75": 0.8529411764705882,
+            "97.5": 0.8783382789317508
+          }
+        },
+        {
+          "successes": 21,
+          "n": 24,
+          "rate": 0.875,
+          "wilson_low": 0.6899611872949993,
+          "wilson_high": 0.9565566591987655,
+          "decile": 7,
+          "lo": 0.7000000000000001,
+          "hi": 0.8,
+          "mean_model_prob": 0.7246688100685542,
+          "mean_baseline_C": 0.8371143773712357,
+          "actual_minus_mean_model_prob": 0.15033118993144579,
+          "actual_minus_mean_baseline_C": 0.03788562262876427,
+          "bootstrap_rate_ci": {
+            "2.5": 0.7489583333333343,
+            "25": 0.8333333333333334,
+            "50": 0.875,
+            "75": 0.9166666666666666,
+            "97.5": 1.0
+          }
+        },
+        {
+          "successes": 13,
+          "n": 15,
+          "rate": 0.8666666666666667,
+          "wilson_low": 0.6211801716767764,
+          "wilson_high": 0.9626387408969346,
+          "decile": 8,
+          "lo": 0.8,
+          "hi": 0.9,
+          "mean_model_prob": 0.8461841138233892,
+          "mean_baseline_C": 0.8406811826609053,
+          "actual_minus_mean_model_prob": 0.02048255284327749,
+          "actual_minus_mean_baseline_C": 0.025985484005761394,
+          "bootstrap_rate_ci": {
+            "2.5": 0.6666666666666666,
+            "25": 0.8,
+            "50": 0.8666666666666667,
+            "75": 0.9333333333333333,
+            "97.5": 1.0
+          }
+        },
+        {
+          "successes": 3,
+          "n": 3,
+          "rate": 1.0,
+          "wilson_low": 0.4385029682449546,
+          "wilson_high": 1.0,
+          "decile": 9,
+          "lo": 0.9,
+          "hi": 1.0,
+          "mean_model_prob": 0.9883006271153296,
+          "mean_baseline_C": 0.8467336683417085,
+          "actual_minus_mean_model_prob": 0.011699372884670378,
+          "actual_minus_mean_baseline_C": 0.1532663316582915,
+          "bootstrap_rate_ci": {
+            "2.5": 1.0,
+            "25": 1.0,
+            "50": 1.0,
+            "75": 1.0,
+            "97.5": 1.0
+          }
+        }
+      ],
+      "per_deficit_analysis": [
+        {
+          "successes": 1210,
+          "n": 1450,
+          "rate": 0.8344827586206897,
+          "wilson_low": 0.8144747235930855,
+          "wilson_high": 0.8527231982400355,
+          "fav_deficit": 3,
+          "mean_model_prob": 0.5558212773343044,
+          "mean_baseline_C": 0.8117227348854668,
+          "brier_model": 0.22091181506448312,
+          "brier_baseline_C": 0.14018303285644937,
+          "brier_constant_training_overall": 0.17996370741606252,
+          "brier_improvement_baseline_C_minus_model": -0.08072878220803295,
+          "brier_improvement_bootstrap_ci": {
+            "2.5": -0.09124269356317728,
+            "25": -0.08442510721074348,
+            "50": -0.08080047530261239,
+            "75": -0.07708728290010888,
+            "97.5": -0.0702571048479712
+          }
+        },
+        {
+          "successes": 779,
+          "n": 1071,
+          "rate": 0.7273576097105509,
+          "wilson_low": 0.6999102798956847,
+          "wilson_high": 0.7531797977184891,
+          "fav_deficit": 7,
+          "mean_model_prob": 0.4488979288634985,
+          "mean_baseline_C": 0.7093349193184825,
+          "brier_model": 0.2647181033732597,
+          "brier_baseline_C": 0.18493728293063516,
+          "brier_constant_training_overall": 0.20780093849035636,
+          "brier_improvement_baseline_C_minus_model": -0.07978082044262713,
+          "brier_improvement_bootstrap_ci": {
+            "2.5": -0.09427710966827756,
+            "25": -0.08480140810574925,
+            "50": -0.07996754229379041,
+            "75": -0.0749308815489213,
+            "97.5": -0.06530722144238182
+          }
+        },
+        {
+          "successes": 332,
+          "n": 697,
+          "rate": 0.4763271162123386,
+          "wilson_low": 0.4394805622987478,
+          "wilson_high": 0.5134331821941522,
+          "fav_deficit": 10,
+          "mean_model_prob": 0.312602346749926,
+          "mean_baseline_C": 0.46193174908425666,
+          "brier_model": 0.2729910407821406,
+          "brier_baseline_C": 0.23779797884884674,
+          "brier_constant_training_overall": 0.2730329958111408,
+          "brier_improvement_baseline_C_minus_model": -0.03519306193329458,
+          "brier_improvement_bootstrap_ci": {
+            "2.5": -0.04951744402204951,
+            "25": -0.04020592188261262,
+            "50": -0.035129691695177115,
+            "75": -0.030254984903477312,
+            "97.5": -0.021116696114565042
+          }
+        },
+        {
+          "successes": 148,
+          "n": 458,
+          "rate": 0.3231441048034934,
+          "wilson_low": 0.2819369489861363,
+          "wilson_high": 0.36729332927068203,
+          "fav_deficit": 14,
+          "mean_model_prob": 0.20333524602379913,
+          "mean_baseline_C": 0.33639108560323505,
+          "brier_model": 0.22410507595339477,
+          "brier_baseline_C": 0.2052301010041249,
+          "brier_constant_training_overall": 0.312838689699335,
+          "brier_improvement_baseline_C_minus_model": -0.018874974949269586,
+          "brier_improvement_bootstrap_ci": {
+            "2.5": -0.03503653541910076,
+            "25": -0.024402676220050122,
+            "50": -0.018887916843830538,
+            "75": -0.013421685403314211,
+            "97.5": -0.0031818820996602293
+          }
+        },
+        {
+          "successes": 16,
+          "n": 178,
+          "rate": 0.0898876404494382,
+          "wilson_low": 0.05608637843274323,
+          "wilson_high": 0.14101641128935094,
+          "fav_deficit": 21,
+          "mean_model_prob": 0.04769452566732666,
+          "mean_baseline_C": 0.1334357840412915,
+          "brier_model": 0.07871246752135092,
+          "brier_baseline_C": 0.07693452409012971,
+          "brier_constant_training_overall": 0.373452039261569,
+          "brier_improvement_baseline_C_minus_model": -0.001777943431221368,
+          "brier_improvement_bootstrap_ci": {
+            "2.5": -0.014415235054963255,
+            "25": -0.005764713187701224,
+            "50": -0.0016362792114959063,
+            "75": 0.0023069169112068296,
+            "97.5": 0.009463601278112823
+          }
+        }
+      ]
+    }
+  },
+  "interpretation": {
+    "structural_finding": "Model probabilities do not improve favorite-final-win Brier versus the training-years deficit-by-time baseline. For the literal deficit-erased label, the classification is no.",
+    "by_label": {
+      "favorite_final_win": {
+        "classification": "no",
+        "overall_brier_vs_baseline_C": {
+          "n": 3857,
+          "n_games": 1451,
+          "brier_model": 0.22564592258643285,
+          "brier_baseline_C": 0.22261873490969772,
+          "brier_improvement_baseline_C_minus_model": -0.0030271876767351477,
+          "brier_improvement_bootstrap_ci": {
+            "2.5": -0.006767343709017204,
+            "25": -0.004293419139117481,
+            "50": -0.003042323268982185,
+            "75": -0.0018136776236636154,
+            "97.5": 0.0005091370142742346
+          }
+        },
+        "spearman_model_prob_vs_actual": 0.2838867729143606
+      },
+      "deficit_erased": {
+        "classification": "no",
+        "overall_brier_vs_baseline_C": {
+          "n": 3854,
+          "n_games": 1450,
+          "brier_model": 0.23631575505627112,
+          "brier_baseline_C": 0.17508255071773204,
+          "brier_improvement_baseline_C_minus_model": -0.06123320433853859,
+          "brier_improvement_bootstrap_ci": {
+            "2.5": -0.07243669530591616,
+            "25": -0.06499143884572436,
+            "50": -0.0612116121507296,
+            "75": -0.05744590195413268,
+            "97.5": -0.05028531878610455
+          }
+        },
+        "spearman_model_prob_vs_actual": 0.4212035378223202
+      }
+    },
+    "favorite_final_win_vs_deficit_erased_note": "favorite_final_win is the N03 training label; deficit_erased is a newly computed literal comeback event. Differences between the two indicate whether the model is detecting final game recovery, temporary deficit erasure, or both."
+  }
+}

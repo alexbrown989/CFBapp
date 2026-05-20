@@ -844,3 +844,53 @@ Project conclusion after N04: **predictive edge versus pre-game market
 consensus is validated; live-line betting edge remains untested**.
 Deployment-context profitability requires going-forward live market data
 collection and a separate validation pass against actual live prices.
+
+---
+
+## N05 honest interpretation (2026-05-19)
+
+N05 produced a clean negative result on the stricter model-vs-baseline
+question. Against the training-years-only `fav_deficit x time_bucket`
+baseline_C, the N03 Scheme U probabilities do **not** improve Brier score on
+either label. For the N03 training label, `favorite_final_win`, Brier
+improvement (`baseline_C - model`) is **-0.00303** with cluster-bootstrap 95%
+CI **[-0.00677, +0.00051]**, which is not distinguishable from zero. For the
+literal comeback label, `deficit_erased`, improvement is **-0.06123** with 95%
+CI **[-0.07244, -0.05029]**, materially worse than the simple baseline.
+
+This reframes N04's per-deficit pattern. N04's positive comparison against
+pre-game market probability remains real, but the mechanism is narrower than
+"the model discovered deep-deficit comeback signal." The more honest read is
+that the pre-game market baseline becomes increasingly stale at deeper
+in-game deficits, while a simple current-state baseline already captures much
+of that structure. N03 beat pre-game market probabilities because pre-game
+markets do not condition on current deficit and game time; N05 shows that N03
+does not beat a naive deficit/time lookup table on held-out triggers.
+
+The descriptive split is itself important: favorites erased the deficit after
+trigger on **63.5%** of non-null trigger events, but won the game only
+**43.3%** of trigger events. That roughly 20-percentage-point gap corresponds
+to **2,326** trigger events where the favorite came back to tie or lead but
+still lost the game. This "favorite came back but lost" subpopulation is large
+enough to deserve direct follow-up rather than being treated as noise around
+the final-win label.
+
+The model is also systematically under-calibrated for `deficit_erased`.
+Across the middle probability deciles, actual deficit-erased rates exceed N03
+model probabilities by roughly 15-30 percentage points. That is consistent
+with the model being trained on `favorite_final_win` rather than on the
+literal deficit-erasure event, and it explains why final-win probabilities
+are a poor direct proxy for comeback-erasure probabilities.
+
+Future research should treat an N06-style model explicitly fit on
+`deficit_erased` as the next candidate notebook. That model should be judged
+against the same strict baseline_C construction and should keep
+`favorite_final_win` separate from `deficit_erased` throughout.
+
+Methodology note: this is exactly the kind of result that a looser analysis
+could hide. The training-years-only baseline_C definition was load-bearing:
+it prevented leakage from held-out seasons while still testing whether the
+model adds signal beyond the two structural dimensions N03 leaned on most
+heavily. Keeping that baseline strict surfaced the real negative finding
+instead of allowing the positive N04 market comparison to overstate the
+model's mechanism.
