@@ -943,3 +943,78 @@ expansion or a different validation target. Candidate feature directions:
 possession-adjusted deficit, trajectory features, and fluke-score
 decomposition. Candidate validation direction: live market comparison once
 historical or go-forward live-line data is available.
+
+---
+
+## N07 edge-case handling decisions (2026-05-19)
+
+N07 -- `dog_points_from_explosives_pct` edge case: 5 trigger events have
+`dog_points_from_explosives > dog_score_at_trigger` due to 02c accounting
+bucketing of explosive points that do not match visible trigger score
+(example: 2015 Ohio vs Idaho, dog_score=1, dog_explosive_points=12).
+Affected feature values are set to `NaN` with paired
+`dog_points_from_explosives_pct_is_null = 1`; the other 13 N07 candidate
+features for those events remain computed normally. Tech debt: 02c
+explosive-point accounting should be revisited to determine if pre-trigger
+explosive-point bucketing is correct or if there is a reversion/attribution
+bug.
+
+N07 -- `fav_yards_per_point_ratio` negative edge case: 5 trigger events have
+negative ratio due to negative yards-per-point on one side, which occurs
+when a side scores more points than yards gained, typically through
+short-field or non-offensive scoring context. The ratio is real football
+state but pathological for the candidate feature. Affected ratio values are
+set to `NaN` with paired `fav_yards_per_point_ratio_is_null = 1`. This
+preserves the underlying `fav_yards_per_point` and `dog_yards_per_point`
+individual features; only the derived ratio is set to `NaN`.
+
+---
+
+## N07 honest interpretation (2026-05-19)
+
+N07 tested 14 pre-registered feature-expansion candidates across three
+mechanistic categories. Two features passed all three inclusion gates:
+`deficit_per_remaining_possession` and `clock_pressure_index`. Both are
+Category A possession-adjusted deficit features. This identifies a real signal
+source the previous feature pool did not explicitly encode: the pressure of a
+given deficit relative to estimated remaining possessions.
+
+The Category B result is the most important negative finding. None of the five
+fluke-score decomposition features passed. That means the
+fluke-vs-sustained-lead hypothesis, one of the project's original
+mechanistic priors, is not supported under the strict N07 gate. Some features
+showed alpha-baseline stability, but they did not produce supported edge
+against baseline_C after Bonferroni correction.
+
+The Category C efficiency-gap features also failed the baseline_C gate. EPA,
+success-rate, third-down, explosive-rate, and drive-yards gaps can look
+incrementally useful against the weak alpha baseline, but they do not beat the
+deficit x time-bucket lookup table in held-out historical validation.
+
+The expanded model is marginally better than N06 but still not edge-grade.
+N07's expanded Scheme U model has Brier improvement (`baseline_C - model`) of
+**-0.00263** with 95% CI **[-0.00631, +0.00110]**, compared with N06's
+**-0.00352**. The move from N06 to N07 slightly reduces the miss, but it does
+not flip the result positive or produce statistical support. AUC remains
+slightly below baseline_C (**0.7637** model versus **0.7659** baseline_C).
+
+The possessions-per-minute calibration note matters for interpretation.
+N07 used the pre-registered locked value **0.450** possessions per minute for
+`estimated_possessions_remaining`; the empirical value from cached drives was
+**0.420**. The locked value was kept to preserve pre-registration discipline,
+but future live deployment should make this parameter explicit and monitor
+whether the live-game possession rate differs by season, clock state, or rule
+environment.
+
+Project implication: historical data is exhausted at this methodology level.
+Phase 0 through N07 now supports a narrow conclusion: current game state beats
+pre-game market probability, but engineered historical features do not beat a
+simple deficit x time baseline for comeback-erasure prediction. Future
+validation requires actual live market comparison, not another historical
+proxy baseline.
+
+Methodology note: N07 held the pre-registration line. No candidates were added
+or swapped after results were visible. Edge cases were handled by NaN +
+paired-indicator policy rather than clipping or redefining features.
+Bonferroni-corrected gates were applied by category. The negative result is
+therefore a real research finding, not an artifact of moving thresholds.

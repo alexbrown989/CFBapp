@@ -1,0 +1,3533 @@
+{
+  "created_at": "2026-05-19 19:51:21",
+  "source_commit": "0d950abfec4b4728e600f66ad62d8e4635901829",
+  "pre_registered_features": [
+    {
+      "feature": "estimated_possessions_remaining",
+      "category": "A",
+      "expected_sign": {
+        "favorite_final_win": "positive",
+        "deficit_erased": "positive"
+      },
+      "description": "Estimated remaining possessions from regulation seconds remaining and locked 0.45 possessions/minute."
+    },
+    {
+      "feature": "deficit_per_remaining_possession",
+      "category": "A",
+      "expected_sign": {
+        "favorite_final_win": "negative",
+        "deficit_erased": "negative"
+      },
+      "description": "fav_deficit / max(1, estimated_possessions_remaining)."
+    },
+    {
+      "feature": "possessions_needed_to_tie",
+      "category": "A",
+      "expected_sign": {
+        "favorite_final_win": "negative",
+        "deficit_erased": "negative"
+      },
+      "description": "ceil(fav_deficit / 7)."
+    },
+    {
+      "feature": "clock_pressure_index",
+      "category": "A",
+      "expected_sign": {
+        "favorite_final_win": "negative",
+        "deficit_erased": "negative"
+      },
+      "description": "deficit_per_remaining_possession * (1 + fav_deficit / 21)."
+    },
+    {
+      "feature": "dog_points_from_turnovers_pct",
+      "category": "B",
+      "expected_sign": {
+        "favorite_final_win": "positive",
+        "deficit_erased": "positive"
+      },
+      "description": "dog_points_off_turnovers / max(1, dog_score_at_trigger)."
+    },
+    {
+      "feature": "dog_points_from_returns_pct",
+      "category": "B",
+      "expected_sign": {
+        "favorite_final_win": "positive",
+        "deficit_erased": "positive"
+      },
+      "description": "dog_points_from_returns / max(1, dog_score_at_trigger)."
+    },
+    {
+      "feature": "dog_points_from_explosives_pct",
+      "category": "B",
+      "expected_sign": {
+        "favorite_final_win": "positive",
+        "deficit_erased": "positive"
+      },
+      "description": "dog_points_from_explosives / max(1, dog_score_at_trigger)."
+    },
+    {
+      "feature": "dog_offensive_points_pct",
+      "category": "B",
+      "expected_sign": {
+        "favorite_final_win": "negative",
+        "deficit_erased": "negative"
+      },
+      "description": "(dog_score_at_trigger - dog_points_from_returns) / max(1, dog_score_at_trigger)."
+    },
+    {
+      "feature": "fav_yards_per_point_ratio",
+      "category": "B",
+      "expected_sign": {
+        "favorite_final_win": "negative",
+        "deficit_erased": "negative"
+      },
+      "description": "fav_yards_per_point / dog_yards_per_point."
+    },
+    {
+      "feature": "epa_per_play_gap",
+      "category": "C",
+      "expected_sign": {
+        "favorite_final_win": "positive",
+        "deficit_erased": "positive"
+      },
+      "description": "fav_off_epa_per_play - dog_off_epa_per_play."
+    },
+    {
+      "feature": "success_rate_gap",
+      "category": "C",
+      "expected_sign": {
+        "favorite_final_win": "positive",
+        "deficit_erased": "positive"
+      },
+      "description": "fav_early_down_success_rate - dog_early_down_success_rate."
+    },
+    {
+      "feature": "third_down_gap",
+      "category": "C",
+      "expected_sign": {
+        "favorite_final_win": "positive",
+        "deficit_erased": "positive"
+      },
+      "description": "fav_third_down_success_rate - dog_third_down_success_rate."
+    },
+    {
+      "feature": "explosive_rate_gap",
+      "category": "C",
+      "expected_sign": {
+        "favorite_final_win": "positive",
+        "deficit_erased": "positive"
+      },
+      "description": "fav_explosive_play_rate - dog_explosive_play_rate."
+    },
+    {
+      "feature": "drive_yards_gap",
+      "category": "C",
+      "expected_sign": {
+        "favorite_final_win": "positive",
+        "deficit_erased": "positive"
+      },
+      "description": "fav_avg_drive_yards - dog_avg_drive_yards."
+    }
+  ],
+  "feature_results": [
+    {
+      "feature": "estimated_possessions_remaining",
+      "category": "A",
+      "expected_sign": {
+        "favorite_final_win": "positive",
+        "deficit_erased": "positive"
+      },
+      "description": "Estimated remaining possessions from regulation seconds remaining and locked 0.45 possessions/minute.",
+      "indicator_cols": [],
+      "null_summary": {
+        "null_count": 0,
+        "null_rate": 0.0,
+        "indicator_cols": []
+      },
+      "labels": {
+        "deficit_erased": {
+          "folds": [
+            {
+              "candidate": "estimated_possessions_remaining",
+              "label": "deficit_erased",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.21679689619929138,
+              "candidate_brier": 0.18292772415290448,
+              "brier_improvement_alpha_minus_candidate": 0.0338691720463869,
+              "candidate_ece": 0.05965918301545136,
+              "candidate_auc": 0.759713529813382
+            },
+            {
+              "candidate": "estimated_possessions_remaining",
+              "label": "deficit_erased",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.22120561443837405,
+              "candidate_brier": 0.19946414665547543,
+              "brier_improvement_alpha_minus_candidate": 0.02174146778289862,
+              "candidate_ece": 0.047251290053089166,
+              "candidate_auc": 0.7406947890818858
+            },
+            {
+              "candidate": "estimated_possessions_remaining",
+              "label": "deficit_erased",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22037335873706868,
+              "candidate_brier": 0.19498770351243697,
+              "brier_improvement_alpha_minus_candidate": 0.02538565522463171,
+              "candidate_ece": 0.026708490490636835,
+              "candidate_auc": 0.7294463130794068
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.02699876501797241,
+          "baseline_C_comparison": {
+            "candidate": "estimated_possessions_remaining",
+            "label": "deficit_erased",
+            "category": "A",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.19254824133914958,
+            "baseline_C_brier": 0.17508255071773204,
+            "brier_improvement_baseline_C_minus_model": -0.017465690621417545,
+            "bonferroni_alpha": 0.0125,
+            "bootstrap_ci": {
+              "alpha": 0.0125,
+              "lower": -0.024597821546395025,
+              "2.5": -0.023607578312092144,
+              "50": -0.01746850669983316,
+              "97.5": -0.011474662152075961
+            },
+            "model_auc": 0.7400594950271387,
+            "baseline_C_auc": 0.7658928001904782
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        },
+        "favorite_final_win": {
+          "folds": [
+            {
+              "candidate": "estimated_possessions_remaining",
+              "label": "favorite_final_win",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.2479776780452761,
+              "candidate_brier": 0.22681029666341404,
+              "brier_improvement_alpha_minus_candidate": 0.021167381381862055,
+              "candidate_ece": 0.06670758009591654,
+              "candidate_auc": 0.6768702565039164
+            },
+            {
+              "candidate": "estimated_possessions_remaining",
+              "label": "favorite_final_win",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.21840806532311133,
+              "candidate_brier": 0.2033506763991075,
+              "brier_improvement_alpha_minus_candidate": 0.015057388924003823,
+              "candidate_ece": 0.0707370874048828,
+              "candidate_auc": 0.7450713981244671
+            },
+            {
+              "candidate": "estimated_possessions_remaining",
+              "label": "favorite_final_win",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22458203822158712,
+              "candidate_brier": 0.21496790883159286,
+              "brier_improvement_alpha_minus_candidate": 0.009614129389994258,
+              "candidate_ece": 0.044574630287133335,
+              "candidate_auc": 0.6992801373950962
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.01527963323195338,
+          "baseline_C_comparison": {
+            "candidate": "estimated_possessions_remaining",
+            "label": "favorite_final_win",
+            "category": "A",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.2149330620726393,
+            "baseline_C_brier": 0.2227409751915523,
+            "brier_improvement_baseline_C_minus_model": 0.007807913118913014,
+            "bonferroni_alpha": 0.0125,
+            "bootstrap_ci": {
+              "alpha": 0.0125,
+              "lower": -0.0006316553932579099,
+              "2.5": 0.00039464465322623513,
+              "50": 0.007854614729891704,
+              "97.5": 0.014970460599795536
+            },
+            "model_auc": 0.7083118887260877,
+            "baseline_C_auc": 0.6676850631983178
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        }
+      },
+      "inclusion_verdict": "FAIL",
+      "fail_reasons": [
+        "baseline_C_bonferroni"
+      ]
+    },
+    {
+      "feature": "deficit_per_remaining_possession",
+      "category": "A",
+      "expected_sign": {
+        "favorite_final_win": "negative",
+        "deficit_erased": "negative"
+      },
+      "description": "fav_deficit / max(1, estimated_possessions_remaining).",
+      "indicator_cols": [],
+      "null_summary": {
+        "null_count": 0,
+        "null_rate": 0.0,
+        "indicator_cols": []
+      },
+      "labels": {
+        "deficit_erased": {
+          "folds": [
+            {
+              "candidate": "deficit_per_remaining_possession",
+              "label": "deficit_erased",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.21679689619929138,
+              "candidate_brier": 0.16088514845939722,
+              "brier_improvement_alpha_minus_candidate": 0.05591174773989416,
+              "candidate_ece": 0.038203804881444633,
+              "candidate_auc": 0.8045018775603097
+            },
+            {
+              "candidate": "deficit_per_remaining_possession",
+              "label": "deficit_erased",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.22120561443837405,
+              "candidate_brier": 0.17996244141563078,
+              "brier_improvement_alpha_minus_candidate": 0.041243173022743274,
+              "candidate_ece": 0.04462461356317608,
+              "candidate_auc": 0.7835227646015374
+            },
+            {
+              "candidate": "deficit_per_remaining_possession",
+              "label": "deficit_erased",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22037335873706868,
+              "candidate_brier": 0.1734952610411634,
+              "brier_improvement_alpha_minus_candidate": 0.046878097695905285,
+              "candidate_ece": 0.0218253900753622,
+              "candidate_auc": 0.7816331350504013
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.04801100615284757,
+          "baseline_C_comparison": {
+            "candidate": "deficit_per_remaining_possession",
+            "label": "deficit_erased",
+            "category": "A",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.1715457491003427,
+            "baseline_C_brier": 0.17508255071773204,
+            "brier_improvement_baseline_C_minus_model": 0.003536801617389338,
+            "bonferroni_alpha": 0.0125,
+            "bootstrap_ci": {
+              "alpha": 0.0125,
+              "lower": -0.002661664752455558,
+              "2.5": -0.0017771527671233594,
+              "50": 0.0035096720223236283,
+              "97.5": 0.008707521457068814
+            },
+            "model_auc": 0.7871018661273704,
+            "baseline_C_auc": 0.7658928001904782
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        },
+        "favorite_final_win": {
+          "folds": [
+            {
+              "candidate": "deficit_per_remaining_possession",
+              "label": "favorite_final_win",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.2479776780452761,
+              "candidate_brier": 0.22296506675452096,
+              "brier_improvement_alpha_minus_candidate": 0.025012611290755132,
+              "candidate_ece": 0.07602245950119353,
+              "candidate_auc": 0.695041397784001
+            },
+            {
+              "candidate": "deficit_per_remaining_possession",
+              "label": "favorite_final_win",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.21840806532311133,
+              "candidate_brier": 0.19443958992592683,
+              "brier_improvement_alpha_minus_candidate": 0.023968475397184497,
+              "candidate_ece": 0.07077592881333496,
+              "candidate_auc": 0.7795764550879641
+            },
+            {
+              "candidate": "deficit_per_remaining_possession",
+              "label": "favorite_final_win",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22458203822158712,
+              "candidate_brier": 0.2059222186340079,
+              "brier_improvement_alpha_minus_candidate": 0.01865981958757923,
+              "candidate_ece": 0.04903841140020741,
+              "candidate_auc": 0.7379249442745953
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.022546968758506286,
+          "baseline_C_comparison": {
+            "candidate": "deficit_per_remaining_possession",
+            "label": "favorite_final_win",
+            "category": "A",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.2076342222784256,
+            "baseline_C_brier": 0.2227409751915523,
+            "brier_improvement_baseline_C_minus_model": 0.015106752913126726,
+            "bonferroni_alpha": 0.0125,
+            "bootstrap_ci": {
+              "alpha": 0.0125,
+              "lower": 0.006505885895957639,
+              "2.5": 0.007614910787381635,
+              "50": 0.0150466214645535,
+              "97.5": 0.022252076361184224
+            },
+            "model_auc": 0.7330023955028572,
+            "baseline_C_auc": 0.6676850631983178
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": true
+          },
+          "pass": true
+        }
+      },
+      "inclusion_verdict": "PASS",
+      "fail_reasons": []
+    },
+    {
+      "feature": "possessions_needed_to_tie",
+      "category": "A",
+      "expected_sign": {
+        "favorite_final_win": "negative",
+        "deficit_erased": "negative"
+      },
+      "description": "ceil(fav_deficit / 7).",
+      "indicator_cols": [],
+      "null_summary": {
+        "null_count": 0,
+        "null_rate": 0.0,
+        "indicator_cols": []
+      },
+      "labels": {
+        "deficit_erased": {
+          "folds": [
+            {
+              "candidate": "possessions_needed_to_tie",
+              "label": "deficit_erased",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.21679689619929138,
+              "candidate_brier": 0.1766619063713946,
+              "brier_improvement_alpha_minus_candidate": 0.04013498982789679,
+              "candidate_ece": 0.05165060706029892,
+              "candidate_auc": 0.7670317478379609
+            },
+            {
+              "candidate": "possessions_needed_to_tie",
+              "label": "deficit_erased",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.22120561443837405,
+              "candidate_brier": 0.18581714929892026,
+              "brier_improvement_alpha_minus_candidate": 0.03538846513945379,
+              "candidate_ece": 0.04372077859976532,
+              "candidate_auc": 0.7612471130472575
+            },
+            {
+              "candidate": "possessions_needed_to_tie",
+              "label": "deficit_erased",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22037335873706868,
+              "candidate_brier": 0.17963384986078662,
+              "brier_improvement_alpha_minus_candidate": 0.040739508876282055,
+              "candidate_ece": 0.04401562568324086,
+              "candidate_auc": 0.7744752250147933
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.038754321281210875,
+          "baseline_C_comparison": {
+            "candidate": "possessions_needed_to_tie",
+            "label": "deficit_erased",
+            "category": "A",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.18074233938625,
+            "baseline_C_brier": 0.17508255071773204,
+            "brier_improvement_baseline_C_minus_model": -0.005659788668517997,
+            "bonferroni_alpha": 0.0125,
+            "bootstrap_ci": {
+              "alpha": 0.0125,
+              "lower": -0.013839115212495616,
+              "2.5": -0.012847417212834758,
+              "50": -0.005684519303698731,
+              "97.5": 0.001455633495789561
+            },
+            "model_auc": 0.7630259276623951,
+            "baseline_C_auc": 0.7658928001904782
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        },
+        "favorite_final_win": {
+          "folds": [
+            {
+              "candidate": "possessions_needed_to_tie",
+              "label": "favorite_final_win",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.2479776780452761,
+              "candidate_brier": 0.23616491248009283,
+              "brier_improvement_alpha_minus_candidate": 0.011812765565183264,
+              "candidate_ece": 0.09005243939077803,
+              "candidate_auc": 0.6625928406185316
+            },
+            {
+              "candidate": "possessions_needed_to_tie",
+              "label": "favorite_final_win",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.21840806532311133,
+              "candidate_brier": 0.20244162958515816,
+              "brier_improvement_alpha_minus_candidate": 0.015966435737953172,
+              "candidate_ece": 0.05957077672256227,
+              "candidate_auc": 0.7567377741610478
+            },
+            {
+              "candidate": "possessions_needed_to_tie",
+              "label": "favorite_final_win",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22458203822158712,
+              "candidate_brier": 0.2089129113807083,
+              "brier_improvement_alpha_minus_candidate": 0.015669126840878816,
+              "candidate_ece": 0.037219379617884275,
+              "candidate_auc": 0.7225447325789595
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.014482776048005084,
+          "baseline_C_comparison": {
+            "candidate": "possessions_needed_to_tie",
+            "label": "favorite_final_win",
+            "category": "A",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.21565175956376365,
+            "baseline_C_brier": 0.2227409751915523,
+            "brier_improvement_baseline_C_minus_model": 0.007089215627788651,
+            "bonferroni_alpha": 0.0125,
+            "bootstrap_ci": {
+              "alpha": 0.0125,
+              "lower": -0.0017792725799814556,
+              "2.5": -0.0008172712189338806,
+              "50": 0.007057532614132339,
+              "97.5": 0.014665561954017014
+            },
+            "model_auc": 0.7047034487853528,
+            "baseline_C_auc": 0.6676850631983178
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        }
+      },
+      "inclusion_verdict": "FAIL",
+      "fail_reasons": [
+        "baseline_C_bonferroni"
+      ]
+    },
+    {
+      "feature": "clock_pressure_index",
+      "category": "A",
+      "expected_sign": {
+        "favorite_final_win": "negative",
+        "deficit_erased": "negative"
+      },
+      "description": "deficit_per_remaining_possession * (1 + fav_deficit / 21).",
+      "indicator_cols": [],
+      "null_summary": {
+        "null_count": 0,
+        "null_rate": 0.0,
+        "indicator_cols": []
+      },
+      "labels": {
+        "deficit_erased": {
+          "folds": [
+            {
+              "candidate": "clock_pressure_index",
+              "label": "deficit_erased",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.21679689619929138,
+              "candidate_brier": 0.16009288760947887,
+              "brier_improvement_alpha_minus_candidate": 0.056704008589812505,
+              "candidate_ece": 0.04787382605108294,
+              "candidate_auc": 0.8052287209831591
+            },
+            {
+              "candidate": "clock_pressure_index",
+              "label": "deficit_erased",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.22120561443837405,
+              "candidate_brier": 0.1783570767539748,
+              "brier_improvement_alpha_minus_candidate": 0.04284853768439925,
+              "candidate_ece": 0.03912087425077206,
+              "candidate_auc": 0.7866636681103536
+            },
+            {
+              "candidate": "clock_pressure_index",
+              "label": "deficit_erased",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22037335873706868,
+              "candidate_brier": 0.17120043381813374,
+              "brier_improvement_alpha_minus_candidate": 0.049172924918934935,
+              "candidate_ece": 0.021060349612269744,
+              "candidate_auc": 0.7860763337382043
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.04957515706438223,
+          "baseline_C_comparison": {
+            "candidate": "clock_pressure_index",
+            "label": "deficit_erased",
+            "category": "A",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.1699745775956823,
+            "baseline_C_brier": 0.17508255071773204,
+            "brier_improvement_baseline_C_minus_model": 0.005107973122049749,
+            "bonferroni_alpha": 0.0125,
+            "bootstrap_ci": {
+              "alpha": 0.0125,
+              "lower": -0.0008511276522646854,
+              "2.5": -0.00011901215339373363,
+              "50": 0.005141955126831799,
+              "97.5": 0.010223340922832615
+            },
+            "model_auc": 0.7900867586821146,
+            "baseline_C_auc": 0.7658928001904782
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        },
+        "favorite_final_win": {
+          "folds": [
+            {
+              "candidate": "clock_pressure_index",
+              "label": "favorite_final_win",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.2479776780452761,
+              "candidate_brier": 0.22355067176375334,
+              "brier_improvement_alpha_minus_candidate": 0.02442700628152275,
+              "candidate_ece": 0.0730518389788749,
+              "candidate_auc": 0.69086483826454
+            },
+            {
+              "candidate": "clock_pressure_index",
+              "label": "favorite_final_win",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.21840806532311133,
+              "candidate_brier": 0.1934398573563456,
+              "brier_improvement_alpha_minus_candidate": 0.024968207966765715,
+              "candidate_ece": 0.061781794749066435,
+              "candidate_auc": 0.7767839843447258
+            },
+            {
+              "candidate": "clock_pressure_index",
+              "label": "favorite_final_win",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22458203822158712,
+              "candidate_brier": 0.20516785558093495,
+              "brier_improvement_alpha_minus_candidate": 0.019414182640652172,
+              "candidate_ece": 0.04764903229751433,
+              "candidate_auc": 0.7397337360991
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.02293646562964688,
+          "baseline_C_comparison": {
+            "candidate": "clock_pressure_index",
+            "label": "favorite_final_win",
+            "category": "A",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.20723571170684088,
+            "baseline_C_brier": 0.2227409751915523,
+            "brier_improvement_baseline_C_minus_model": 0.015505263484711406,
+            "bonferroni_alpha": 0.0125,
+            "bootstrap_ci": {
+              "alpha": 0.0125,
+              "lower": 0.007149286614972766,
+              "2.5": 0.008120194356424809,
+              "50": 0.015546813306931912,
+              "97.5": 0.02265214110121058
+            },
+            "model_auc": 0.7314931329374119,
+            "baseline_C_auc": 0.6676850631983178
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": true
+          },
+          "pass": true
+        }
+      },
+      "inclusion_verdict": "PASS",
+      "fail_reasons": []
+    },
+    {
+      "feature": "dog_points_from_turnovers_pct",
+      "category": "B",
+      "expected_sign": {
+        "favorite_final_win": "positive",
+        "deficit_erased": "positive"
+      },
+      "description": "dog_points_off_turnovers / max(1, dog_score_at_trigger).",
+      "indicator_cols": [
+        "dog_points_from_turnovers_pct_is_null"
+      ],
+      "null_summary": {
+        "null_count": 2966,
+        "null_rate": 0.2599018576936558,
+        "indicator_cols": [
+          "dog_points_from_turnovers_pct_is_null"
+        ]
+      },
+      "labels": {
+        "deficit_erased": {
+          "folds": [
+            {
+              "candidate": "dog_points_from_turnovers_pct",
+              "label": "deficit_erased",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.21679689619929138,
+              "candidate_brier": 0.21168225035470414,
+              "brier_improvement_alpha_minus_candidate": 0.0051146458445872345,
+              "candidate_ece": 0.04900633084642152,
+              "candidate_auc": 0.6387701979972691
+            },
+            {
+              "candidate": "dog_points_from_turnovers_pct",
+              "label": "deficit_erased",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.22120561443837405,
+              "candidate_brier": 0.22341278819748628,
+              "brier_improvement_alpha_minus_candidate": -0.0022071737591122242,
+              "candidate_ece": 0.07740726338121177,
+              "candidate_auc": 0.6507583146765855
+            },
+            {
+              "candidate": "dog_points_from_turnovers_pct",
+              "label": "deficit_erased",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22037335873706868,
+              "candidate_brier": 0.21779521639152463,
+              "brier_improvement_alpha_minus_candidate": 0.0025781423455440433,
+              "candidate_ece": 0.04437794830488026,
+              "candidate_auc": 0.6461986255151724
+            }
+          ],
+          "r6_positive_folds": 2,
+          "mean_brier_improvement_alpha_minus_candidate": 0.001828538143673018,
+          "baseline_C_comparison": {
+            "candidate": "dog_points_from_turnovers_pct",
+            "label": "deficit_erased",
+            "category": "B",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.21768560052746175,
+            "baseline_C_brier": 0.17508255071773204,
+            "brier_improvement_baseline_C_minus_model": -0.042603049809729725,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.05374366895701747,
+              "2.5": -0.05190058873458402,
+              "50": -0.04265370281907732,
+              "97.5": -0.03326528419451657
+            },
+            "model_auc": 0.6370546140245417,
+            "baseline_C_auc": 0.7658928001904782
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        },
+        "favorite_final_win": {
+          "folds": [
+            {
+              "candidate": "dog_points_from_turnovers_pct",
+              "label": "favorite_final_win",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.2479776780452761,
+              "candidate_brier": 0.24844029261433373,
+              "brier_improvement_alpha_minus_candidate": -0.00046261456905763443,
+              "candidate_ece": 0.09283593971613638,
+              "candidate_auc": 0.6010922724136532
+            },
+            {
+              "candidate": "dog_points_from_turnovers_pct",
+              "label": "favorite_final_win",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.21840806532311133,
+              "candidate_brier": 0.22101003136240768,
+              "brier_improvement_alpha_minus_candidate": -0.002601966039296355,
+              "candidate_ece": 0.06392621857091983,
+              "candidate_auc": 0.7128647407579632
+            },
+            {
+              "candidate": "dog_points_from_turnovers_pct",
+              "label": "favorite_final_win",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22458203822158712,
+              "candidate_brier": 0.22296872359959494,
+              "brier_improvement_alpha_minus_candidate": 0.0016133146219921846,
+              "candidate_ece": 0.06284168287170563,
+              "candidate_auc": 0.6886210550676621
+            }
+          ],
+          "r6_positive_folds": 1,
+          "mean_brier_improvement_alpha_minus_candidate": -0.0004837553287872683,
+          "baseline_C_comparison": {
+            "candidate": "dog_points_from_turnovers_pct",
+            "label": "favorite_final_win",
+            "category": "B",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.2306436651398009,
+            "baseline_C_brier": 0.2227409751915523,
+            "brier_improvement_baseline_C_minus_model": -0.007902689948248574,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.01984388779076775,
+              "2.5": -0.018000281241192163,
+              "50": -0.007823884832943061,
+              "97.5": 0.0018561710679472004
+            },
+            "model_auc": 0.6596881058016042,
+            "baseline_C_auc": 0.6676850631983178
+          },
+          "gates": {
+            "r6_stability": false,
+            "magnitude": false,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        }
+      },
+      "inclusion_verdict": "FAIL",
+      "fail_reasons": [
+        "baseline_C_bonferroni"
+      ]
+    },
+    {
+      "feature": "dog_points_from_returns_pct",
+      "category": "B",
+      "expected_sign": {
+        "favorite_final_win": "positive",
+        "deficit_erased": "positive"
+      },
+      "description": "dog_points_from_returns / max(1, dog_score_at_trigger).",
+      "indicator_cols": [
+        "dog_points_from_returns_pct_is_null"
+      ],
+      "null_summary": {
+        "null_count": 1900,
+        "null_rate": 0.16649141254819488,
+        "indicator_cols": [
+          "dog_points_from_returns_pct_is_null"
+        ]
+      },
+      "labels": {
+        "deficit_erased": {
+          "folds": [
+            {
+              "candidate": "dog_points_from_returns_pct",
+              "label": "deficit_erased",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.21679689619929138,
+              "candidate_brier": 0.217290802619341,
+              "brier_improvement_alpha_minus_candidate": -0.0004939064200496224,
+              "candidate_ece": 0.07359059032933479,
+              "candidate_auc": 0.6463615157032316
+            },
+            {
+              "candidate": "dog_points_from_returns_pct",
+              "label": "deficit_erased",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.22120561443837405,
+              "candidate_brier": 0.2222095422547692,
+              "brier_improvement_alpha_minus_candidate": -0.0010039278163951337,
+              "candidate_ece": 0.06737131595567475,
+              "candidate_auc": 0.6594078019739934
+            },
+            {
+              "candidate": "dog_points_from_returns_pct",
+              "label": "deficit_erased",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22037335873706868,
+              "candidate_brier": 0.2197733957208346,
+              "brier_improvement_alpha_minus_candidate": 0.0005999630162340785,
+              "candidate_ece": 0.05958208470243108,
+              "candidate_auc": 0.6448633301151286
+            }
+          ],
+          "r6_positive_folds": 1,
+          "mean_brier_improvement_alpha_minus_candidate": -0.0002992904067368925,
+          "baseline_C_comparison": {
+            "candidate": "dog_points_from_returns_pct",
+            "label": "deficit_erased",
+            "category": "B",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.21978095466051542,
+            "baseline_C_brier": 0.17508255071773204,
+            "brier_improvement_baseline_C_minus_model": -0.04469840394278334,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.056483189746577254,
+              "2.5": -0.05439809198220339,
+              "50": -0.04466266870667168,
+              "97.5": -0.03507329096077134
+            },
+            "model_auc": 0.6372809538016998,
+            "baseline_C_auc": 0.7658928001904782
+          },
+          "gates": {
+            "r6_stability": false,
+            "magnitude": false,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        },
+        "favorite_final_win": {
+          "folds": [
+            {
+              "candidate": "dog_points_from_returns_pct",
+              "label": "favorite_final_win",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.2479776780452761,
+              "candidate_brier": 0.24806911633591316,
+              "brier_improvement_alpha_minus_candidate": -9.143829063706921e-05,
+              "candidate_ece": 0.08386310398232039,
+              "candidate_auc": 0.6031672348715451
+            },
+            {
+              "candidate": "dog_points_from_returns_pct",
+              "label": "favorite_final_win",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.21840806532311133,
+              "candidate_brier": 0.21684722535836978,
+              "brier_improvement_alpha_minus_candidate": 0.001560839964741545,
+              "candidate_ece": 0.11865230569036489,
+              "candidate_auc": 0.7216877857862513
+            },
+            {
+              "candidate": "dog_points_from_returns_pct",
+              "label": "favorite_final_win",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22458203822158712,
+              "candidate_brier": 0.22875914836954814,
+              "brier_improvement_alpha_minus_candidate": -0.004177110147961016,
+              "candidate_ece": 0.08713660741337788,
+              "candidate_auc": 0.6817208492186263
+            }
+          ],
+          "r6_positive_folds": 1,
+          "mean_brier_improvement_alpha_minus_candidate": -0.0009025694912855134,
+          "baseline_C_comparison": {
+            "candidate": "dog_points_from_returns_pct",
+            "label": "favorite_final_win",
+            "category": "B",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.23106846478368617,
+            "baseline_C_brier": 0.2227409751915523,
+            "brier_improvement_baseline_C_minus_model": -0.008327489592133848,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.02065332611133434,
+              "2.5": -0.0186985169477431,
+              "50": -0.008302808891579548,
+              "97.5": 0.0018752057038901042
+            },
+            "model_auc": 0.6572444466333677,
+            "baseline_C_auc": 0.6676850631983178
+          },
+          "gates": {
+            "r6_stability": false,
+            "magnitude": false,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        }
+      },
+      "inclusion_verdict": "FAIL",
+      "fail_reasons": [
+        "r6_stability",
+        "magnitude",
+        "baseline_C_bonferroni"
+      ]
+    },
+    {
+      "feature": "dog_points_from_explosives_pct",
+      "category": "B",
+      "expected_sign": {
+        "favorite_final_win": "positive",
+        "deficit_erased": "positive"
+      },
+      "description": "dog_points_from_explosives / max(1, dog_score_at_trigger).",
+      "indicator_cols": [
+        "dog_points_from_explosives_pct_is_null"
+      ],
+      "null_summary": {
+        "null_count": 1905,
+        "null_rate": 0.16692954784437433,
+        "indicator_cols": [
+          "dog_points_from_explosives_pct_is_null"
+        ]
+      },
+      "labels": {
+        "deficit_erased": {
+          "folds": [
+            {
+              "candidate": "dog_points_from_explosives_pct",
+              "label": "deficit_erased",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.21679689619929138,
+              "candidate_brier": 0.19931039167999318,
+              "brier_improvement_alpha_minus_candidate": 0.0174865045192982,
+              "candidate_ece": 0.046631008228519504,
+              "candidate_auc": 0.7014181269913519
+            },
+            {
+              "candidate": "dog_points_from_explosives_pct",
+              "label": "deficit_erased",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.22120561443837405,
+              "candidate_brier": 0.20517365956895148,
+              "brier_improvement_alpha_minus_candidate": 0.016031954869422577,
+              "candidate_ece": 0.027351753211242242,
+              "candidate_auc": 0.706218129810535
+            },
+            {
+              "candidate": "dog_points_from_explosives_pct",
+              "label": "deficit_erased",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22037335873706868,
+              "candidate_brier": 0.20044642591549985,
+              "brier_improvement_alpha_minus_candidate": 0.01992693282156882,
+              "candidate_ece": 0.04593470225628466,
+              "candidate_auc": 0.7083891328495644
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.0178151307367632,
+          "baseline_C_comparison": {
+            "candidate": "dog_points_from_explosives_pct",
+            "label": "deficit_erased",
+            "category": "B",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.20166559635596504,
+            "baseline_C_brier": 0.17508255071773204,
+            "brier_improvement_baseline_C_minus_model": -0.026583045638232997,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.0355968544581127,
+              "2.5": -0.03421194768563054,
+              "50": -0.026553035515846035,
+              "97.5": -0.018832392572779626
+            },
+            "model_auc": 0.7035607362215659,
+            "baseline_C_auc": 0.7658928001904782
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        },
+        "favorite_final_win": {
+          "folds": [
+            {
+              "candidate": "dog_points_from_explosives_pct",
+              "label": "favorite_final_win",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.2479776780452761,
+              "candidate_brier": 0.239144793130506,
+              "brier_improvement_alpha_minus_candidate": 0.008832884914770106,
+              "candidate_ece": 0.07829884795392897,
+              "candidate_auc": 0.6307682941677828
+            },
+            {
+              "candidate": "dog_points_from_explosives_pct",
+              "label": "favorite_final_win",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.21840806532311133,
+              "candidate_brier": 0.21237292505137137,
+              "brier_improvement_alpha_minus_candidate": 0.006035140271739958,
+              "candidate_ece": 0.06428871160594425,
+              "candidate_auc": 0.7231009745795552
+            },
+            {
+              "candidate": "dog_points_from_explosives_pct",
+              "label": "favorite_final_win",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22458203822158712,
+              "candidate_brier": 0.21727786053373133,
+              "brier_improvement_alpha_minus_candidate": 0.007304177687855795,
+              "candidate_ece": 0.041430493885736094,
+              "candidate_auc": 0.6918074519787087
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.0073907342914552865,
+          "baseline_C_comparison": {
+            "candidate": "dog_points_from_explosives_pct",
+            "label": "favorite_final_win",
+            "category": "B",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.2227818825067235,
+            "baseline_C_brier": 0.2227409751915523,
+            "brier_improvement_baseline_C_minus_model": -4.090731517121887e-05,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.009843745638160538,
+              "2.5": -0.008445142268209747,
+              "50": -8.60741198598215e-05,
+              "97.5": 0.0079535646895934
+            },
+            "model_auc": 0.6708684416097889,
+            "baseline_C_auc": 0.6676850631983178
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        }
+      },
+      "inclusion_verdict": "FAIL",
+      "fail_reasons": [
+        "baseline_C_bonferroni"
+      ]
+    },
+    {
+      "feature": "dog_offensive_points_pct",
+      "category": "B",
+      "expected_sign": {
+        "favorite_final_win": "negative",
+        "deficit_erased": "negative"
+      },
+      "description": "(dog_score_at_trigger - dog_points_from_returns) / max(1, dog_score_at_trigger).",
+      "indicator_cols": [
+        "dog_offensive_points_pct_is_null"
+      ],
+      "null_summary": {
+        "null_count": 1900,
+        "null_rate": 0.16649141254819488,
+        "indicator_cols": [
+          "dog_offensive_points_pct_is_null"
+        ]
+      },
+      "labels": {
+        "deficit_erased": {
+          "folds": [
+            {
+              "candidate": "dog_offensive_points_pct",
+              "label": "deficit_erased",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.21679689619929138,
+              "candidate_brier": 0.2265440702347804,
+              "brier_improvement_alpha_minus_candidate": -0.009747174035489026,
+              "candidate_ece": 0.08111573151045744,
+              "candidate_auc": 0.6349297337278106
+            },
+            {
+              "candidate": "dog_offensive_points_pct",
+              "label": "deficit_erased",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.22120561443837405,
+              "candidate_brier": 0.22182002754195027,
+              "brier_improvement_alpha_minus_candidate": -0.0006144131035762113,
+              "candidate_ece": 0.06139217059546887,
+              "candidate_auc": 0.6582770261733536
+            },
+            {
+              "candidate": "dog_offensive_points_pct",
+              "label": "deficit_erased",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22037335873706868,
+              "candidate_brier": 0.21977723454025438,
+              "brier_improvement_alpha_minus_candidate": 0.0005961241968142905,
+              "candidate_ece": 0.05958498676368751,
+              "candidate_auc": 0.6448633301151286
+            }
+          ],
+          "r6_positive_folds": 1,
+          "mean_brier_improvement_alpha_minus_candidate": -0.003255154314083649,
+          "baseline_C_comparison": {
+            "candidate": "dog_offensive_points_pct",
+            "label": "deficit_erased",
+            "category": "B",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.22267876083345545,
+            "baseline_C_brier": 0.17508255071773204,
+            "brier_improvement_baseline_C_minus_model": -0.0475962101157234,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.05940684754874614,
+              "2.5": -0.05741770252631229,
+              "50": -0.0476029448929202,
+              "97.5": -0.03811474013052863
+            },
+            "model_auc": 0.6335569295980411,
+            "baseline_C_auc": 0.7658928001904782
+          },
+          "gates": {
+            "r6_stability": false,
+            "magnitude": false,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        },
+        "favorite_final_win": {
+          "folds": [
+            {
+              "candidate": "dog_offensive_points_pct",
+              "label": "favorite_final_win",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.2479776780452761,
+              "candidate_brier": 0.2506742360551842,
+              "brier_improvement_alpha_minus_candidate": -0.00269655800990809,
+              "candidate_ece": 0.08631258094663939,
+              "candidate_auc": 0.5972759142010633
+            },
+            {
+              "candidate": "dog_offensive_points_pct",
+              "label": "favorite_final_win",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.21840806532311133,
+              "candidate_brier": 0.21744419662440692,
+              "brier_improvement_alpha_minus_candidate": 0.0009638686987044065,
+              "candidate_ece": 0.12414423939779495,
+              "candidate_auc": 0.7224143610013175
+            },
+            {
+              "candidate": "dog_offensive_points_pct",
+              "label": "favorite_final_win",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22458203822158712,
+              "candidate_brier": 0.22901810248720125,
+              "brier_improvement_alpha_minus_candidate": -0.004436064265614131,
+              "candidate_ece": 0.08981990393781822,
+              "candidate_auc": 0.681519872349237
+            }
+          ],
+          "r6_positive_folds": 1,
+          "mean_brier_improvement_alpha_minus_candidate": -0.0020562511922726048,
+          "baseline_C_comparison": {
+            "candidate": "dog_offensive_points_pct",
+            "label": "favorite_final_win",
+            "category": "B",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.2322088208383124,
+            "baseline_C_brier": 0.2227409751915523,
+            "brier_improvement_baseline_C_minus_model": -0.009467845646760066,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.02175873974162662,
+              "2.5": -0.01981392307651639,
+              "50": -0.009407360707257974,
+              "97.5": 0.0007370124939690758
+            },
+            "model_auc": 0.6540925339932937,
+            "baseline_C_auc": 0.6676850631983178
+          },
+          "gates": {
+            "r6_stability": false,
+            "magnitude": false,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        }
+      },
+      "inclusion_verdict": "FAIL",
+      "fail_reasons": [
+        "r6_stability",
+        "magnitude",
+        "baseline_C_bonferroni"
+      ]
+    },
+    {
+      "feature": "fav_yards_per_point_ratio",
+      "category": "B",
+      "expected_sign": {
+        "favorite_final_win": "negative",
+        "deficit_erased": "negative"
+      },
+      "description": "fav_yards_per_point / dog_yards_per_point.",
+      "indicator_cols": [
+        "fav_yards_per_point_ratio_is_null"
+      ],
+      "null_summary": {
+        "null_count": 6977,
+        "null_rate": 0.6113739922888188,
+        "indicator_cols": [
+          "fav_yards_per_point_ratio_is_null"
+        ]
+      },
+      "labels": {
+        "deficit_erased": {
+          "folds": [
+            {
+              "candidate": "fav_yards_per_point_ratio",
+              "label": "deficit_erased",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.21679689619929138,
+              "candidate_brier": 0.1984308548831948,
+              "brier_improvement_alpha_minus_candidate": 0.018366041316096565,
+              "candidate_ece": 0.06629490301154434,
+              "candidate_auc": 0.7036484410559855
+            },
+            {
+              "candidate": "fav_yards_per_point_ratio",
+              "label": "deficit_erased",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.22120561443837405,
+              "candidate_brier": 0.21364692736820756,
+              "brier_improvement_alpha_minus_candidate": 0.007558687070166492,
+              "candidate_ece": 0.06932657945536205,
+              "candidate_auc": 0.6896431044154584
+            },
+            {
+              "candidate": "fav_yards_per_point_ratio",
+              "label": "deficit_erased",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22037335873706868,
+              "candidate_brier": 0.21460636494430715,
+              "brier_improvement_alpha_minus_candidate": 0.005766993792761521,
+              "candidate_ece": 0.047949440605269025,
+              "candidate_auc": 0.6688078108941418
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.010563907393008193,
+          "baseline_C_comparison": {
+            "candidate": "fav_yards_per_point_ratio",
+            "label": "deficit_erased",
+            "category": "B",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.20899097606956304,
+            "baseline_C_brier": 0.17508255071773204,
+            "brier_improvement_baseline_C_minus_model": -0.03390842535183101,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.043059878761361366,
+              "2.5": -0.04160042342509622,
+              "50": -0.033968379668890075,
+              "97.5": -0.026102053761155406
+            },
+            "model_auc": 0.6801516182559197,
+            "baseline_C_auc": 0.7658928001904782
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        },
+        "favorite_final_win": {
+          "folds": [
+            {
+              "candidate": "fav_yards_per_point_ratio",
+              "label": "favorite_final_win",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.2479776780452761,
+              "candidate_brier": 0.23962679659947259,
+              "brier_improvement_alpha_minus_candidate": 0.00835088144580351,
+              "candidate_ece": 0.08379155918128148,
+              "candidate_auc": 0.6265930029627824
+            },
+            {
+              "candidate": "fav_yards_per_point_ratio",
+              "label": "favorite_final_win",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.21840806532311133,
+              "candidate_brier": 0.21521641107977454,
+              "brier_improvement_alpha_minus_candidate": 0.0031916542433367834,
+              "candidate_ece": 0.0652929077718076,
+              "candidate_auc": 0.7157552991552353
+            },
+            {
+              "candidate": "fav_yards_per_point_ratio",
+              "label": "favorite_final_win",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22458203822158712,
+              "candidate_brier": 0.22300560595801838,
+              "brier_improvement_alpha_minus_candidate": 0.0015764322635687389,
+              "candidate_ece": 0.07012078998822653,
+              "candidate_auc": 0.6720983203205886
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.004372989317569677,
+          "baseline_C_comparison": {
+            "candidate": "fav_yards_per_point_ratio",
+            "label": "favorite_final_win",
+            "category": "B",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.22582261053554603,
+            "baseline_C_brier": 0.2227409751915523,
+            "brier_improvement_baseline_C_minus_model": -0.003081635343993702,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.01312526420010819,
+              "2.5": -0.011490340517034235,
+              "50": -0.0029807387183425123,
+              "97.5": 0.005173096952613057
+            },
+            "model_auc": 0.6659012275755075,
+            "baseline_C_auc": 0.6676850631983178
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        }
+      },
+      "inclusion_verdict": "FAIL",
+      "fail_reasons": [
+        "baseline_C_bonferroni"
+      ]
+    },
+    {
+      "feature": "epa_per_play_gap",
+      "category": "C",
+      "expected_sign": {
+        "favorite_final_win": "positive",
+        "deficit_erased": "positive"
+      },
+      "description": "fav_off_epa_per_play - dog_off_epa_per_play.",
+      "indicator_cols": [
+        "epa_per_play_gap_is_null"
+      ],
+      "null_summary": {
+        "null_count": 1945,
+        "null_rate": 0.17043463021381003,
+        "indicator_cols": [
+          "epa_per_play_gap_is_null"
+        ]
+      },
+      "labels": {
+        "deficit_erased": {
+          "folds": [
+            {
+              "candidate": "epa_per_play_gap",
+              "label": "deficit_erased",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.21679689619929138,
+              "candidate_brier": 0.20917122875841088,
+              "brier_improvement_alpha_minus_candidate": 0.007625667440880501,
+              "candidate_ece": 0.0674646608226636,
+              "candidate_auc": 0.6753129267182523
+            },
+            {
+              "candidate": "epa_per_play_gap",
+              "label": "deficit_erased",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.22120561443837405,
+              "candidate_brier": 0.2104005650873082,
+              "brier_improvement_alpha_minus_candidate": 0.010805049351065854,
+              "candidate_ece": 0.03357495062751991,
+              "candidate_auc": 0.6994827490359978
+            },
+            {
+              "candidate": "epa_per_play_gap",
+              "label": "deficit_erased",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22037335873706868,
+              "candidate_brier": 0.2194660753653898,
+              "brier_improvement_alpha_minus_candidate": 0.0009072833716788631,
+              "candidate_ece": 0.0740920978553457,
+              "candidate_auc": 0.6512569165446862
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.0064460000545417395,
+          "baseline_C_comparison": {
+            "candidate": "epa_per_play_gap",
+            "label": "deficit_erased",
+            "category": "C",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.21304683083968343,
+            "baseline_C_brier": 0.17508255071773204,
+            "brier_improvement_baseline_C_minus_model": -0.037964280121951396,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.0485191688568442,
+              "2.5": -0.04690968556445115,
+              "50": -0.03811732724839826,
+              "97.5": -0.029441640824564654
+            },
+            "model_auc": 0.6687811309052267,
+            "baseline_C_auc": 0.7658928001904782
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        },
+        "favorite_final_win": {
+          "folds": [
+            {
+              "candidate": "epa_per_play_gap",
+              "label": "favorite_final_win",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.2479776780452761,
+              "candidate_brier": 0.24442137601972952,
+              "brier_improvement_alpha_minus_candidate": 0.003556302025546576,
+              "candidate_ece": 0.08440364360151836,
+              "candidate_auc": 0.6237215390234995
+            },
+            {
+              "candidate": "epa_per_play_gap",
+              "label": "favorite_final_win",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.21840806532311133,
+              "candidate_brier": 0.2098883713012169,
+              "brier_improvement_alpha_minus_candidate": 0.008519694021894425,
+              "candidate_ece": 0.07584357034372441,
+              "candidate_auc": 0.7310242772998526
+            },
+            {
+              "candidate": "epa_per_play_gap",
+              "label": "favorite_final_win",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22458203822158712,
+              "candidate_brier": 0.22101580116199557,
+              "brier_improvement_alpha_minus_candidate": 0.003566237059591554,
+              "candidate_ece": 0.05844258075351484,
+              "candidate_auc": 0.6839717901557876
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.005214077702344185,
+          "baseline_C_comparison": {
+            "candidate": "epa_per_play_gap",
+            "label": "favorite_final_win",
+            "category": "C",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.224929177748963,
+            "baseline_C_brier": 0.2227409751915523,
+            "brier_improvement_baseline_C_minus_model": -0.002188202557410706,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.012883961845866095,
+              "2.5": -0.01104463380411994,
+              "50": -0.0021709924311328183,
+              "97.5": 0.0065950340251267866
+            },
+            "model_auc": 0.6759683591147446,
+            "baseline_C_auc": 0.6676850631983178
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        }
+      },
+      "inclusion_verdict": "FAIL",
+      "fail_reasons": [
+        "baseline_C_bonferroni"
+      ]
+    },
+    {
+      "feature": "success_rate_gap",
+      "category": "C",
+      "expected_sign": {
+        "favorite_final_win": "positive",
+        "deficit_erased": "positive"
+      },
+      "description": "fav_early_down_success_rate - dog_early_down_success_rate.",
+      "indicator_cols": [
+        "success_rate_gap_is_null"
+      ],
+      "null_summary": {
+        "null_count": 3143,
+        "null_rate": 0.2754118471784087,
+        "indicator_cols": [
+          "success_rate_gap_is_null"
+        ]
+      },
+      "labels": {
+        "deficit_erased": {
+          "folds": [
+            {
+              "candidate": "success_rate_gap",
+              "label": "deficit_erased",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.21679689619929138,
+              "candidate_brier": 0.19463059675591532,
+              "brier_improvement_alpha_minus_candidate": 0.02216629944337606,
+              "candidate_ece": 0.04982649943978575,
+              "candidate_auc": 0.716411583978152
+            },
+            {
+              "candidate": "success_rate_gap",
+              "label": "deficit_erased",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.22120561443837405,
+              "candidate_brier": 0.20875475982872888,
+              "brier_improvement_alpha_minus_candidate": 0.012450854609645179,
+              "candidate_ece": 0.051534487018139424,
+              "candidate_auc": 0.7147741227959347
+            },
+            {
+              "candidate": "success_rate_gap",
+              "label": "deficit_erased",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22037335873706868,
+              "candidate_brier": 0.21821429273326293,
+              "brier_improvement_alpha_minus_candidate": 0.0021590660038057485,
+              "candidate_ece": 0.06618683603195,
+              "candidate_auc": 0.6597241687169744
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.01225874001894233,
+          "baseline_C_comparison": {
+            "candidate": "success_rate_gap",
+            "label": "deficit_erased",
+            "category": "C",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.20731443419547985,
+            "baseline_C_brier": 0.17508255071773204,
+            "brier_improvement_baseline_C_minus_model": -0.03223188347774781,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.041786599282831516,
+              "2.5": -0.040308876693693395,
+              "50": -0.032259138124961756,
+              "97.5": -0.02408868206328485
+            },
+            "model_auc": 0.6928741183404296,
+            "baseline_C_auc": 0.7658928001904782
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        },
+        "favorite_final_win": {
+          "folds": [
+            {
+              "candidate": "success_rate_gap",
+              "label": "favorite_final_win",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.2479776780452761,
+              "candidate_brier": 0.24147594188495658,
+              "brier_improvement_alpha_minus_candidate": 0.006501736160319516,
+              "candidate_ece": 0.07322398481048252,
+              "candidate_auc": 0.6301886744591908
+            },
+            {
+              "candidate": "success_rate_gap",
+              "label": "favorite_final_win",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.21840806532311133,
+              "candidate_brier": 0.21043206166027828,
+              "brier_improvement_alpha_minus_candidate": 0.007976003662833048,
+              "candidate_ece": 0.060358814418364236,
+              "candidate_auc": 0.7268246725567696
+            },
+            {
+              "candidate": "success_rate_gap",
+              "label": "favorite_final_win",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22458203822158712,
+              "candidate_brier": 0.21994583975849955,
+              "brier_improvement_alpha_minus_candidate": 0.004636198463087576,
+              "candidate_ece": 0.06255638183277233,
+              "candidate_auc": 0.682820740812921
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.006371312762080046,
+          "baseline_C_comparison": {
+            "candidate": "success_rate_gap",
+            "label": "favorite_final_win",
+            "category": "C",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.22378862351253934,
+            "baseline_C_brier": 0.2227409751915523,
+            "brier_improvement_baseline_C_minus_model": -0.0010476483209870067,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.010763729345453596,
+              "2.5": -0.009287556464422975,
+              "50": -0.001007333163730475,
+              "97.5": 0.007090457510052559
+            },
+            "model_auc": 0.6748704773083904,
+            "baseline_C_auc": 0.6676850631983178
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        }
+      },
+      "inclusion_verdict": "FAIL",
+      "fail_reasons": [
+        "baseline_C_bonferroni"
+      ]
+    },
+    {
+      "feature": "third_down_gap",
+      "category": "C",
+      "expected_sign": {
+        "favorite_final_win": "positive",
+        "deficit_erased": "positive"
+      },
+      "description": "fav_third_down_success_rate - dog_third_down_success_rate.",
+      "indicator_cols": [
+        "third_down_gap_is_null"
+      ],
+      "null_summary": {
+        "null_count": 3494,
+        "null_rate": 0.3061689449702068,
+        "indicator_cols": [
+          "third_down_gap_is_null"
+        ]
+      },
+      "labels": {
+        "deficit_erased": {
+          "folds": [
+            {
+              "candidate": "third_down_gap",
+              "label": "deficit_erased",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.21679689619929138,
+              "candidate_brier": 0.19595873806650635,
+              "brier_improvement_alpha_minus_candidate": 0.02083815813278503,
+              "candidate_ece": 0.050809319326647354,
+              "candidate_auc": 0.7221310309512972
+            },
+            {
+              "candidate": "third_down_gap",
+              "label": "deficit_erased",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.22120561443837405,
+              "candidate_brier": 0.2117942960096018,
+              "brier_improvement_alpha_minus_candidate": 0.009411318428772242,
+              "candidate_ece": 0.06906408067794592,
+              "candidate_auc": 0.7001094136137825
+            },
+            {
+              "candidate": "third_down_gap",
+              "label": "deficit_erased",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22037335873706868,
+              "candidate_brier": 0.2114458356598266,
+              "brier_improvement_alpha_minus_candidate": 0.008927523077242067,
+              "candidate_ece": 0.06487651145765141,
+              "candidate_auc": 0.676007246151131
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.013058999879599778,
+          "baseline_C_comparison": {
+            "candidate": "third_down_gap",
+            "label": "deficit_erased",
+            "category": "C",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.20649584162985296,
+            "baseline_C_brier": 0.17508255071773204,
+            "brier_improvement_baseline_C_minus_model": -0.03141329091212091,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.04111812901477734,
+              "2.5": -0.03961972271633603,
+              "50": -0.031436733592819885,
+              "97.5": -0.023091610347145786
+            },
+            "model_auc": 0.6943171079067538,
+            "baseline_C_auc": 0.7658928001904782
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        },
+        "favorite_final_win": {
+          "folds": [
+            {
+              "candidate": "third_down_gap",
+              "label": "favorite_final_win",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.2479776780452761,
+              "candidate_brier": 0.23755135477010997,
+              "brier_improvement_alpha_minus_candidate": 0.010426323275166127,
+              "candidate_ece": 0.09566316861821274,
+              "candidate_auc": 0.647255113843906
+            },
+            {
+              "candidate": "third_down_gap",
+              "label": "favorite_final_win",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.21840806532311133,
+              "candidate_brier": 0.21262899850503053,
+              "brier_improvement_alpha_minus_candidate": 0.005779066818080797,
+              "candidate_ece": 0.057137826487203,
+              "candidate_auc": 0.7125280942416492
+            },
+            {
+              "candidate": "third_down_gap",
+              "label": "favorite_final_win",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22458203822158712,
+              "candidate_brier": 0.21989726240177587,
+              "brier_improvement_alpha_minus_candidate": 0.004684775819811249,
+              "candidate_ece": 0.05856627574464075,
+              "candidate_auc": 0.6818925930888319
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.006963388637686058,
+          "baseline_C_comparison": {
+            "candidate": "third_down_gap",
+            "label": "favorite_final_win",
+            "category": "C",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.22322753541744544,
+            "baseline_C_brier": 0.2227409751915523,
+            "brier_improvement_baseline_C_minus_model": -0.0004865602258931415,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.010146628642274986,
+              "2.5": -0.008551552319052011,
+              "50": -0.00043772670526224936,
+              "97.5": 0.007479201472740278
+            },
+            "model_auc": 0.6711965064785286,
+            "baseline_C_auc": 0.6676850631983178
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        }
+      },
+      "inclusion_verdict": "FAIL",
+      "fail_reasons": [
+        "baseline_C_bonferroni"
+      ]
+    },
+    {
+      "feature": "explosive_rate_gap",
+      "category": "C",
+      "expected_sign": {
+        "favorite_final_win": "positive",
+        "deficit_erased": "positive"
+      },
+      "description": "fav_explosive_play_rate - dog_explosive_play_rate.",
+      "indicator_cols": [
+        "explosive_rate_gap_is_null"
+      ],
+      "null_summary": {
+        "null_count": 2053,
+        "null_rate": 0.17989835261128637,
+        "indicator_cols": [
+          "explosive_rate_gap_is_null"
+        ]
+      },
+      "labels": {
+        "deficit_erased": {
+          "folds": [
+            {
+              "candidate": "explosive_rate_gap",
+              "label": "deficit_erased",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.21679689619929138,
+              "candidate_brier": 0.20573765310639666,
+              "brier_improvement_alpha_minus_candidate": 0.011059243092894716,
+              "candidate_ece": 0.0665551444920742,
+              "candidate_auc": 0.68525261720528
+            },
+            {
+              "candidate": "explosive_rate_gap",
+              "label": "deficit_erased",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.22120561443837405,
+              "candidate_brier": 0.2095013695952359,
+              "brier_improvement_alpha_minus_candidate": 0.011704244843138145,
+              "candidate_ece": 0.03357841323839813,
+              "candidate_auc": 0.6986021336918125
+            },
+            {
+              "candidate": "explosive_rate_gap",
+              "label": "deficit_erased",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22037335873706868,
+              "candidate_brier": 0.2177592291400306,
+              "brier_improvement_alpha_minus_candidate": 0.0026141295970380785,
+              "candidate_ece": 0.06638698305608784,
+              "candidate_auc": 0.6540481900194131
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.00845920584435698,
+          "baseline_C_comparison": {
+            "candidate": "explosive_rate_gap",
+            "label": "deficit_erased",
+            "category": "C",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.21104681315455812,
+            "baseline_C_brier": 0.17508255071773204,
+            "brier_improvement_baseline_C_minus_model": -0.03596426243682606,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.046149429175675535,
+              "2.5": -0.0445462054740258,
+              "50": -0.035977695207102575,
+              "97.5": -0.027216905893536612
+            },
+            "model_auc": 0.6754472782641796,
+            "baseline_C_auc": 0.7658928001904782
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        },
+        "favorite_final_win": {
+          "folds": [
+            {
+              "candidate": "explosive_rate_gap",
+              "label": "favorite_final_win",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.2479776780452761,
+              "candidate_brier": 0.24608723618933642,
+              "brier_improvement_alpha_minus_candidate": 0.001890441855939673,
+              "candidate_ece": 0.08219661575192076,
+              "candidate_auc": 0.617383771662811
+            },
+            {
+              "candidate": "explosive_rate_gap",
+              "label": "favorite_final_win",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.21840806532311133,
+              "candidate_brier": 0.2110998146745628,
+              "brier_improvement_alpha_minus_candidate": 0.0073082506485485366,
+              "candidate_ece": 0.0754834882090866,
+              "candidate_auc": 0.7336326823219407
+            },
+            {
+              "candidate": "explosive_rate_gap",
+              "label": "favorite_final_win",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22458203822158712,
+              "candidate_brier": 0.22317514454030818,
+              "brier_improvement_alpha_minus_candidate": 0.0014068936812789423,
+              "candidate_ece": 0.05668303479775101,
+              "candidate_auc": 0.6791787963312585
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.003535195395255717,
+          "baseline_C_comparison": {
+            "candidate": "explosive_rate_gap",
+            "label": "favorite_final_win",
+            "category": "C",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.2266080570295539,
+            "baseline_C_brier": 0.2227409751915523,
+            "brier_improvement_baseline_C_minus_model": -0.0038670818380015584,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.014370065729963986,
+              "2.5": -0.012813103156592424,
+              "50": -0.003852238295975869,
+              "97.5": 0.004757473207777609
+            },
+            "model_auc": 0.6698168008066182,
+            "baseline_C_auc": 0.6676850631983178
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        }
+      },
+      "inclusion_verdict": "FAIL",
+      "fail_reasons": [
+        "baseline_C_bonferroni"
+      ]
+    },
+    {
+      "feature": "drive_yards_gap",
+      "category": "C",
+      "expected_sign": {
+        "favorite_final_win": "positive",
+        "deficit_erased": "positive"
+      },
+      "description": "fav_avg_drive_yards - dog_avg_drive_yards.",
+      "indicator_cols": [
+        "drive_yards_gap_is_null"
+      ],
+      "null_summary": {
+        "null_count": 3119,
+        "null_rate": 0.27330879775674727,
+        "indicator_cols": [
+          "drive_yards_gap_is_null"
+        ]
+      },
+      "labels": {
+        "deficit_erased": {
+          "folds": [
+            {
+              "candidate": "drive_yards_gap",
+              "label": "deficit_erased",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.21679689619929138,
+              "candidate_brier": 0.19818635463711648,
+              "brier_improvement_alpha_minus_candidate": 0.018610541562174898,
+              "candidate_ece": 0.04751309958465174,
+              "candidate_auc": 0.7155026741010468
+            },
+            {
+              "candidate": "drive_yards_gap",
+              "label": "deficit_erased",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.22120561443837405,
+              "candidate_brier": 0.2087717895302634,
+              "brier_improvement_alpha_minus_candidate": 0.012433824908110652,
+              "candidate_ece": 0.058562690377565216,
+              "candidate_auc": 0.7079780970622571
+            },
+            {
+              "candidate": "drive_yards_gap",
+              "label": "deficit_erased",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22037335873706868,
+              "candidate_brier": 0.20916323698766814,
+              "brier_improvement_alpha_minus_candidate": 0.011210121749400531,
+              "candidate_ece": 0.04972894825104199,
+              "candidate_auc": 0.6817494056702691
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.014084829406562027,
+          "baseline_C_comparison": {
+            "candidate": "drive_yards_gap",
+            "label": "deficit_erased",
+            "category": "C",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.20543994793829096,
+            "baseline_C_brier": 0.17508255071773204,
+            "brier_improvement_baseline_C_minus_model": -0.03035739722055891,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.039960843103492044,
+              "2.5": -0.038664021869779436,
+              "50": -0.030251314975912304,
+              "97.5": -0.021968204107075107
+            },
+            "model_auc": 0.698308771548208,
+            "baseline_C_auc": 0.7658928001904782
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        },
+        "favorite_final_win": {
+          "folds": [
+            {
+              "candidate": "drive_yards_gap",
+              "label": "favorite_final_win",
+              "fold": 2022,
+              "n": 1261,
+              "alpha_brier": 0.2479776780452761,
+              "candidate_brier": 0.23850752231075315,
+              "brier_improvement_alpha_minus_candidate": 0.00947015573452295,
+              "candidate_ece": 0.07819393118806767,
+              "candidate_auc": 0.6410010552376314
+            },
+            {
+              "candidate": "drive_yards_gap",
+              "label": "favorite_final_win",
+              "fold": 2023,
+              "n": 1297,
+              "alpha_brier": 0.21840806532311133,
+              "candidate_brier": 0.2085435488290321,
+              "brier_improvement_alpha_minus_candidate": 0.00986451649407924,
+              "candidate_ece": 0.07362308867552762,
+              "candidate_auc": 0.7324737948539101
+            },
+            {
+              "candidate": "drive_yards_gap",
+              "label": "favorite_final_win",
+              "fold": 2024,
+              "n": 1296,
+              "alpha_brier": 0.22458203822158712,
+              "candidate_brier": 0.21709024262510127,
+              "brier_improvement_alpha_minus_candidate": 0.007491795596485856,
+              "candidate_ece": 0.05912406103633946,
+              "candidate_auc": 0.6900291111950206
+            }
+          ],
+          "r6_positive_folds": 3,
+          "mean_brier_improvement_alpha_minus_candidate": 0.008942155941696015,
+          "baseline_C_comparison": {
+            "candidate": "drive_yards_gap",
+            "label": "favorite_final_win",
+            "category": "C",
+            "n": 3854,
+            "n_games": 1450,
+            "model_brier": 0.22122156795725106,
+            "baseline_C_brier": 0.2227409751915523,
+            "brier_improvement_baseline_C_minus_model": 0.0015194072343012572,
+            "bonferroni_alpha": 0.01,
+            "bootstrap_ci": {
+              "alpha": 0.01,
+              "lower": -0.008078024641260515,
+              "2.5": -0.006551876671426796,
+              "50": 0.001492102393022229,
+              "97.5": 0.00952346705931317
+            },
+            "model_auc": 0.6817192076645147,
+            "baseline_C_auc": 0.6676850631983178
+          },
+          "gates": {
+            "r6_stability": true,
+            "magnitude": true,
+            "baseline_C_bonferroni": false
+          },
+          "pass": false
+        }
+      },
+      "inclusion_verdict": "FAIL",
+      "fail_reasons": [
+        "baseline_C_bonferroni"
+      ]
+    }
+  ],
+  "passing_features": [
+    "deficit_per_remaining_possession",
+    "clock_pressure_index"
+  ],
+  "category_summary": {
+    "A": {
+      "candidate_count": 4,
+      "pass_count": 2,
+      "bonferroni_alpha": 0.0125,
+      "passing_features": [
+        "deficit_per_remaining_possession",
+        "clock_pressure_index"
+      ]
+    },
+    "B": {
+      "candidate_count": 5,
+      "pass_count": 0,
+      "bonferroni_alpha": 0.01,
+      "passing_features": []
+    },
+    "C": {
+      "candidate_count": 5,
+      "pass_count": 0,
+      "bonferroni_alpha": 0.01,
+      "passing_features": []
+    }
+  },
+  "bonferroni_alpha": {
+    "A": 0.0125,
+    "B": 0.01,
+    "C": 0.01
+  },
+  "null_summary": {
+    "estimated_possessions_remaining": {
+      "null_count": 0,
+      "null_rate": 0.0,
+      "indicator_cols": []
+    },
+    "deficit_per_remaining_possession": {
+      "null_count": 0,
+      "null_rate": 0.0,
+      "indicator_cols": []
+    },
+    "possessions_needed_to_tie": {
+      "null_count": 0,
+      "null_rate": 0.0,
+      "indicator_cols": []
+    },
+    "clock_pressure_index": {
+      "null_count": 0,
+      "null_rate": 0.0,
+      "indicator_cols": []
+    },
+    "dog_points_from_turnovers_pct": {
+      "null_count": 2966,
+      "null_rate": 0.2599018576936558,
+      "indicator_cols": [
+        "dog_points_from_turnovers_pct_is_null"
+      ]
+    },
+    "dog_points_from_returns_pct": {
+      "null_count": 1900,
+      "null_rate": 0.16649141254819488,
+      "indicator_cols": [
+        "dog_points_from_returns_pct_is_null"
+      ]
+    },
+    "dog_points_from_explosives_pct": {
+      "null_count": 1905,
+      "null_rate": 0.16692954784437433,
+      "indicator_cols": [
+        "dog_points_from_explosives_pct_is_null"
+      ]
+    },
+    "dog_offensive_points_pct": {
+      "null_count": 1900,
+      "null_rate": 0.16649141254819488,
+      "indicator_cols": [
+        "dog_offensive_points_pct_is_null"
+      ]
+    },
+    "fav_yards_per_point_ratio": {
+      "null_count": 6977,
+      "null_rate": 0.6113739922888188,
+      "indicator_cols": [
+        "fav_yards_per_point_ratio_is_null"
+      ]
+    },
+    "epa_per_play_gap": {
+      "null_count": 1945,
+      "null_rate": 0.17043463021381003,
+      "indicator_cols": [
+        "epa_per_play_gap_is_null"
+      ]
+    },
+    "success_rate_gap": {
+      "null_count": 3143,
+      "null_rate": 0.2754118471784087,
+      "indicator_cols": [
+        "success_rate_gap_is_null"
+      ]
+    },
+    "third_down_gap": {
+      "null_count": 3494,
+      "null_rate": 0.3061689449702068,
+      "indicator_cols": [
+        "third_down_gap_is_null"
+      ]
+    },
+    "explosive_rate_gap": {
+      "null_count": 2053,
+      "null_rate": 0.17989835261128637,
+      "indicator_cols": [
+        "explosive_rate_gap_is_null"
+      ]
+    },
+    "drive_yards_gap": {
+      "null_count": 3119,
+      "null_rate": 0.27330879775674727,
+      "indicator_cols": [
+        "drive_yards_gap_is_null"
+      ]
+    }
+  },
+  "feature_indicator_map": {
+    "estimated_possessions_remaining": [],
+    "deficit_per_remaining_possession": [],
+    "possessions_needed_to_tie": [],
+    "clock_pressure_index": [],
+    "dog_points_from_turnovers_pct": [
+      "dog_points_from_turnovers_pct_is_null"
+    ],
+    "dog_points_from_returns_pct": [
+      "dog_points_from_returns_pct_is_null"
+    ],
+    "dog_points_from_explosives_pct": [
+      "dog_points_from_explosives_pct_is_null"
+    ],
+    "dog_offensive_points_pct": [
+      "dog_offensive_points_pct_is_null"
+    ],
+    "fav_yards_per_point_ratio": [
+      "fav_yards_per_point_ratio_is_null"
+    ],
+    "epa_per_play_gap": [
+      "epa_per_play_gap_is_null"
+    ],
+    "success_rate_gap": [
+      "success_rate_gap_is_null"
+    ],
+    "third_down_gap": [
+      "third_down_gap_is_null"
+    ],
+    "explosive_rate_gap": [
+      "explosive_rate_gap_is_null"
+    ],
+    "drive_yards_gap": [
+      "drive_yards_gap_is_null"
+    ]
+  },
+  "data_quality": {
+    "n_feature_rows": 11412,
+    "n_unique_games": 4309,
+    "empirical_possessions_per_minute": 0.42001237719501816,
+    "locked_possessions_per_minute_used": 0.45,
+    "edge_case_handling": {
+      "dog_points_from_explosives_pct_gt_1_set_to_null": 5,
+      "fav_yards_per_point_ratio_lt_0_set_to_null": 5
+    }
+  },
+  "expanded_model": {
+    "expanded_features": [
+      "deficit_per_remaining_possession",
+      "clock_pressure_index"
+    ],
+    "expanded_model_columns": [
+      "dog_off_epa_per_play",
+      "epa_divergence",
+      "fav_def_epa_per_play",
+      "plays_so_far",
+      "fav_is_home",
+      "season_phase_bowl",
+      "dog_early_down_success_rate",
+      "dog_third_down_success_rate",
+      "fav_early_down_success_rate",
+      "fav_third_down_success_rate",
+      "dog_avg_drive_plays",
+      "dog_avg_drive_yards",
+      "dog_explosive_play_count",
+      "dog_points_from_explosives",
+      "dog_points_from_returns",
+      "dog_points_from_sustained",
+      "seconds_since_last_dog_explosive_play",
+      "defense_stabilized_flag",
+      "dog_received_opening_kickoff",
+      "dog_scored_on_opening_drive",
+      "fav_def_epa_after_first_drive",
+      "opening_drive_was_explosive_td",
+      "opening_drive_was_td",
+      "fav_red_zone_tds",
+      "fav_red_zone_trips",
+      "fav_yards_per_point",
+      "dog_avg_starting_field_pos",
+      "dog_points_off_turnovers",
+      "fav_turnovers_so_far",
+      "short_field_tds_allowed",
+      "deficit_per_remaining_possession",
+      "clock_pressure_index",
+      "fav_deficit",
+      "epa_divergence_is_null",
+      "dog_early_down_success_rate_is_null",
+      "dog_third_down_success_rate_is_null",
+      "fav_early_down_success_rate_is_null",
+      "fav_third_down_success_rate_is_null",
+      "dog_avg_drive_plays_is_null",
+      "dog_avg_drive_yards_is_null",
+      "dog_points_from_explosives_is_null",
+      "dog_points_from_returns_is_null",
+      "dog_points_from_sustained_is_null",
+      "seconds_since_last_dog_explosive_play_is_null",
+      "defense_stabilized_flag_is_null",
+      "dog_scored_on_opening_drive_is_null",
+      "fav_def_epa_after_first_drive_is_null",
+      "opening_drive_was_explosive_td_is_null",
+      "opening_drive_was_td_is_null",
+      "fav_yards_per_point_is_null",
+      "dog_avg_starting_field_pos_is_null",
+      "dog_points_off_turnovers_is_null"
+    ],
+    "metric_rows": [
+      {
+        "scheme": "U",
+        "fold": 2022,
+        "n": 1261,
+        "brier_model": 0.16879910672078027,
+        "brier_baseline_C": 0.16688375824544455,
+        "brier_improvement_baseline_C_minus_model": -0.001915348475335724,
+        "ece_model": 0.0694691024781181,
+        "auc_model": 0.788613734638143,
+        "auc_baseline_C": 0.7821475307237141
+      },
+      {
+        "scheme": "U",
+        "fold": 2023,
+        "n": 1297,
+        "brier_model": 0.18545082447173578,
+        "brier_baseline_C": 0.1836095944435067,
+        "brier_improvement_baseline_C_minus_model": -0.0018412300282290611,
+        "ece_model": 0.04348546425619923,
+        "auc_model": 0.757987446493458,
+        "auc_baseline_C": 0.7564308925421862
+      },
+      {
+        "scheme": "U",
+        "fold": 2024,
+        "n": 1296,
+        "brier_model": 0.17864765289856302,
+        "brier_baseline_C": 0.17452630194861535,
+        "brier_improvement_baseline_C_minus_model": -0.00412135094994768,
+        "ece_model": 0.04590463626588541,
+        "auc_model": 0.7583387835186397,
+        "auc_baseline_C": 0.7612092144466245
+      },
+      {
+        "scheme": "W2",
+        "fold": 2022,
+        "n": 1261,
+        "brier_model": 0.16879910672078027,
+        "brier_baseline_C": 0.16688375824544455,
+        "brier_improvement_baseline_C_minus_model": -0.001915348475335724,
+        "ece_model": 0.0694691024781181,
+        "auc_model": 0.788613734638143,
+        "auc_baseline_C": 0.7821475307237141
+      },
+      {
+        "scheme": "W2",
+        "fold": 2023,
+        "n": 1297,
+        "brier_model": 0.18545082447173578,
+        "brier_baseline_C": 0.1836095944435067,
+        "brier_improvement_baseline_C_minus_model": -0.0018412300282290611,
+        "ece_model": 0.04348546425619923,
+        "auc_model": 0.757987446493458,
+        "auc_baseline_C": 0.7564308925421862
+      },
+      {
+        "scheme": "W2",
+        "fold": 2024,
+        "n": 1296,
+        "brier_model": 0.17864765289856302,
+        "brier_baseline_C": 0.17452630194861535,
+        "brier_improvement_baseline_C_minus_model": -0.00412135094994768,
+        "ece_model": 0.04590463626588541,
+        "auc_model": 0.7583387835186397,
+        "auc_baseline_C": 0.7612092144466245
+      }
+    ],
+    "overall_U": {
+      "n": 3854,
+      "brier_model": 0.17771477713318184,
+      "brier_baseline_C": 0.17508255071773204,
+      "brier_improvement_baseline_C_minus_model": -0.0026322264154498274,
+      "bootstrap_ci": {
+        "alpha": 0.05,
+        "lower": -0.0056790345571117035,
+        "2.5": -0.00630555080789388,
+        "50": -0.0026072320179123874,
+        "97.5": 0.0011005296987911671
+      },
+      "ece_model": 0.04149837297850218,
+      "auc_model": 0.7636573274563379,
+      "auc_baseline_C": 0.7658928001904782,
+      "n06_reference": {
+        "label": "deficit_erased",
+        "n": 3854,
+        "n_games": 1450,
+        "actual_rate": 0.644784639335755,
+        "mean_model_prob": 0.6183659631523021,
+        "mean_baseline_C": 0.6321953243516776,
+        "brier_model": 0.17860561016654128,
+        "brier_baseline_C": 0.17508255071773204,
+        "brier_improvement_baseline_C_minus_model": -0.0035230594488092543,
+        "brier_improvement_bootstrap_ci": {
+          "2.5": -0.007243032502475119,
+          "25": -0.004778386574519485,
+          "50": -0.003538266503414239,
+          "75": -0.0022860483212087356,
+          "97.5": 0.00012532199273670804
+        },
+        "ece_model": 0.03959251226492333,
+        "ece_baseline_C": 0.02255654697044313,
+        "auc_model": 0.7645576894530073,
+        "auc_baseline_C": 0.7658928001904782
+      }
+    },
+    "coefficients": {
+      "U": [
+        {
+          "fold": 2022,
+          "coefficients": {
+            "dog_off_epa_per_play": -0.02703184037539117,
+            "epa_divergence": 0.09880768362951213,
+            "fav_def_epa_per_play": -0.024880354367276272,
+            "plays_so_far": -0.6169781814937456,
+            "fav_is_home": 0.04819590759865201,
+            "season_phase_bowl": -0.09339897683329176,
+            "dog_early_down_success_rate": -0.07136720480838851,
+            "dog_third_down_success_rate": -0.04109422799557504,
+            "fav_early_down_success_rate": -0.02011847766493354,
+            "fav_third_down_success_rate": -0.019276682179569272,
+            "dog_avg_drive_plays": 0.06673345938061923,
+            "dog_avg_drive_yards": -0.01930025837498434,
+            "dog_explosive_play_count": -0.038655265287286994,
+            "dog_points_from_explosives": 0.10732222968223165,
+            "dog_points_from_returns": 0.07782418880971236,
+            "dog_points_from_sustained": 0.04744811004256699,
+            "seconds_since_last_dog_explosive_play": -0.002867158633486719,
+            "defense_stabilized_flag": 0.0622696394011848,
+            "dog_received_opening_kickoff": -0.0020210086612153285,
+            "dog_scored_on_opening_drive": 0.029648520928186626,
+            "fav_def_epa_after_first_drive": 0.13956722631035412,
+            "opening_drive_was_explosive_td": -0.10327663064153453,
+            "opening_drive_was_td": 0.1154863448710255,
+            "fav_red_zone_tds": -0.04788073415256981,
+            "fav_red_zone_trips": 0.23009053664295787,
+            "fav_yards_per_point": 0.10303631698305717,
+            "dog_avg_starting_field_pos": -0.002076163810626984,
+            "dog_points_off_turnovers": -0.049215036334626164,
+            "fav_turnovers_so_far": -0.009982280121550316,
+            "short_field_tds_allowed": 0.0066440031440488535,
+            "deficit_per_remaining_possession": -0.9925494780880713,
+            "clock_pressure_index": 0.0,
+            "fav_deficit": -0.6846312290705667,
+            "epa_divergence_is_null": -0.23271403694305745,
+            "dog_early_down_success_rate_is_null": 0.19386652402098528,
+            "dog_third_down_success_rate_is_null": -0.03444956997206002,
+            "fav_early_down_success_rate_is_null": 0.31315174464662854,
+            "fav_third_down_success_rate_is_null": 0.004443538645157612,
+            "dog_avg_drive_plays_is_null": 0.0,
+            "dog_avg_drive_yards_is_null": 0.0,
+            "dog_points_from_explosives_is_null": -0.0014867714551722302,
+            "dog_points_from_returns_is_null": -9.718885770610401e-05,
+            "dog_points_from_sustained_is_null": -0.006200141788027014,
+            "seconds_since_last_dog_explosive_play_is_null": -0.006566478266554598,
+            "defense_stabilized_flag_is_null": -0.1332931734408614,
+            "dog_scored_on_opening_drive_is_null": 0.0,
+            "fav_def_epa_after_first_drive_is_null": -0.019161910449419162,
+            "opening_drive_was_explosive_td_is_null": 0.0,
+            "opening_drive_was_td_is_null": 0.0,
+            "fav_yards_per_point_is_null": -0.01958228492791133,
+            "dog_avg_starting_field_pos_is_null": 0.0,
+            "dog_points_off_turnovers_is_null": 0.0
+          }
+        },
+        {
+          "fold": 2023,
+          "coefficients": {
+            "dog_off_epa_per_play": -0.026578758221976077,
+            "epa_divergence": 0.06101079912465243,
+            "fav_def_epa_per_play": -0.01420917708820025,
+            "plays_so_far": -0.4720187772153786,
+            "fav_is_home": 0.04285322410352165,
+            "season_phase_bowl": -0.06484055649689947,
+            "dog_early_down_success_rate": -0.08572363848740917,
+            "dog_third_down_success_rate": -0.029500411631940605,
+            "fav_early_down_success_rate": 0.00954080400214701,
+            "fav_third_down_success_rate": -0.013021689605494165,
+            "dog_avg_drive_plays": 0.04984738456744922,
+            "dog_avg_drive_yards": 0.0,
+            "dog_explosive_play_count": -0.0964347589105984,
+            "dog_points_from_explosives": 0.07185405989352879,
+            "dog_points_from_returns": 0.039482397166558686,
+            "dog_points_from_sustained": 0.003994469645575174,
+            "seconds_since_last_dog_explosive_play": -0.0036167505332874864,
+            "defense_stabilized_flag": 0.05607603840610809,
+            "dog_received_opening_kickoff": 0.09482540208378504,
+            "dog_scored_on_opening_drive": 0.02432165535212823,
+            "fav_def_epa_after_first_drive": 0.09604830362156141,
+            "opening_drive_was_explosive_td": -0.12869214989307828,
+            "opening_drive_was_td": 0.1337102777100976,
+            "fav_red_zone_tds": -0.0193232235164526,
+            "fav_red_zone_trips": 0.14303441869125258,
+            "fav_yards_per_point": 0.06565105709023145,
+            "dog_avg_starting_field_pos": -0.02155545010116847,
+            "dog_points_off_turnovers": -0.04320780270501158,
+            "fav_turnovers_so_far": -0.005381547166369328,
+            "short_field_tds_allowed": 0.014716165944171513,
+            "deficit_per_remaining_possession": -1.0601587427854384,
+            "clock_pressure_index": 0.0,
+            "fav_deficit": -0.6629701502422152,
+            "epa_divergence_is_null": -0.3888673832685156,
+            "dog_early_down_success_rate_is_null": 0.23560152941490203,
+            "dog_third_down_success_rate_is_null": -0.029011805724669635,
+            "fav_early_down_success_rate_is_null": 0.4190472163309751,
+            "fav_third_down_success_rate_is_null": 0.0,
+            "dog_avg_drive_plays_is_null": 0.0,
+            "dog_avg_drive_yards_is_null": -0.03555986114251641,
+            "dog_points_from_explosives_is_null": -0.05083917234188598,
+            "dog_points_from_returns_is_null": 0.0,
+            "dog_points_from_sustained_is_null": -0.0031213492698206197,
+            "seconds_since_last_dog_explosive_play_is_null": -0.029173522371035317,
+            "defense_stabilized_flag_is_null": -0.23186283079196368,
+            "dog_scored_on_opening_drive_is_null": 0.04104893608589761,
+            "fav_def_epa_after_first_drive_is_null": 0.1118897070451253,
+            "opening_drive_was_explosive_td_is_null": 0.0,
+            "opening_drive_was_td_is_null": 0.0,
+            "fav_yards_per_point_is_null": -0.05217020811356539,
+            "dog_avg_starting_field_pos_is_null": 0.0,
+            "dog_points_off_turnovers_is_null": 0.0
+          }
+        },
+        {
+          "fold": 2024,
+          "coefficients": {
+            "dog_off_epa_per_play": -0.004917336391960932,
+            "epa_divergence": 0.07511537242959529,
+            "fav_def_epa_per_play": -0.033423218718958286,
+            "plays_so_far": -0.4275118858531535,
+            "fav_is_home": 0.050611367552812495,
+            "season_phase_bowl": -0.07946381728319812,
+            "dog_early_down_success_rate": -0.06852614832143639,
+            "dog_third_down_success_rate": 0.014111772176514511,
+            "fav_early_down_success_rate": 0.03341139049957107,
+            "fav_third_down_success_rate": 0.014728371370172211,
+            "dog_avg_drive_plays": 0.006785998145820437,
+            "dog_avg_drive_yards": 0.0012470458089384917,
+            "dog_explosive_play_count": -0.07761481897919502,
+            "dog_points_from_explosives": 0.0,
+            "dog_points_from_returns": -0.008730973455373875,
+            "dog_points_from_sustained": -0.01656775756456732,
+            "seconds_since_last_dog_explosive_play": 0.0016202274673760152,
+            "defense_stabilized_flag": 0.02928655750380968,
+            "dog_received_opening_kickoff": -0.04228992539922552,
+            "dog_scored_on_opening_drive": 0.03901353550558348,
+            "fav_def_epa_after_first_drive": 0.08043750527852749,
+            "opening_drive_was_explosive_td": -0.1779483352741453,
+            "opening_drive_was_td": 0.16606797674227664,
+            "fav_red_zone_tds": -0.029821122564561056,
+            "fav_red_zone_trips": 0.16660821866119377,
+            "fav_yards_per_point": 0.044370583093409445,
+            "dog_avg_starting_field_pos": -0.0367264968063444,
+            "dog_points_off_turnovers": -0.08251166858444975,
+            "fav_turnovers_so_far": -0.008411097658073307,
+            "short_field_tds_allowed": 0.012791051514618044,
+            "deficit_per_remaining_possession": -1.002132318376218,
+            "clock_pressure_index": 0.0,
+            "fav_deficit": -0.6401287052598821,
+            "epa_divergence_is_null": -0.27952346766598285,
+            "dog_early_down_success_rate_is_null": 0.23464826780060077,
+            "dog_third_down_success_rate_is_null": 0.0,
+            "fav_early_down_success_rate_is_null": 0.29072528487368593,
+            "fav_third_down_success_rate_is_null": -0.021777925262093028,
+            "dog_avg_drive_plays_is_null": -0.011456354393554347,
+            "dog_avg_drive_yards_is_null": -0.0566928174065953,
+            "dog_points_from_explosives_is_null": 0.0,
+            "dog_points_from_returns_is_null": 0.0,
+            "dog_points_from_sustained_is_null": 0.0,
+            "seconds_since_last_dog_explosive_play_is_null": 0.0026014342094703184,
+            "defense_stabilized_flag_is_null": -0.10275210061343197,
+            "dog_scored_on_opening_drive_is_null": 0.06262688007641601,
+            "fav_def_epa_after_first_drive_is_null": 0.0,
+            "opening_drive_was_explosive_td_is_null": 0.0,
+            "opening_drive_was_td_is_null": 0.0,
+            "fav_yards_per_point_is_null": -0.034664051442086785,
+            "dog_avg_starting_field_pos_is_null": -0.007838339984452847,
+            "dog_points_off_turnovers_is_null": -0.008942237119525999
+          }
+        }
+      ],
+      "W2": [
+        {
+          "fold": 2022,
+          "coefficients": {
+            "dog_off_epa_per_play": -0.02703184037539117,
+            "epa_divergence": 0.09880768362951213,
+            "fav_def_epa_per_play": -0.024880354367276272,
+            "plays_so_far": -0.6169781814937456,
+            "fav_is_home": 0.04819590759865201,
+            "season_phase_bowl": -0.09339897683329176,
+            "dog_early_down_success_rate": -0.07136720480838851,
+            "dog_third_down_success_rate": -0.04109422799557504,
+            "fav_early_down_success_rate": -0.02011847766493354,
+            "fav_third_down_success_rate": -0.019276682179569272,
+            "dog_avg_drive_plays": 0.06673345938061923,
+            "dog_avg_drive_yards": -0.01930025837498434,
+            "dog_explosive_play_count": -0.038655265287286994,
+            "dog_points_from_explosives": 0.10732222968223165,
+            "dog_points_from_returns": 0.07782418880971236,
+            "dog_points_from_sustained": 0.04744811004256699,
+            "seconds_since_last_dog_explosive_play": -0.002867158633486719,
+            "defense_stabilized_flag": 0.0622696394011848,
+            "dog_received_opening_kickoff": -0.0020210086612153285,
+            "dog_scored_on_opening_drive": 0.029648520928186626,
+            "fav_def_epa_after_first_drive": 0.13956722631035412,
+            "opening_drive_was_explosive_td": -0.10327663064153453,
+            "opening_drive_was_td": 0.1154863448710255,
+            "fav_red_zone_tds": -0.04788073415256981,
+            "fav_red_zone_trips": 0.23009053664295787,
+            "fav_yards_per_point": 0.10303631698305717,
+            "dog_avg_starting_field_pos": -0.002076163810626984,
+            "dog_points_off_turnovers": -0.049215036334626164,
+            "fav_turnovers_so_far": -0.009982280121550316,
+            "short_field_tds_allowed": 0.0066440031440488535,
+            "deficit_per_remaining_possession": -0.9925494780880713,
+            "clock_pressure_index": 0.0,
+            "fav_deficit": -0.6846312290705667,
+            "epa_divergence_is_null": -0.23271403694305745,
+            "dog_early_down_success_rate_is_null": 0.19386652402098528,
+            "dog_third_down_success_rate_is_null": -0.03444956997206002,
+            "fav_early_down_success_rate_is_null": 0.31315174464662854,
+            "fav_third_down_success_rate_is_null": 0.004443538645157612,
+            "dog_avg_drive_plays_is_null": 0.0,
+            "dog_avg_drive_yards_is_null": 0.0,
+            "dog_points_from_explosives_is_null": -0.0014867714551722302,
+            "dog_points_from_returns_is_null": -9.718885770610401e-05,
+            "dog_points_from_sustained_is_null": -0.006200141788027014,
+            "seconds_since_last_dog_explosive_play_is_null": -0.006566478266554598,
+            "defense_stabilized_flag_is_null": -0.1332931734408614,
+            "dog_scored_on_opening_drive_is_null": 0.0,
+            "fav_def_epa_after_first_drive_is_null": -0.019161910449419162,
+            "opening_drive_was_explosive_td_is_null": 0.0,
+            "opening_drive_was_td_is_null": 0.0,
+            "fav_yards_per_point_is_null": -0.01958228492791133,
+            "dog_avg_starting_field_pos_is_null": 0.0,
+            "dog_points_off_turnovers_is_null": 0.0
+          }
+        },
+        {
+          "fold": 2023,
+          "coefficients": {
+            "dog_off_epa_per_play": -0.026578758221976077,
+            "epa_divergence": 0.06101079912465243,
+            "fav_def_epa_per_play": -0.01420917708820025,
+            "plays_so_far": -0.4720187772153786,
+            "fav_is_home": 0.04285322410352165,
+            "season_phase_bowl": -0.06484055649689947,
+            "dog_early_down_success_rate": -0.08572363848740917,
+            "dog_third_down_success_rate": -0.029500411631940605,
+            "fav_early_down_success_rate": 0.00954080400214701,
+            "fav_third_down_success_rate": -0.013021689605494165,
+            "dog_avg_drive_plays": 0.04984738456744922,
+            "dog_avg_drive_yards": 0.0,
+            "dog_explosive_play_count": -0.0964347589105984,
+            "dog_points_from_explosives": 0.07185405989352879,
+            "dog_points_from_returns": 0.039482397166558686,
+            "dog_points_from_sustained": 0.003994469645575174,
+            "seconds_since_last_dog_explosive_play": -0.0036167505332874864,
+            "defense_stabilized_flag": 0.05607603840610809,
+            "dog_received_opening_kickoff": 0.09482540208378504,
+            "dog_scored_on_opening_drive": 0.02432165535212823,
+            "fav_def_epa_after_first_drive": 0.09604830362156141,
+            "opening_drive_was_explosive_td": -0.12869214989307828,
+            "opening_drive_was_td": 0.1337102777100976,
+            "fav_red_zone_tds": -0.0193232235164526,
+            "fav_red_zone_trips": 0.14303441869125258,
+            "fav_yards_per_point": 0.06565105709023145,
+            "dog_avg_starting_field_pos": -0.02155545010116847,
+            "dog_points_off_turnovers": -0.04320780270501158,
+            "fav_turnovers_so_far": -0.005381547166369328,
+            "short_field_tds_allowed": 0.014716165944171513,
+            "deficit_per_remaining_possession": -1.0601587427854384,
+            "clock_pressure_index": 0.0,
+            "fav_deficit": -0.6629701502422152,
+            "epa_divergence_is_null": -0.3888673832685156,
+            "dog_early_down_success_rate_is_null": 0.23560152941490203,
+            "dog_third_down_success_rate_is_null": -0.029011805724669635,
+            "fav_early_down_success_rate_is_null": 0.4190472163309751,
+            "fav_third_down_success_rate_is_null": 0.0,
+            "dog_avg_drive_plays_is_null": 0.0,
+            "dog_avg_drive_yards_is_null": -0.03555986114251641,
+            "dog_points_from_explosives_is_null": -0.05083917234188598,
+            "dog_points_from_returns_is_null": 0.0,
+            "dog_points_from_sustained_is_null": -0.0031213492698206197,
+            "seconds_since_last_dog_explosive_play_is_null": -0.029173522371035317,
+            "defense_stabilized_flag_is_null": -0.23186283079196368,
+            "dog_scored_on_opening_drive_is_null": 0.04104893608589761,
+            "fav_def_epa_after_first_drive_is_null": 0.1118897070451253,
+            "opening_drive_was_explosive_td_is_null": 0.0,
+            "opening_drive_was_td_is_null": 0.0,
+            "fav_yards_per_point_is_null": -0.05217020811356539,
+            "dog_avg_starting_field_pos_is_null": 0.0,
+            "dog_points_off_turnovers_is_null": 0.0
+          }
+        },
+        {
+          "fold": 2024,
+          "coefficients": {
+            "dog_off_epa_per_play": -0.004917336391960932,
+            "epa_divergence": 0.07511537242959529,
+            "fav_def_epa_per_play": -0.033423218718958286,
+            "plays_so_far": -0.4275118858531535,
+            "fav_is_home": 0.050611367552812495,
+            "season_phase_bowl": -0.07946381728319812,
+            "dog_early_down_success_rate": -0.06852614832143639,
+            "dog_third_down_success_rate": 0.014111772176514511,
+            "fav_early_down_success_rate": 0.03341139049957107,
+            "fav_third_down_success_rate": 0.014728371370172211,
+            "dog_avg_drive_plays": 0.006785998145820437,
+            "dog_avg_drive_yards": 0.0012470458089384917,
+            "dog_explosive_play_count": -0.07761481897919502,
+            "dog_points_from_explosives": 0.0,
+            "dog_points_from_returns": -0.008730973455373875,
+            "dog_points_from_sustained": -0.01656775756456732,
+            "seconds_since_last_dog_explosive_play": 0.0016202274673760152,
+            "defense_stabilized_flag": 0.02928655750380968,
+            "dog_received_opening_kickoff": -0.04228992539922552,
+            "dog_scored_on_opening_drive": 0.03901353550558348,
+            "fav_def_epa_after_first_drive": 0.08043750527852749,
+            "opening_drive_was_explosive_td": -0.1779483352741453,
+            "opening_drive_was_td": 0.16606797674227664,
+            "fav_red_zone_tds": -0.029821122564561056,
+            "fav_red_zone_trips": 0.16660821866119377,
+            "fav_yards_per_point": 0.044370583093409445,
+            "dog_avg_starting_field_pos": -0.0367264968063444,
+            "dog_points_off_turnovers": -0.08251166858444975,
+            "fav_turnovers_so_far": -0.008411097658073307,
+            "short_field_tds_allowed": 0.012791051514618044,
+            "deficit_per_remaining_possession": -1.002132318376218,
+            "clock_pressure_index": 0.0,
+            "fav_deficit": -0.6401287052598821,
+            "epa_divergence_is_null": -0.27952346766598285,
+            "dog_early_down_success_rate_is_null": 0.23464826780060077,
+            "dog_third_down_success_rate_is_null": 0.0,
+            "fav_early_down_success_rate_is_null": 0.29072528487368593,
+            "fav_third_down_success_rate_is_null": -0.021777925262093028,
+            "dog_avg_drive_plays_is_null": -0.011456354393554347,
+            "dog_avg_drive_yards_is_null": -0.0566928174065953,
+            "dog_points_from_explosives_is_null": 0.0,
+            "dog_points_from_returns_is_null": 0.0,
+            "dog_points_from_sustained_is_null": 0.0,
+            "seconds_since_last_dog_explosive_play_is_null": 0.0026014342094703184,
+            "defense_stabilized_flag_is_null": -0.10275210061343197,
+            "dog_scored_on_opening_drive_is_null": 0.06262688007641601,
+            "fav_def_epa_after_first_drive_is_null": 0.0,
+            "opening_drive_was_explosive_td_is_null": 0.0,
+            "opening_drive_was_td_is_null": 0.0,
+            "fav_yards_per_point_is_null": -0.034664051442086785,
+            "dog_avg_starting_field_pos_is_null": -0.007838339984452847,
+            "dog_points_off_turnovers_is_null": -0.008942237119525999
+          }
+        }
+      ]
+    },
+    "calibration_params": {
+      "U": [
+        {
+          "fold": 2022,
+          "x_thresholds": [
+            3.6904610980575383e-06,
+            0.01317120109847225,
+            0.017204401604930565,
+            0.08870178311851938,
+            0.09058360742815863,
+            0.14777422311091032,
+            0.147829558455661,
+            0.1777855301786903,
+            0.1836381174774182,
+            0.46684524919758214,
+            0.46845805719112155,
+            0.47499228950149125,
+            0.47601534703164794,
+            0.47949553692600255,
+            0.4806447725858118,
+            0.5327265289898435,
+            0.5366238250522778,
+            0.6141249147645982,
+            0.6162130663107405,
+            0.673461867967148,
+            0.6738715480046189,
+            0.6939545365041044,
+            0.6952513112165387,
+            0.7300233921347146,
+            0.7302480879307396,
+            0.7660225666485831,
+            0.766405289705263,
+            0.8350011953419155,
+            0.8352304372516308,
+            0.8832128329971919,
+            0.8833947257224848,
+            0.9020519656313165,
+            0.9020547601786971,
+            0.943296617627804
+          ],
+          "y_thresholds": [
+            0.0,
+            0.0,
+            0.03571428571428571,
+            0.03571428571428571,
+            0.05714285714285714,
+            0.05714285714285714,
+            0.2222222222222222,
+            0.2222222222222222,
+            0.3017241379310345,
+            0.3017241379310345,
+            0.3333333333333333,
+            0.3333333333333333,
+            0.5,
+            0.5,
+            0.5217391304347826,
+            0.5217391304347826,
+            0.5571428571428572,
+            0.5571428571428572,
+            0.6136363636363638,
+            0.6136363636363638,
+            0.7142857142857143,
+            0.7142857142857143,
+            0.7333333333333333,
+            0.7333333333333333,
+            0.7454545454545455,
+            0.7454545454545455,
+            0.7980769230769231,
+            0.7980769230769231,
+            0.8435374149659864,
+            0.8435374149659864,
+            0.8656716417910447,
+            0.8656716417910447,
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "fold": 2023,
+          "x_thresholds": [
+            1.9861515845464966e-06,
+            0.05562388611038075,
+            0.05715974966720892,
+            0.11260774773928986,
+            0.11523550408845294,
+            0.1370530840878578,
+            0.14275672043787518,
+            0.28181884436993565,
+            0.2820978965489775,
+            0.29098779018728627,
+            0.29280980921298944,
+            0.5148190563085343,
+            0.5167175597580235,
+            0.5263242262139136,
+            0.5268639136629207,
+            0.5789068759782016,
+            0.5816358197835662,
+            0.714207358151003,
+            0.7157939547731745,
+            0.7800861945129487,
+            0.781570566416779,
+            0.7865527122798535,
+            0.7878674128160734,
+            0.8662766023973884,
+            0.8662992211874047,
+            0.9027874256479729,
+            0.9044868684706688,
+            0.9458322091865843,
+            0.9517857239709411,
+            0.9949786882942893
+          ],
+          "y_thresholds": [
+            0.0,
+            0.0,
+            0.06666666666666667,
+            0.06666666666666667,
+            0.16666666666666666,
+            0.16666666666666666,
+            0.3333333333333333,
+            0.3333333333333333,
+            0.4,
+            0.4,
+            0.4166666666666667,
+            0.4166666666666667,
+            0.5555555555555556,
+            0.5555555555555556,
+            0.6382978723404256,
+            0.6382978723404256,
+            0.717948717948718,
+            0.717948717948718,
+            0.7216494845360825,
+            0.7216494845360825,
+            0.8235294117647058,
+            0.8235294117647058,
+            0.8872549019607843,
+            0.8872549019607843,
+            0.9122807017543859,
+            0.9122807017543859,
+            0.9166666666666666,
+            0.9166666666666666,
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "fold": 2024,
+          "x_thresholds": [
+            3.1856967559510893e-06,
+            0.08507714299593856,
+            0.08575777824215572,
+            0.12614308484021394,
+            0.12817580013106664,
+            0.18882434509524354,
+            0.18915308794904515,
+            0.21618321037949578,
+            0.21995389076744953,
+            0.3560531765435475,
+            0.3579757608620006,
+            0.3837834130422646,
+            0.38614374780332994,
+            0.5003285186102603,
+            0.5014392675562047,
+            0.5207341861834472,
+            0.522037226241573,
+            0.526026695048336,
+            0.5292615893391743,
+            0.5912986492728838,
+            0.5924397901030396,
+            0.619751937681264,
+            0.6199450664643782,
+            0.6830337057252759,
+            0.684187577742684,
+            0.698014019402399,
+            0.7035279090965828,
+            0.7131607475901569,
+            0.7132316870846139,
+            0.846278090672341,
+            0.8466582925687165,
+            0.8573493774753785,
+            0.8583304991055523,
+            0.9273132242194172,
+            0.9290125061625096,
+            0.9397369115851775
+          ],
+          "y_thresholds": [
+            0.0,
+            0.0,
+            0.05555555555555555,
+            0.05555555555555555,
+            0.19230769230769232,
+            0.19230769230769232,
+            0.25,
+            0.25,
+            0.3090909090909091,
+            0.3090909090909091,
+            0.3333333333333333,
+            0.3333333333333333,
+            0.37662337662337664,
+            0.37662337662337664,
+            0.4375,
+            0.4375,
+            0.5,
+            0.5,
+            0.510204081632653,
+            0.510204081632653,
+            0.5526315789473685,
+            0.5526315789473685,
+            0.6481481481481481,
+            0.6481481481481481,
+            0.6666666666666666,
+            0.6666666666666666,
+            0.7142857142857143,
+            0.7142857142857143,
+            0.7813765182186235,
+            0.7813765182186235,
+            0.8181818181818182,
+            0.8181818181818182,
+            0.8571428571428571,
+            0.8571428571428571,
+            1.0,
+            1.0
+          ]
+        }
+      ],
+      "W2": [
+        {
+          "fold": 2022,
+          "x_thresholds": [
+            3.6904610980575383e-06,
+            0.01317120109847225,
+            0.017204401604930565,
+            0.08870178311851938,
+            0.09058360742815863,
+            0.14777422311091032,
+            0.147829558455661,
+            0.1777855301786903,
+            0.1836381174774182,
+            0.46684524919758214,
+            0.46845805719112155,
+            0.47499228950149125,
+            0.47601534703164794,
+            0.47949553692600255,
+            0.4806447725858118,
+            0.5327265289898435,
+            0.5366238250522778,
+            0.6141249147645982,
+            0.6162130663107405,
+            0.673461867967148,
+            0.6738715480046189,
+            0.6939545365041044,
+            0.6952513112165387,
+            0.7300233921347146,
+            0.7302480879307396,
+            0.7660225666485831,
+            0.766405289705263,
+            0.8350011953419155,
+            0.8352304372516308,
+            0.8832128329971919,
+            0.8833947257224848,
+            0.9020519656313165,
+            0.9020547601786971,
+            0.943296617627804
+          ],
+          "y_thresholds": [
+            0.0,
+            0.0,
+            0.03571428571428571,
+            0.03571428571428571,
+            0.05714285714285714,
+            0.05714285714285714,
+            0.2222222222222222,
+            0.2222222222222222,
+            0.3017241379310345,
+            0.3017241379310345,
+            0.3333333333333333,
+            0.3333333333333333,
+            0.5,
+            0.5,
+            0.5217391304347826,
+            0.5217391304347826,
+            0.5571428571428572,
+            0.5571428571428572,
+            0.6136363636363638,
+            0.6136363636363638,
+            0.7142857142857143,
+            0.7142857142857143,
+            0.7333333333333333,
+            0.7333333333333333,
+            0.7454545454545455,
+            0.7454545454545455,
+            0.7980769230769231,
+            0.7980769230769231,
+            0.8435374149659864,
+            0.8435374149659864,
+            0.8656716417910447,
+            0.8656716417910447,
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "fold": 2023,
+          "x_thresholds": [
+            1.9861515845464966e-06,
+            0.05562388611038075,
+            0.05715974966720892,
+            0.11260774773928986,
+            0.11523550408845294,
+            0.1370530840878578,
+            0.14275672043787518,
+            0.28181884436993565,
+            0.2820978965489775,
+            0.29098779018728627,
+            0.29280980921298944,
+            0.5148190563085343,
+            0.5167175597580235,
+            0.5263242262139136,
+            0.5268639136629207,
+            0.5789068759782016,
+            0.5816358197835662,
+            0.714207358151003,
+            0.7157939547731745,
+            0.7800861945129487,
+            0.781570566416779,
+            0.7865527122798535,
+            0.7878674128160734,
+            0.8662766023973884,
+            0.8662992211874047,
+            0.9027874256479729,
+            0.9044868684706688,
+            0.9458322091865843,
+            0.9517857239709411,
+            0.9949786882942893
+          ],
+          "y_thresholds": [
+            0.0,
+            0.0,
+            0.06666666666666667,
+            0.06666666666666667,
+            0.16666666666666666,
+            0.16666666666666666,
+            0.3333333333333333,
+            0.3333333333333333,
+            0.4,
+            0.4,
+            0.4166666666666667,
+            0.4166666666666667,
+            0.5555555555555556,
+            0.5555555555555556,
+            0.6382978723404256,
+            0.6382978723404256,
+            0.717948717948718,
+            0.717948717948718,
+            0.7216494845360825,
+            0.7216494845360825,
+            0.8235294117647058,
+            0.8235294117647058,
+            0.8872549019607843,
+            0.8872549019607843,
+            0.9122807017543859,
+            0.9122807017543859,
+            0.9166666666666666,
+            0.9166666666666666,
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "fold": 2024,
+          "x_thresholds": [
+            3.1856967559510893e-06,
+            0.08507714299593856,
+            0.08575777824215572,
+            0.12614308484021394,
+            0.12817580013106664,
+            0.18882434509524354,
+            0.18915308794904515,
+            0.21618321037949578,
+            0.21995389076744953,
+            0.3560531765435475,
+            0.3579757608620006,
+            0.3837834130422646,
+            0.38614374780332994,
+            0.5003285186102603,
+            0.5014392675562047,
+            0.5207341861834472,
+            0.522037226241573,
+            0.526026695048336,
+            0.5292615893391743,
+            0.5912986492728838,
+            0.5924397901030396,
+            0.619751937681264,
+            0.6199450664643782,
+            0.6830337057252759,
+            0.684187577742684,
+            0.698014019402399,
+            0.7035279090965828,
+            0.7131607475901569,
+            0.7132316870846139,
+            0.846278090672341,
+            0.8466582925687165,
+            0.8573493774753785,
+            0.8583304991055523,
+            0.9273132242194172,
+            0.9290125061625096,
+            0.9397369115851775
+          ],
+          "y_thresholds": [
+            0.0,
+            0.0,
+            0.05555555555555555,
+            0.05555555555555555,
+            0.19230769230769232,
+            0.19230769230769232,
+            0.25,
+            0.25,
+            0.3090909090909091,
+            0.3090909090909091,
+            0.3333333333333333,
+            0.3333333333333333,
+            0.37662337662337664,
+            0.37662337662337664,
+            0.4375,
+            0.4375,
+            0.5,
+            0.5,
+            0.510204081632653,
+            0.510204081632653,
+            0.5526315789473685,
+            0.5526315789473685,
+            0.6481481481481481,
+            0.6481481481481481,
+            0.6666666666666666,
+            0.6666666666666666,
+            0.7142857142857143,
+            0.7142857142857143,
+            0.7813765182186235,
+            0.7813765182186235,
+            0.8181818181818182,
+            0.8181818181818182,
+            0.8571428571428571,
+            0.8571428571428571,
+            1.0,
+            1.0
+          ]
+        }
+      ]
+    }
+  },
+  "phase0_extract_summary": [
+    {
+      "notebook": "02a_baseline_features.ipynb",
+      "cells": [
+        4,
+        6,
+        8,
+        10,
+        11,
+        13
+      ],
+      "rows": 11416,
+      "cols": 23,
+      "candidate_count": 6,
+      "elapsed_sec": 14.864100600010715,
+      "stdout_tail": "dog_pregame_rating']\n  R16-safe imputed col + indicator: ['spread_movement', 'spread_movement_is_null']\ncandidate features (6): ['fav_off_epa_per_play', 'fav_def_epa_per_play', 'dog_off_epa_per_play', 'dog_def_epa_per_play', 'epa_divergence', 'plays_so_far']\nrandom state: 42\ntrigger_events.csv:    11,416 rows x 45 cols\ntrigger_outcomes.csv:  11,416 rows x 6 cols\nmerged:                11,416 rows x 49 cols\n\nDropped 0 rows with NaN final_fav_won (ties / unknown).\nIn-scope rows for 02a: 11,416\n\nRows per season:\nseason\n2015     998\n2016    1129\n2017    1116\n2018    1104\n2019    1101\n2020     890\n2021    1221\n2022    1261\n2023    1300\n2024    1296\n\n[ok] always-present pre-game columns are non-null on the in-scope subset\n     spread_movement nulls (pre-impute): 6,352 (55.64% of in-scope)\ndistinct (season, season_type, week) tuples to load from cache: 161\n[ok] /plays loaded from cache in 9.6s -- 8,536 games, 1,541,058 plays\n[info] CFBD negative-id encoding: 19,828 plays across 115 games carry the alternate (negative-int) id format. Retained; chrono_key orders them correctly without referencing play.id. See research/corrections_log.md.\n[ok] cache-hit assertion passed: 0 /plays lookups, all cached.\n[ok] plays_by_game sorted by composite _chrono_key (8,536 games)\n[ok] assert_no_lookahead defined (composite chrono_key gate)\n[ok] 6 feature functions registered\nfeature_matrix_df:  11,416 rows x 23 cols\n  skipped (game not in plays_by_game): 0\n\nNull counts per candidate feature (this run):\n  total in-scope triggers: 11,416\n  fav_off_epa_per_play       1,839 null (16.11%)\n  fav_def_epa_per_play         215 null ( 1.88%)\n  dog_off_epa_per_play         215 null ( 1.88%)\n  dog_def_epa_per_play       1,839 null (16.11%)\n  epa_divergence             1,945 null (17.04%)\n  plays_so_far                   0 null ( 0.00%)\n\nR16-safe NaN handling for spread_movement:\n  spread_movement nulls AFTER impute:    0  (expected: 0)\n  spread_movement_is_null indicator sum: 6,352 (55.64% of in-scope)\n"
+    },
+    {
+      "notebook": "02b_opening_drive_shock.ipynb",
+      "cells": [
+        4,
+        6,
+        8,
+        10,
+        11,
+        13
+      ],
+      "rows": 11416,
+      "cols": 28,
+      "candidate_count": 10,
+      "elapsed_sec": 20.9148497999995,
+      "stdout_tail": "2 (drive-summary features computable): 9,556 (83.7%)\n\n[ok] always-present pre-game columns are non-null on the in-scope subset\n     spread_movement nulls (pre-impute): 6,352 (55.64% of in-scope)\ndistinct (season, season_type, week) tuples to load from cache: 161\n[ok] /plays loaded from cache in 10.3s -- 8,536 games, 1,541,058 plays\n[info] CFBD negative-id encoding: 19,828 plays across 115 games carry the alternate (negative-int) id format. Retained; chrono_key orders them correctly without referencing play.id. See research/corrections_log.md.\n[ok] /drives loaded from cache in 3.9s -- 8,537 games, 214,313 drives\n[ok] cache-hit assertion passed: 0 /plays lookups, 0 /drives lookups, all cached.\n[ok] plays_by_game sorted by composite _chrono_key (8,536 games)\n[ok] drives_by_game sorted by driveNumber (8,537 games)\n[ok] assert_no_lookahead defined (composite chrono_key gate)\n[ok] 10 feature functions registered\nfeature_matrix_df:  11,416 rows x 28 cols\n  skipped (game not in plays_by_game): 0\n\nNull counts per candidate feature (this run):\n  total in-scope triggers: 11,416\n  dog_received_opening_kickoff         0 null ( 0.00%) \n  dog_scored_on_opening_drive      1,860 null (16.29%) (D4 drive-summary)\n  opening_drive_was_td             1,860 null (16.29%) (D4 drive-summary)\n  opening_drive_was_explosive_td   1,860 null (16.29%) (D4 drive-summary)\n  opening_drive_yards              1,860 null (16.29%) (D4 drive-summary)\n  opening_drive_plays              1,860 null (16.29%) (D4 drive-summary)\n  opening_drive_seconds            1,860 null (16.29%) (D4 drive-summary)\n  fav_def_epa_first_drive          5,377 null (47.10%) \n  fav_def_epa_after_first_drive    2,019 null (17.69%) \n  defense_stabilized_flag          7,181 null (62.90%) \n\n  drive-1 trigger count (expected null floor for drive-summary feats): 1,860\n\nR16-safe NaN handling for spread_movement:\n  spread_movement nulls AFTER impute:    0  (expected: 0)\n  spread_movement_is_null indicator sum: 6,352 (55.64% of in-scope)\n"
+    },
+    {
+      "notebook": "02c_explosive_vs_sustained.ipynb",
+      "cells": [
+        4,
+        6,
+        8,
+        10,
+        12,
+        13,
+        15
+      ],
+      "rows": 11416,
+      "cols": 29,
+      "candidate_count": 8,
+      "elapsed_sec": 18.11502530000871,
+      "stdout_tail": "ngle-feature extractors)\nfeature_matrix_df:  11,416 rows x 28 cols\n  skipped (game not in plays_by_game): 0\n\nNull counts per candidate feature (this run):\n  total in-scope triggers: 11,416\n  dog_points_from_explosives                 1,914 null (16.77%) (D7 NULL when no completed dog drive)\n  dog_points_from_sustained                  1,914 null (16.77%) (D7 NULL when no completed dog drive)\n  dog_points_from_returns                    1,914 null (16.77%) (D7 NULL when no completed dog drive)\n  dog_explosive_play_count                       0 null ( 0.00%)\n  dog_avg_drive_yards                        2,982 null (26.12%)\n  dog_avg_drive_plays                        2,982 null (26.12%)\n  seconds_since_last_dog_explosive_play      1,944 null (17.03%) (D8 R16-safe impute in eval loop)\n  prior_drive_had_dog_explosive_play         1,860 null (16.29%) (D9 NULL on drive-1 triggers)\n\n  drive-1 trigger count (expected null floor for prior_drive_had_dog_explosive_play): 1,860\n\nR16-safe NaN handling for spread_movement (baseline):\n  spread_movement nulls AFTER impute:    0  (expected: 0)\n  spread_movement_is_null indicator sum: 6,352 (55.64% of in-scope)\n\nAccounting delta = dog_score_at_trigger - sum(3 buckets) (9,502 triggers with completed dog drives):\n  per D12: PAT/2pt attribute to preceding TD's bucket, so positive deltas\n  reflect the trigger play itself being a dog scoring play.\n  Top deltas (value: count, % of accounted):\n    delta=   7  count= 3,304  (34.77%)\n    delta=   8  count= 2,316  (24.37%)\n    delta=   9  count= 1,207  (12.70%)\n    delta=  10  count=   674  ( 7.09%)\n    delta=   3  count=   642  ( 6.76%)\n    delta=   4  count=   410  ( 4.31%)\n    delta=  11  count=   262  ( 2.76%)\n    delta=   5  count=   219  ( 2.30%)\n    delta=   6  count=   181  ( 1.90%)\n    delta=  12  count=    81  ( 0.85%)\n  [WARN] 8 triggers have NEGATIVE delta -- buckets exceeded dog_score_at_trigger. Investigate registry / attribution edge case before relying on these features in N03.\n"
+    },
+    {
+      "notebook": "02d_turnover_and_short_field.ipynb",
+      "cells": [
+        4,
+        6,
+        8,
+        10,
+        11,
+        13
+      ],
+      "rows": 11416,
+      "cols": 24,
+      "candidate_count": 4,
+      "elapsed_sec": 23.67560859999503,
+      "stdout_tail": "etained; chrono_key orders them correctly without referencing play.id. See research/corrections_log.md.\n[ok] /drives loaded from cache in 6.8s -- 8,537 games, 214,313 drives\n[ok] cache-hit assertion passed: 0 /plays lookups, 0 /drives lookups, all cached.\n[ok] plays_by_game sorted by composite _chrono_key (8,536 games)\n[ok] drives_by_game sorted by driveNumber (8,537 games)\n[ok] assert_no_lookahead defined (composite chrono_key gate)\n[ok] 4 feature extractors defined (all Category A: drive-metadata only)\n     fav_turnovers_so_far / dog_points_off_turnovers\n     dog_avg_starting_field_pos / short_field_tds_allowed\n[ok] canonical (chrono_key) feature matrix built in 2.4s\n     11,416 rows x 24 cols\n     skipped (game not in plays_by_game): 0\n\nNull counts per candidate feature (this run):\n  total in-scope triggers: 11,416\n  fav_turnovers_so_far                 0 null ( 0.00%) (always defined; 0 when no qualifying drives)\n  dog_points_off_turnovers         2,982 null (26.12%) (D7 NULL when no completed dog drive)\n  dog_avg_starting_field_pos       2,982 null (26.12%) (D5 NULL when no completed dog drive)\n  short_field_tds_allowed              0 null ( 0.00%) (always defined; 0 when no qualifying drives)\n\n  drive-1 trigger count (expected D7 NULL floor for dog_points_off_turnovers + dog_avg_starting_field_pos): 1,860\n\nR16-safe NaN handling for spread_movement (baseline):\n  spread_movement nulls AFTER impute:    0  (expected: 0)\n  spread_movement_is_null indicator sum: 6,352 (55.64% of in-scope)\n\nSummary statistics per candidate (in-scope, non-null):\n  fav_turnovers_so_far             n_nonnull=11,416  mean=  0.526  median=  0.000  min=    0.0  max=    5.0\n  dog_points_off_turnovers         n_nonnull=8,434  mean=  2.265  median=  0.000  min=    0.0  max=   24.0\n  dog_avg_starting_field_pos       n_nonnull=8,434  mean= 29.674  median= 27.333  min=    0.0  max=  100.0\n  short_field_tds_allowed          n_nonnull=11,416  mean=  0.116  median=  0.000  min=    0.0  max=    5.0\n"
+    },
+    {
+      "notebook": "02e_red_zone_failure.ipynb",
+      "cells": [
+        4,
+        6,
+        8,
+        10,
+        11,
+        13
+      ],
+      "rows": 11416,
+      "cols": 25,
+      "candidate_count": 3,
+      "elapsed_sec": 20.79247850002139,
+      "stdout_tail": "   fav_yards_per_point  (Category A: drive-metadata only)\n[ok] D7 two-bucket NULL classifier defined (_classify_yards_per_point_null_bucket)\n[ok] canonical (chrono_key) feature matrix built in 2.8s\n     11,416 rows x 25 cols\n     skipped (game not in plays_by_game): 0\n\nNull counts per candidate feature (this run):\n  total in-scope triggers: 11,416\n  fav_red_zone_trips                   0 null ( 0.00%) (always defined; 0 when no qualifying drives)\n  fav_red_zone_tds                     0 null ( 0.00%) (always defined; 0 when no qualifying drives)\n  fav_yards_per_point              6,514 null (57.06%) (D7 NULL: bucket (a) no completed fav drives OR bucket (b) 0 fav offensive points)\n\nD7 two-bucket NULL breakdown for fav_yards_per_point:\n  (a) no completed fav drives:       1,997 (17.49% of in-scope)\n  (b) drives exist, 0 fav points:    4,517 (39.57% of in-scope)\n      total NULL:                     6,514 (57.06%)\n  nonnull (drives + fav points > 0): 4,902 (42.94%)\n[ok] D7 bucket-sum sanity passed (a + b == total NULL).\n[info] bucket (b) is large (4,517 > 200 triggers). If fav_yards_per_point fails at small magnitudes, the worst-case-imputation alternative becomes a tech-debt entry for N03 to consider.\n\n  drive-1 trigger count: 1,860\n  drive-1 triggers in bucket (a) (expected: all of them): 1,860\n\nR16-safe NaN handling for spread_movement (baseline):\n  spread_movement nulls AFTER impute:    0  (expected: 0)\n  spread_movement_is_null indicator sum: 6,352 (55.64% of in-scope)\n\nR16-safe pair for fav_yards_per_point (D8 Mode B):\n  fav_yards_per_point_is_null indicator sum: 6,514 (57.06% of in-scope)\n\nSummary statistics per candidate (in-scope, non-null):\n  fav_red_zone_trips               n_nonnull=11,416  mean=  0.814  median=  0.000  min=   0.00  max=   8.00\n  fav_red_zone_tds                 n_nonnull=11,416  mean=  0.345  median=  0.000  min=   0.00  max=   5.00\n  fav_yards_per_point              n_nonnull=4,902  mean= 20.655  median= 17.684  min= -12.00  max= 112.33\n"
+    },
+    {
+      "notebook": "02f_down_distance_efficiency.ipynb",
+      "cells": [
+        4,
+        6,
+        8,
+        10,
+        11,
+        13
+      ],
+      "rows": 11416,
+      "cols": 28,
+      "candidate_count": 4,
+      "elapsed_sec": 14.573394100007135,
+      "stdout_tail": "_movement nulls (pre-impute): 6,352 (55.64% of in-scope)\ndistinct (season, season_type, week) tuples to load from cache: 161\n[ok] /plays loaded from cache in 8.8s -- 8,536 games, 1,541,058 plays\n[info] CFBD negative-id encoding: 19,828 plays across 115 games carry the alternate (negative-int) id format. Retained; chrono_key orders them correctly without referencing play.id. See research/corrections_log.md.\n[ok] /drives loaded from cache in 1.2s -- 8,537 games, 214,313 drives\n[ok] cache-hit assertion passed: 0 /plays lookups, 0 /drives lookups, all cached.\n[ok] plays_by_game sorted by composite _chrono_key (8,536 games)\n[ok] drives_by_game sorted by driveNumber (8,537 games)\n[ok] dn field audit 250,000 snaps effective_distance=max(0,min(distance,yardsToGoal))\n[warn] audit skipped 60 DN snaps with negative raw min(distance,yardsToGoal)\n[ok] assert_no_lookahead defined (composite chrono_key gate)\n[ok] down-distance extractors initialized (Category B -- play iteration)\n[ok] canonical (chrono_key) feature matrix built in 3.1s\n     11,416 rows x 28 cols\n     skipped (game not in plays_by_game): 0\n\nNull counts per DDL rate (D7 denom == 0 -> NaN):\n  total in-scope triggers: 11,416\n  fav_early_down_success_rate          2,008 null / insum=2,008 (17.59%)\n  fav_third_down_success_rate          2,285 null / insum=2,285 (20.02%)\n  dog_early_down_success_rate          3,007 null / insum=3,007 (26.34%)\n  dog_third_down_success_rate          3,236 null / insum=3,236 (28.35%)\n\nR16 baseline spread_movement:\n  nulls after impute: 0  indicator sum: 6,352\n\nSummary statistics per candidate (non-null rows):\n  fav_early_down_success_rate          n=9,408  mean= 0.354  median= 0.375  min= 0.00  max= 1.00\n  fav_third_down_success_rate          n=9,131  mean= 0.277  median= 0.286  min= 0.00  max= 1.00\n  dog_early_down_success_rate          n=8,409  mean= 0.404  median= 0.419  min= 0.00  max= 1.00\n  dog_third_down_success_rate          n=8,180  mean= 0.374  median= 0.385  min= 0.00  max= 1.00\n"
+    },
+    {
+      "notebook": "02g_context_week_home_neutral.ipynb",
+      "cells": [
+        4,
+        6,
+        8,
+        10
+      ],
+      "rows": 11416,
+      "cols": 56,
+      "candidate_count": 5,
+      "elapsed_sec": 0.6110892999859061,
+      "stdout_tail": "feature_set_version: v1_context_week_home_neutral\nbaseline pre-game (6): ['pregame_spread', 'rating_gap', 'fav_pregame_rating', 'dog_pregame_rating', 'spread_movement', 'spread_movement_is_null']\ncandidates (5) all Category A:\n  - season_phase_mid\n  - season_phase_late\n  - season_phase_bowl\n  - fav_is_home\n  - is_neutral_site\ntrigger_events.csv:    11,416 rows x 45 cols\ntrigger_outcomes.csv:  11,416 rows x 6 cols\nmerged:                11,416 rows\ndropped final_fav_won NaN rows: 0\nin-scope rows for 02g: 11,416\n[ok] direct trigger columns available: season_type, week, home_is_fav\ncached /games rows loaded: 8,570\nunique trigger games:      4,311\ncached join coverage:      4,311/4,311\nneutral-site trigger games: 379\n[ok] no external fetch needed for reduced 02g feature set\nfeature_matrix_df: 11,416 rows x 56 cols\nCandidate prevalence:\n  season_phase_mid          4,016 (35.18%)\n  season_phase_late         4,116 (36.05%)\n  season_phase_bowl           767 ( 6.72%)\n  fav_is_home               6,536 (57.25%)\n  is_neutral_site           1,069 ( 9.36%)\n"
+    }
+  ]
+}
