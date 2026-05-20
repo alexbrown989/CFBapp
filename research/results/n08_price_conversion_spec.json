@@ -1,0 +1,41 @@
+{
+  "created_at": "2026-05-20 15:56:44",
+  "source_commit": "3a3cb22adf5a8c52d3104b8e54cfc02bf693b8aa",
+  "function_name": "stern_winston_favorite_win_probability_v1",
+  "interface": {
+    "inputs": {
+      "current_score_diff": "favorite score minus underdog score at evaluation time",
+      "time_remaining_seconds": "seconds remaining in regulation, clipped to [0, 3600]",
+      "pregame_spread": "accepted for future compatibility; coefficient is 0.0 in N08 v1"
+    },
+    "output": "favorite implied win probability"
+  },
+  "formula": {
+    "epa_adjustment": 0.0,
+    "pregame_spread_coefficient": 0.0,
+    "mean": "current_score_diff",
+    "std": "15.752295689841 * sqrt(time_remaining_seconds / 3600)",
+    "probability": "1 - normal_cdf((0.5 - mean) / std)",
+    "clip": "[0, 1]"
+  },
+  "parameters": {
+    "pfr_reference_std": 13.45,
+    "empirical_cfb_std": 15.752295689841276,
+    "empirical_cfb_variance": 248.13481950019204,
+    "training_years": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021
+    ],
+    "n_training_games": 2860
+  },
+  "limitations": [
+    "EPA adjustment is held at zero in N08 v1.",
+    "pregame_spread is accepted by the interface but not used in v1.",
+    "For deficit_erased, the final-win probability is only an approximation to ever-erased probability."
+  ]
+}

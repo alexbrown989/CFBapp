@@ -1018,3 +1018,47 @@ or swapped after results were visible. Edge cases were handled by NaN +
 paired-indicator policy rather than clipping or redefining features.
 Bonferroni-corrected gates were applied by category. The negative result is
 therefore a real research finding, not an artifact of moving thresholds.
+
+---
+
+## N08 honest interpretation (2026-05-20)
+
+N08 recommends `M3_N06_CONFORMAL` for deployment scaffolding: the N06
+calibrated point predictions with split-conformal intervals added as a
+descriptive uncertainty layer. The corrected Decision 4 ordering is important.
+All three candidate variants beat at least one baseline with statistical
+support, M1 and M3 tie on weighted ECE (**0.0483**) ahead of M2 (**0.0512**),
+and the conformal interval criterion breaks the M1/M3 tie in favor of M3.
+
+This does not reverse the N05/N06/N07 baseline_C conclusion. No model beats
+baseline_C on `deficit_erased`: N06 and M3 remain at **-0.00352**, while N07
+expanded is **-0.00263**, both with CIs crossing or below zero. The supported
+Brier edge in N08 is against Stern-Winston baselines. That result mainly shows
+that Stern-Winston final-margin probability is the wrong baseline for the
+path-dependent `deficit_erased` label: B_SW_CFB has ECE around **0.411** on
+`deficit_erased`, versus about **0.040** for the N06 point model.
+
+N08 documents a project-level variance finding. The empirical CFB 2015-2021
+favorite final-margin standard deviation is **15.75**, materially higher than
+the PFR/NFL reference value **13.45**. In variance terms, CFB is approximately
+**37%** higher. The exported Stern-Winston price-conversion function therefore
+uses the CFB-specific standard deviation for N09 live-price approximation.
+
+The conformal interval result is an honest uncertainty warning. Held-out
+coverage is **0.9549**, matching nominal 95% coverage, but average interval
+width is **0.9732**. Individual trigger probabilities carry far more
+uncertainty than a point estimate communicates. For N09, deploy the N06 point
+probability, display conformal intervals, and treat narrow-confidence staking
+assumptions skeptically.
+
+Bet-sizing implication for N09: quarter-Kelly may overstate confidence given
+the conformal width. Eighth-Kelly or flat staking should be considered as
+primary simulation strategies, with larger Kelly fractions treated as
+sensitivity checks rather than the main deployment assumption.
+
+Known approximation limitation: the Stern-Winston v1 price-conversion function
+accepts `pregame_spread` for interface stability but sets its coefficient to
+0.0. This is conservative and keeps N08 aligned with the locked no-EPA
+analytical baseline, but live market behavior will reflect pregame strength.
+Future live-market modeling should revisit this coefficient once actual live
+line data exists.
