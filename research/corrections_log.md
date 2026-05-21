@@ -1062,3 +1062,85 @@ accepts `pregame_spread` for interface stability but sets its coefficient to
 analytical baseline, but live market behavior will reflect pregame strength.
 Future live-market modeling should revisit this coefficient once actual live
 line data exists.
+
+---
+
+## N09 Sim B audit and rerun decision (2026-05-20)
+
+The first N09 run surfaced an extraordinary Sim B betting result: the
+N06-based edge filter at threshold `>= 0.10` produced flat-stake ROI around
+**+42.5%**. A focused audit was required before treating that as real betting
+edge. The audit is tracked at `research/audit/n09_sim_b_audit.md`.
+
+The critical finding was a target mismatch. The original Sim B filter used
+`n06_prob`, which is trained on `deficit_erased`, while the simulated bet pays
+on `favorite_final_win`. That is not direct outcome leakage, but it means
+`edge_at_entry = n06_prob - market_implied_prob` is not a same-label final-win
+probability edge. The N04 cross-check was decisive: on the same high-edge
+selected games, the same-label final-win model did **not** show positive edge
+against market probability. Therefore the original Sim B result is a
+deficit-erasure selection heuristic, not validated final-win betting edge.
+
+N09 was rerun with a same-label Sim B track using N03's calibrated
+`favorite_final_win` probability, named `model_prob_final_win`, as the edge
+filter source. The original N06-based Sim B track remains in the notebook for
+comparison, but it is explicitly labeled as a `deficit_erased` heuristic and is
+not used as the headline betting-edge claim.
+
+N09 also separates synthetic fallback odds from real-moneyline results. When
+no direction-consistent moneyline is available, the initial N09 run used a
+baseline_C-derived synthetic price. Those rows remain in the dataset for
+analytical completeness, but all headline betting summaries now split
+`all_bets`, `real_moneyline_only`, and `synthetic_fallback_only`. Headline ROI
+uses `real_moneyline_only`; synthetic-fallback ROI is not treated as a cached
+sportsbook result.
+
+Methodology implication: the N09 betting section now reports three distinct
+concepts separately: same-label final-win betting simulation, deficit-erased
+selection heuristic, and synthetic fallback sensitivity. This preserves the
+interesting descriptive pattern without overstating it as confirmed betting
+edge.
+
+---
+
+## N09 honest interpretation (2026-05-21)
+
+N09's audit-corrected betting results have a three-tier structure.
+
+First, pre-game CFB markets correctly price favorite comeback risk on average.
+The unfiltered always-bet-favorite strategy on trigger games loses
+substantially: ROI is **-22.4%** with 95% CI **[-26.1%, -18.7%]** across
+**1,393** real-moneyline bets. This is the cleanest broad betting result in
+N09 and it is negative.
+
+Second, the methodologically valid same-label Sim B filter is suggestive but
+underpowered. Using N03's `favorite_final_win` probability as
+`model_prob_final_win`, ROI is positive at every tested threshold:
+**+46.1%** at edge >= 0.00 (**48** bets), **+52.0%** at edge >= 0.05
+(**23** bets), and **+65.0%** at edge >= 0.10 (**7** bets). All CIs have
+positive lower bounds, but every real-moneyline sample is below the project's
+locked 50-event floor for rate-comparison claims. This is a directional signal
+to preserve, not a deployable strategy.
+
+The underpower itself is informative. The same-label final-win model rarely
+disagrees with pre-game markets by even 10 percentage points on trigger games.
+That scarcity supports the broader interpretation that pre-game markets are
+already reasonably calibrated for the trigger-game subpopulation.
+
+Third, the original N06-based Sim B result remains a real pattern but not a
+validated betting mechanism. The N06 `deficit_erased` heuristic produces ROI
+of **+33.8%** on **204** real-moneyline bets at edge >= 0.10, but the bet pays
+on `favorite_final_win`. N04's same-label final-win model showed negative edge
+on those same games. Therefore no validated probability framework in the
+project explains the favorable realized outcomes. The pattern should be kept
+as a research curiosity and dashboard filter, not as a deployable betting
+strategy.
+
+This audit-corrected framing prevents a false-positive interpretation. The
+project should not claim historical final-win betting edge from the original
+N06 Sim B result. The honest project-level conclusion is narrower:
+pre-game markets are efficient on average, the same-label filter is
+directionally promising but sample-starved, and confirmation requires live
+data accumulation across 2026+ seasons. Future N10+ work should prioritize
+collecting trigger events with live market prices over further historical
+proxy simulations.
