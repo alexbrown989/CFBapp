@@ -1144,3 +1144,56 @@ directionally promising but sample-starved, and confirmation requires live
 data accumulation across 2026+ seasons. Future N10+ work should prioritize
 collecting trigger events with live market prices over further historical
 proxy simulations.
+
+---
+
+## N10 honest interpretation (2026-05-22)
+
+N10 is the direct conditional test of the project's core mechanistic
+hypothesis. It asks whether favorites that fall behind in clear fluky-deficit
+conditions are underpriced by pre-game markets. The answer is no.
+
+The headline Tier 7 condition uses the stricter `clear_fluky_lead` definition:
+N07-attributed `fluky_lead`, dog completed-drive yards per point at or below
+the sustained-lead median, big or huge pre-game favorite, and Q1/Q2 trigger
+timing. This produced **472** events across **311** games and **10** seasons.
+Favorite final-win rate was **43.9%** versus mean pre-game no-vig market
+probability of **79.1%**. Actual-minus-market was **-35.2 percentage points**
+with bootstrap CI **[-41.1%, -29.2%]**.
+
+The held-out betting diagnostic agrees with the probability comparison.
+Across 2022-2024, the same condition produced flat-stake real-moneyline ROI of
+**-49.6%** on **135** bets, with bootstrap CI **[-62.9%, -36.1%]**. This is a
+clean negative result, not an underpowered positive.
+
+N10 also found **zero** candidate live-watch conditions under the locked rule.
+No reliable three-way cell produced actual favorite final-win rate above
+pre-game no-vig market probability with statistical confidence and positive
+held-out real-moneyline ROI. The strongest project-level interpretation is
+therefore that pre-game CFB markets correctly price favorite comeback
+scenarios, and may include extra favorite-side padding.
+
+The fluke-classification path matters. The first sanity check failed because
+`fluky_lead` dogs had higher early-down success rate than `sustained_lead`
+dogs. That assumption was too crude: quick-score leads can leave fewer
+pre-trigger plays and overweight recent successful sequences. The replacement
+yardage sanity check then failed too: broad N07-attributed `fluky_lead` did not
+separate dog yards per point cleanly from `sustained_lead`. A manual
+classification investigation (`research/results/n10_fluke_classification_investigation.md`)
+showed that the broad N07 bucket is directionally useful but semantically
+noisy. N10 therefore adopted Option C with a stricter `clear_fluky_lead`
+headline criterion, preserving the descriptive buckets while avoiding a
+headline claim based on noisy attribution.
+
+The project-level conclusion is stronger after the sanity-check failures, not
+weaker. The core fluky-vs-sustained comeback hypothesis is contradicted by the
+direct conditional analysis. The project's historical-data arc has not found a
+hidden pre-game mechanistic edge that survived baseline_C, market comparison,
+label switching, feature expansion, or direct conditional testing.
+
+Path forward has two honest branches. One is to treat the historical research
+arc as complete. The other is to build a live-data scaffold for the 2026 season
+and test a fresh hypothesis: live in-game markets may overreact to favorite
+deficits more than pre-game markets do. That live-market question remains
+untested by N10 and should not be described as supported by the pre-game
+analysis.
