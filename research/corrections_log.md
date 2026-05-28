@@ -1197,3 +1197,52 @@ and test a fresh hypothesis: live in-game markets may overreact to favorite
 deficits more than pre-game markets do. That live-market question remains
 untested by N10 and should not be described as supported by the pre-game
 analysis.
+
+---
+
+## N11 honest interpretation (2026-05-28)
+
+N11 tested whether AP ranking was the missing stratification dimension in the
+project's pre-game edge hypothesis. The ranking data sanity checks all passed:
+top-5 favorites were favored by more points on average, had higher pre-game
+ratings, and won more often across the cached game corpus than unranked teams.
+The AP ranking assignment is therefore behaving like a real team-strength
+signal, not a noisy label.
+
+Hypothesis A found one descriptive matched-cell separation: `top_25` favorites
+at D=3 / Q1 / `small_favorite` won **59.6%** of trigger events versus
+**34.9%** for matched unranked favorites. This is a real descriptive finding,
+but it is narrow and does not by itself imply pre-game market inefficiency.
+
+Hypothesis B is the more important market-efficiency result. Every ranking
+bucket remains overpriced relative to actual favorite final-win rates. The
+gap diminishes with ranking quality but does not close: `top_5` favorites are
+**-18.3 percentage points** actual-minus-market, `top_10` are **-22.9
+points**, `top_25` are **-23.1 points**, and unranked favorites are **-27.2
+points**. Markets reward ranking strength, but they still price favorite
+comeback scenarios above realized outcomes in every bucket.
+
+The inverse sanity check passed strongly. Unranked small favorites in Q4 had
+held-out real-moneyline ROI of **-73.6%** on **51** bets, with bootstrap CI
+**[-93.5%, -47.1%]**. That is exactly the direction expected if the
+methodology is not manufacturing false positive favorite-comeback edge in the
+dog's most-likely-real-win scenario.
+
+N11 found **zero** candidate live-watch cells under the locked rule. No
+ranking-stratified cell combined reliable sample size, actual win rate above
+pre-game no-vig probability, positive bootstrap support, and positive held-out
+real-moneyline ROI.
+
+Project-level interpretation: the pre-game edge hypothesis is closed across
+six notebook angles. N04 showed a model-vs-market Brier improvement, but the
+mechanism was restricted. N05/N06 found no structural edge beyond deficit x
+time. N07/N08 did not surface an edge under stricter methodology and
+uncertainty diagnostics. N09 showed broad realized betting losses with only
+underpowered same-label positives. N10 directly contradicted the fluky-deficit
+hypothesis. N11 closes the ranking-stratification possibility. Pre-game CFB
+markets correctly price, and often overprice, favorite comeback scenarios.
+
+Path forward: N12 should consolidate the dashboard/live-data data layer, and
+N13 should build the live data scaffold for the 2026 season. Live in-game
+market edge remains a separate, untested hypothesis; it should be treated as a
+fresh test rather than as an extension of the closed pre-game edge story.
