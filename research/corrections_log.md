@@ -1246,3 +1246,23 @@ Path forward: N12 should consolidate the dashboard/live-data data layer, and
 N13 should build the live data scaffold for the 2026 season. Live in-game
 market edge remains a separate, untested hypothesis; it should be treated as a
 fresh test rather than as an extension of the closed pre-game edge story.
+
+---
+
+## N06 fitted-state re-export (2026-06-29)
+
+Added complete fitted-state provenance for N06 to enable live scoring in
+N12/N13. The additive export records logistic intercepts, `StandardScaler`
+parameters, train-fold imputation medians, and isotonic calibration knots for
+all U/W2 folds plus the Scheme E deployment model.
+
+The re-export reproduces committed N06 raw and calibrated probabilities to
+**0.0 max absolute difference** across **7,708** main held-out rows plus
+**1,296** Scheme E rows. No N06 findings changed, and existing N06 result
+artifacts were untouched.
+
+Scheme E is recorded as the deployment choice: train 2015-2023, validate on
+2024. Environment recorded in the fitted-state artifact: Python 3.12.2, NumPy
+2.4.4, pandas 2.3.3, scikit-learn 1.7.2, and SciPy 1.17.1. Original N06 did
+not record package versions, so practical determinism is confirmed by exact
+reproduction against committed outputs.

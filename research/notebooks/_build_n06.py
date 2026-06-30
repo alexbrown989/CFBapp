@@ -77,6 +77,7 @@ import math
 import os
 import pathlib
 import subprocess
+import sys
 import time
 import warnings
 from dataclasses import dataclass
@@ -84,6 +85,8 @@ from typing import Any, Callable
 
 import numpy as np
 import pandas as pd
+import scipy
+import sklearn
 from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import brier_score_loss, roc_auc_score
@@ -117,6 +120,8 @@ N06_PREDICTIONS_PARQUET = RESULTS_DIR / "n06_calibrated_predictions.parquet"
 N06_E_PREDICTIONS_PARQUET = RESULTS_DIR / "n06_e_calibrated_predictions.parquet"
 N06_MODEL_SPEC_JSON = RESULTS_DIR / "n06_model_spec.json"
 N06_SUMMARY_REPORT_MD = RESULTS_DIR / "n06_summary_report.md"
+N06_FULL_FITTED_STATE_JSON = RESULTS_DIR / "n06_full_fitted_state.json"
+N06_STATE_EXPORT_ONLY = os.environ.get("N06_STATE_EXPORT_ONLY", "").strip().lower() in {"1", "true", "yes"}
 
 assert RESEARCH_DIR.name == "research", (
     f"Expected to run inside research/notebooks; got {NOTEBOOK_DIR}"
@@ -1115,8 +1120,11 @@ for scheme in ["U", "W2"]:
         prediction_frames.append(pred)
 
 predictions_df = pd.concat(prediction_frames, ignore_index=True)
-predictions_df.to_parquet(N06_PREDICTIONS_PARQUET, index=False)
-print(f"[ok] wrote {N06_PREDICTIONS_PARQUET.relative_to(REPO_ROOT)} rows={len(predictions_df):,} cols={predictions_df.shape[1]}")
+if N06_STATE_EXPORT_ONLY:
+    print(f"[state-export-only] skipped rewrite of {N06_PREDICTIONS_PARQUET.relative_to(REPO_ROOT)}")
+else:
+    predictions_df.to_parquet(N06_PREDICTIONS_PARQUET, index=False)
+    print(f"[ok] wrote {N06_PREDICTIONS_PARQUET.relative_to(REPO_ROOT)} rows={len(predictions_df):,} cols={predictions_df.shape[1]}")
 
 # Deployment-proximate E: train 2015-2023, calibrate/evaluate on 2024 validation.
 # Use the W2 selected feature set as the recent-weighted production reference.
@@ -1133,8 +1141,11 @@ e_pred.insert(2, "scheme", "E")
 e_pred["raw_model_prob"] = e_raw_event
 e_pred["calibrated_prob"] = e_cal_event
 e_pred["split_role"] = "validation"
-e_pred.to_parquet(N06_E_PREDICTIONS_PARQUET, index=False)
-print(f"[ok] wrote {N06_E_PREDICTIONS_PARQUET.relative_to(REPO_ROOT)} rows={len(e_pred):,} cols={e_pred.shape[1]}")
+if N06_STATE_EXPORT_ONLY:
+    print(f"[state-export-only] skipped rewrite of {N06_E_PREDICTIONS_PARQUET.relative_to(REPO_ROOT)}")
+else:
+    e_pred.to_parquet(N06_E_PREDICTIONS_PARQUET, index=False)
+    print(f"[ok] wrote {N06_E_PREDICTIONS_PARQUET.relative_to(REPO_ROOT)} rows={len(e_pred):,} cols={e_pred.shape[1]}")
 
 fav_deficit_coefficients: dict[str, dict[int, float]] = {
     scheme: {fit.fold: float(fit.coef_by_col.get("fav_deficit", 0.0)) for fit in fits}
@@ -1208,6 +1219,148 @@ probability_variation_sample = sample_rows
 print(f"[ok] fav_deficit coefficients: {fav_deficit_coefficients}")
 print(f"[ok] prediction key uniqueness passed on {prediction_key_cols}")
 print(f"[ok] probability variation summary: {probability_variation_summary}")
+""")
+
+
+add("code", "c06_0008b", """
+def _state_jsonable(obj: Any) -> Any:
+    if isinstance(obj, dict):
+        return {str(k): _state_jsonable(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_state_jsonable(v) for v in obj]
+    if isinstance(obj, tuple):
+        return [_state_jsonable(v) for v in obj]
+    if isinstance(obj, (np.integer,)):
+        return int(obj)
+    if isinstance(obj, (np.floating, float)):
+        val = float(obj)
+        return None if math.isnan(val) or math.isinf(val) else val
+    if isinstance(obj, (np.bool_,)):
+        return bool(obj)
+    return obj
+
+
+def fitted_state_for_fit(scheme: str, fit: FitResult, *, deployment_model: bool = False) -> dict[str, Any]:
+    scaler = fit.estimator.named_steps["scaler"]
+    logreg = fit.estimator.named_steps["logreg"]
+    return {
+        "scheme": scheme,
+        "fold": fit.fold,
+        "train_window": fit.train_window_label,
+        "val_season": fit.val_season,
+        "test_season": fit.test_season,
+        "deployment_model": deployment_model,
+        "target_label": TARGET_LABEL,
+        "model_class": {
+            "pipeline": "StandardScaler -> LogisticRegression",
+            "penalty": "l1",
+            "solver": "liblinear",
+            "C": 1.0,
+            "random_state": RANDOM_STATE,
+        },
+        "core_features": fit.core_features,
+        "indicator_columns": fit.indicator_cols,
+        "model_columns": fit.model_columns,
+        "imputation_medians": fit.prep["medians"],
+        "all_null_features": fit.prep["all_null_features"],
+        "standard_scaler": {
+            "mean": {col: float(scaler.mean_[i]) for i, col in enumerate(fit.model_columns)},
+            "scale": {col: float(scaler.scale_[i]) for i, col in enumerate(fit.model_columns)},
+            "var": {col: float(scaler.var_[i]) for i, col in enumerate(fit.model_columns)},
+            "n_features_in": int(scaler.n_features_in_),
+        },
+        "logistic_regression": {
+            "classes": [int(x) for x in logreg.classes_.tolist()],
+            "intercept": float(logreg.intercept_[0]),
+            "coefficients": {col: float(logreg.coef_[0][i]) for i, col in enumerate(fit.model_columns)},
+            "n_iter": [int(x) for x in np.ravel(logreg.n_iter_).tolist()],
+        },
+        "isotonic_calibration": {
+            "out_of_bounds": "clip",
+            "x_thresholds": [float(x) for x in fit.calibrator.X_thresholds_.tolist()],
+            "y_thresholds": [float(y) for y in fit.calibrator.y_thresholds_.tolist()],
+            "health": fit.calibration_health,
+        },
+    }
+
+
+def compare_predictions_to_committed(new_df: pd.DataFrame, committed_path: pathlib.Path, label: str) -> dict[str, Any]:
+    committed = pd.read_parquet(committed_path)
+    key = prediction_key_cols
+    assert len(new_df) == len(committed), (
+        f"{label} row count mismatch: regenerated={len(new_df):,} committed={len(committed):,}"
+    )
+    new_keyed = new_df[key + ["raw_model_prob", "calibrated_prob"]].sort_values(key).reset_index(drop=True)
+    old_keyed = committed[key + ["raw_model_prob", "calibrated_prob"]].sort_values(key).reset_index(drop=True)
+    key_mismatch = int((new_keyed[key] != old_keyed[key]).any(axis=1).sum())
+    assert key_mismatch == 0, f"{label} key mismatch rows: {key_mismatch}"
+    raw_diff = np.abs(new_keyed["raw_model_prob"].to_numpy(float) - old_keyed["raw_model_prob"].to_numpy(float))
+    cal_diff = np.abs(new_keyed["calibrated_prob"].to_numpy(float) - old_keyed["calibrated_prob"].to_numpy(float))
+    return {
+        "label": label,
+        "committed_artifact": str(committed_path.relative_to(REPO_ROOT)),
+        "row_count": int(len(new_keyed)),
+        "raw_model_prob_max_abs_diff": float(raw_diff.max()) if len(raw_diff) else 0.0,
+        "calibrated_prob_max_abs_diff": float(cal_diff.max()) if len(cal_diff) else 0.0,
+        "calibrated_prob_mean_abs_diff": float(cal_diff.mean()) if len(cal_diff) else 0.0,
+    }
+
+
+main_reproduction_gate = compare_predictions_to_committed(
+    predictions_df,
+    N06_PREDICTIONS_PARQUET,
+    "main_heldout_U_W2",
+)
+e_reproduction_gate = compare_predictions_to_committed(
+    e_pred,
+    N06_E_PREDICTIONS_PARQUET,
+    "scheme_E_validation",
+)
+assert main_reproduction_gate["calibrated_prob_max_abs_diff"] < 1e-9, main_reproduction_gate
+assert e_reproduction_gate["calibrated_prob_max_abs_diff"] < 1e-9, e_reproduction_gate
+
+full_fitted_state = {
+    "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+    "source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, text=True).strip(),
+    "artifact_purpose": (
+        "Additive fitted-state provenance export for committed N06. This file is not a new model fit "
+        "or new estimate; it records the full fitted preprocessing/model/calibration state needed for live scoring."
+    ),
+    "reproduction_gate": {
+        "required_max_abs_diff": 1e-9,
+        "main_heldout_U_W2": main_reproduction_gate,
+        "scheme_E_validation": e_reproduction_gate,
+        "passed": True,
+    },
+    "environment": {
+        "python": sys.version,
+        "numpy": np.__version__,
+        "pandas": pd.__version__,
+        "scikit_learn": sklearn.__version__,
+        "scipy": scipy.__version__,
+    },
+    "deployment_choice": {
+        "scheme": "E",
+        "fold": int(fit_e.fold),
+        "train_window": fit_e.train_window_label,
+        "validation_season": int(fit_e.val_season),
+        "rationale": "Scheme E is trained on 2015-2023 and validated on 2024, using the most historical data available before live deployment.",
+    },
+    "indicator_meta": indicator_meta,
+    "fits": [
+        fitted_state_for_fit(scheme, fit)
+        for scheme, fits in final_fits_by_scheme.items()
+        for fit in fits
+    ] + [
+        fitted_state_for_fit("E", fit_e, deployment_model=True)
+    ],
+}
+
+N06_FULL_FITTED_STATE_JSON.write_text(json.dumps(_state_jsonable(full_fitted_state), indent=2), encoding="utf-8")
+print(f"[ok] wrote {N06_FULL_FITTED_STATE_JSON.relative_to(REPO_ROOT)} size={N06_FULL_FITTED_STATE_JSON.stat().st_size:,} bytes")
+print(f"[ok] N06 reproduction gate main calibrated max abs diff={main_reproduction_gate['calibrated_prob_max_abs_diff']:.12g}")
+print(f"[ok] N06 reproduction gate E calibrated max abs diff={e_reproduction_gate['calibrated_prob_max_abs_diff']:.12g}")
+print(f"[info] versions: sklearn={sklearn.__version__}, numpy={np.__version__}, scipy={scipy.__version__}")
 """)
 
 
@@ -1788,8 +1941,11 @@ spec = {
     },
 }
 
-N06_MODEL_SPEC_JSON.write_text(json.dumps(_jsonable(spec), indent=2), encoding="utf-8")
-print(f"[ok] wrote {N06_MODEL_SPEC_JSON.relative_to(REPO_ROOT)} size={N06_MODEL_SPEC_JSON.stat().st_size:,} bytes")
+if N06_STATE_EXPORT_ONLY:
+    print(f"[state-export-only] skipped rewrite of {N06_MODEL_SPEC_JSON.relative_to(REPO_ROOT)}")
+else:
+    N06_MODEL_SPEC_JSON.write_text(json.dumps(_jsonable(spec), indent=2), encoding="utf-8")
+    print(f"[ok] wrote {N06_MODEL_SPEC_JSON.relative_to(REPO_ROOT)} size={N06_MODEL_SPEC_JSON.stat().st_size:,} bytes")
 """)
 
 
@@ -2004,8 +2160,11 @@ elif cal_gap is not None and cal_gap <= 0.05:
 else:
     lines.append("N06 does not rescue the comeback-detection question. Even after training directly on `deficit_erased`, the model does not show a statistically supported Brier edge over baseline_C and calibration gaps remain material enough to treat the feature pool as insufficient for this target.")
 
-N06_SUMMARY_REPORT_MD.write_text("\\n".join(lines) + "\\n", encoding="utf-8")
-print(f"[ok] wrote {N06_SUMMARY_REPORT_MD.relative_to(REPO_ROOT)} size={N06_SUMMARY_REPORT_MD.stat().st_size:,} bytes")
+if N06_STATE_EXPORT_ONLY:
+    print(f"[state-export-only] skipped rewrite of {N06_SUMMARY_REPORT_MD.relative_to(REPO_ROOT)}")
+else:
+    N06_SUMMARY_REPORT_MD.write_text("\\n".join(lines) + "\\n", encoding="utf-8")
+    print(f"[ok] wrote {N06_SUMMARY_REPORT_MD.relative_to(REPO_ROOT)} size={N06_SUMMARY_REPORT_MD.stat().st_size:,} bytes")
 """)
 
 
@@ -2064,7 +2223,7 @@ print(
 )
 
 print("\\nDeliverables:")
-for path in [N06_PREDICTIONS_PARQUET, N06_E_PREDICTIONS_PARQUET, N06_MODEL_SPEC_JSON, N06_SUMMARY_REPORT_MD]:
+for path in [N06_PREDICTIONS_PARQUET, N06_E_PREDICTIONS_PARQUET, N06_MODEL_SPEC_JSON, N06_SUMMARY_REPORT_MD, N06_FULL_FITTED_STATE_JSON]:
     print(f"  {path.relative_to(REPO_ROOT)}  {path.stat().st_size:,} bytes")
 
 print("\\nOutput verification:")
