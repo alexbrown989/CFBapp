@@ -1,6 +1,6 @@
 # Project State
 
-Last updated: 2026-06-30
+Last updated: 2026-07-14
 
 ## Project Summary
 
@@ -32,6 +32,7 @@ N13 is a long-running service, not a research notebook.
 - **Tier 3 full N06:** full model scoring is shown only when all required features are available and live-parity-safe. N13 parity work already found attribution-heavy features are not safe for v1 without runtime guards.
 - **Posture:** alert/dashboard only; no auto-bet; read-only data and market keys only.
 - **Deployment shape:** local web app, top-25 scope, 20-30 second poll when live access is active.
+- **Stage 4 risk and variance panel:** show this beside any bet-sizing suggestion. In addition to fractional-Kelly stake, display expected bet value, probability of losing streaks of user-selected length N, season-level risk-of-ruin at the current bankroll and sizing, and stake as a fraction of bankroll. Inputs are user bankroll, suggested stake, estimated win probability, and offered odds. This is standard bankroll math, not a new research estimate; it is required because plus-money favorite strategies can lose most individual bets even when positive in expectation.
 - **Build stages:** Stage 1 data loop -> Stage 2 scoring -> Stage 3 markets -> Stage 4 dashboard -> Stage 5 logging/retraining/Tailscale.
 
 ## CFBD Access Status
@@ -48,15 +49,20 @@ Keep this section current.
 
 ## Build-Now vs Activate-Later Ledger
 
-Buildable now without paid live access:
+Stage 1 buildable-now components completed on 2026-07-14:
 
-- Trigger detection logic.
-- Watch-list construction from `/lines` + `/games`, with ranking input stubbed by cached 2024 rankings or a manual team list.
-- JSONL logging schema.
-- Replay verification on cached completed games.
-- Stubbed `/scoreboard` client that replays cached score progressions.
+- [done] Source-agnostic scoreboard contract with `ScoreboardStub` and guarded `ScoreboardLive` implementations.
+- [done] Trigger detection with multi-threshold crossing, one-fire deduplication, and recovery-based re-arming.
+- [done] Watch-list construction from cached `/games` + `/lines`, with AP-ranking or manual-team input injection.
+- [done] Append-only local JSONL trigger logging with a stable 16-field schema.
+- [done] Cached 2024 replay verification using No. 2 Georgia at Alabama; trigger timing, deduplication, re-fire behavior, watch-list construction, and log schema all pass.
+- [done] Stub-mode FastAPI service shell and configuration-only stub/live source selection.
+- Verification: `research/results/n13_stage1_replay_verification.md`.
+
+Buildable later without paid live access:
+
 - Stage 2 scoring engine using N12 lookup/scoring artifacts, tested against cached triggers.
-- Dashboard shell.
+- Stage 4 dashboard shell, including the required risk and variance panel.
 
 Activate later after CFBD Tier 2 subscription in late August 2026:
 
@@ -88,4 +94,4 @@ Activate later after CFBD Tier 2 subscription in late August 2026:
 
 ## Open Decisions / Next Action
 
-Current next action: build N13 Stage 1 **buildable-now** components after this tracker is reviewed and committed. Stage 1 should use a stub scoreboard source, replay verification, watch-list construction with ranking input injection, trigger detection, and JSONL logging. Do not activate real `/scoreboard` until the late-August CFBD Tier 2 subscription and a successful live schema verification.
+Current next action: review and commit N13 Stage 1 buildable-now components. After that, proceed to Stage 2 scoring against cached replays. Live activation remains pending the late-August CFBD Tier 2 subscription, current-season rankings, and successful `/scoreboard` nested-field and latency certification. Stage 4 must include the risk and variance panel defined above.
