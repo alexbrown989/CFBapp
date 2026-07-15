@@ -3,14 +3,21 @@ from __future__ import annotations
 import argparse
 import asyncio
 from contextlib import asynccontextmanager
+import json
 import os
 from pathlib import Path
+from typing import Callable
 
 from .config import Settings
-from .data_source import ScoreboardLive, ScoreboardSource, ScoreboardStub
+from .data_source import ScoreboardGameState, ScoreboardLive, ScoreboardSource, ScoreboardStub
 from .logger import JSONLTriggerLogger
-from .trigger_detect import TriggerDetector
+from .scoring import ScoringContext, ScoringResult, score_trigger
+from .trigger_detect import TriggerDetector, TriggerEvent
 from .watchlist import WatchGame
+
+
+Scorer = Callable[[TriggerEvent, ScoringContext], ScoringResult]
+ContextProvider = Callable[[WatchGame, ScoreboardGameState, TriggerEvent], ScoringContext]
 
 
 class LiveMonitor:
@@ -23,12 +30,16 @@ class LiveMonitor:
         detector: TriggerDetector,
         logger: JSONLTriggerLogger,
         poll_interval_seconds: float,
+        scorer: Scorer | None = None,
+        context_provider: ContextProvider | None = None,
     ) -> None:
         self.source = source
         self.watchlist = watchlist
         self.detector = detector
         self.logger = logger
         self.poll_interval_seconds = poll_interval_seconds
+        self.scorer = scorer
+        self.context_provider = context_provider
 
     def poll_once(self) -> int:
         event_count = 0
@@ -37,12 +48,24 @@ class LiveMonitor:
             if game is None:
                 continue
             events = self.detector.process(state, game)
-            self.logger.append_many(events)
             for event in events:
+                scoring_result = None
+                if self.scorer is not None:
+                    if self.context_provider is None:
+                        raise RuntimeError("a scoring context provider is required when scoring is enabled")
+                    context = self.context_provider(game, state, event)
+                    scoring_result = self.scorer(event, context)
+                self.logger.append(
+                    event,
+                    None if scoring_result is None else scoring_result.as_log_fields(),
+                )
                 print(
                     f"TRIGGER {event.game_id} {event.favorite} D={event.threshold_crossed} "
                     f"score={event.fav_score}-{event.dog_score} Q{event.period} {event.clock}"
+                    + ("" if scoring_result is None else f" tier={scoring_result.tier_used}")
                 )
+                if scoring_result is not None:
+                    print("SCORING " + json.dumps(scoring_result.as_dict(), sort_keys=True))
             event_count += len(events)
         return event_count
 
@@ -68,6 +91,24 @@ def create_monitor(settings: Settings | None = None) -> LiveMonitor:
         detector=TriggerDetector(settings.deficit_thresholds),
         logger=JSONLTriggerLogger(Path(__file__).parent / "logs" / "triggers.jsonl"),
         poll_interval_seconds=settings.poll_interval_seconds,
+        scorer=score_trigger,
+        context_provider=default_scoring_context,
+    )
+
+
+def default_scoring_context(
+    game: WatchGame,
+    _: ScoreboardGameState,
+    __: TriggerEvent,
+) -> ScoringContext:
+    """Stage 2 context available without /live/plays."""
+    return ScoringContext(
+        spread_bucket=game.spread_bucket,
+        ranking_bucket=game.ranking_bucket,
+        fluke_bucket=None,
+        tier3_features=None,
+        tier3_certified=False,
+        tier3_unavailable_reason="unavailable - no live play feed",
     )
 
 

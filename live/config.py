@@ -1,10 +1,22 @@
 ﻿from __future__ import annotations
 
 import os
+import sys
 from dataclasses import dataclass
+from pathlib import Path
 
 
 DEFAULT_THRESHOLDS = (3, 7, 10, 14, 21)
+REPO_ROOT = Path(__file__).resolve().parents[1]
+RESEARCH_NOTEBOOKS_DIR = REPO_ROOT / "research" / "notebooks"
+
+
+def ensure_n12_lookup_import_path() -> Path:
+    """Expose the committed N12 helper module without copying its logic."""
+    path = str(RESEARCH_NOTEBOOKS_DIR)
+    if path not in sys.path:
+        sys.path.insert(0, path)
+    return RESEARCH_NOTEBOOKS_DIR
 
 
 @dataclass(frozen=True)

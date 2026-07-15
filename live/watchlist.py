@@ -27,6 +27,9 @@ class WatchGame:
     home_team: str
     away_team: str
     spread_provider_used: str
+    spread_bucket: str = "pick_or_dog"
+    favorite_ap_rank: int | None = None
+    ranking_bucket: str = "unranked"
 
     def favorite_scores(self, state: ScoreboardGameState) -> tuple[int, int]:
         if state.game_id != self.game_id:
@@ -43,10 +46,12 @@ def build_watchlist(
     line_records: Iterable[Mapping[str, object]],
     *,
     ranked_teams: Iterable[str] | None = None,
+    rank_by_team: Mapping[str, int] | None = None,
     manual_teams: Iterable[str] | None = None,
     top25_only: bool = True,
 ) -> dict[str, WatchGame]:
-    scope = {str(team) for team in (ranked_teams or [])} | {str(team) for team in (manual_teams or [])}
+    ranks = {str(team): int(rank) for team, rank in (rank_by_team or {}).items()}
+    scope = set(ranks) | {str(team) for team in (ranked_teams or [])} | {str(team) for team in (manual_teams or [])}
     if top25_only and not scope:
         raise ValueError("top-25 watch-list construction requires rankings input or a manual team list")
 
@@ -68,6 +73,7 @@ def build_watchlist(
             continue
         favorite, dog = (home, away) if home_spread < 0 else (away, home)
         favorite_spread = home_spread if home_spread < 0 else -home_spread
+        favorite_rank = ranks.get(favorite)
         result[game_id] = WatchGame(
             game_id=game_id,
             season=int(game.get("season") or game.get("year") or 0),
@@ -78,8 +84,39 @@ def build_watchlist(
             home_team=home,
             away_team=away,
             spread_provider_used=provider,
+            spread_bucket=spread_bucket(float(favorite_spread)),
+            favorite_ap_rank=favorite_rank,
+            ranking_bucket=ranking_bucket(favorite_rank),
         )
     return result
+
+
+def spread_bucket(favorite_spread: float) -> str:
+    """N10/N11 spread buckets; favorite spreads are negative."""
+    spread = float(favorite_spread)
+    if spread <= -14.0:
+        return "huge_favorite"
+    if spread <= -7.0:
+        return "big_favorite"
+    if spread <= -3.0:
+        return "moderate_favorite"
+    if spread <= -0.5:
+        return "small_favorite"
+    return "pick_or_dog"
+
+
+def ranking_bucket(rank: int | None) -> str:
+    """N11 AP ranking buckets."""
+    if rank is None:
+        return "unranked"
+    value = int(rank)
+    if value < 1 or value > 25:
+        raise ValueError(f"AP rank must be in 1..25, got {value}")
+    if value <= 5:
+        return "top_5"
+    if value <= 10:
+        return "top_10"
+    return "top_25"
 
 
 def select_home_spread(record: Mapping[str, object]) -> tuple[float, str] | None:

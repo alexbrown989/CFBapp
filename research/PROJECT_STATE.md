@@ -59,9 +59,20 @@ Stage 1 buildable-now components completed on 2026-07-14:
 - [done] Stub-mode FastAPI service shell and configuration-only stub/live source selection.
 - Verification: `research/results/n13_stage1_replay_verification.md`.
 
+Stage 2 tiered scoring completed on 2026-07-14:
+
+- [done] Tier 1 primary baseline_C lookup for both labels using N12's committed key and time normalization helpers.
+- [done] Tier 2 historical conditional/ranking/no-vig enrichment with sample size, reliability, confidence bounds, and provenance on every estimate.
+- [done] Tier 3 N06 plus conformal scoring behind an all-31-feature and certified-source runtime gate; normal runtime explicitly reports unavailable until `/live/plays` is wired and certified.
+- [done] Additive scoring log schema; original Stage 1 records remain readable.
+- [done] Post-game live-vs-cached feature drift comparison and append-only parity log schema.
+- [done] Exact five-trigger acceptance gate: Tier 1/Tier 2 match N12 rows exactly and Tier 3 reproduces committed N06 with 0.0 maximum absolute difference.
+- [done] Georgia-Alabama replay now produces full scoring reads: five committed trigger states reach Tier 3; two recovery-based re-fires stop honestly at Tier 2.
+- Verification: `research/results/n13_stage2_scoring_verification.md`.
+
 Buildable later without paid live access:
 
-- Stage 2 scoring engine using N12 lookup/scoring artifacts, tested against cached triggers.
+- Stage 3 market adapters and price comparison using read-only credentials.
 - Stage 4 dashboard shell, including the required risk and variance panel.
 
 Activate later after CFBD Tier 2 subscription in late August 2026:
@@ -80,6 +91,9 @@ Activate later after CFBD Tier 2 subscription in late August 2026:
 - `research/results/n12_live_scoring_spec.json` - N06 fitted state, conformal parameters, and live scoring spec.
 - `research/results/n13_feature_parity_probe.md` - Tier feasibility and live feature parity recommendation.
 - `research/results/n13_live_source_schema.md` - Step 0 live endpoint findings and current access blockers.
+- `live/scoring.py` - tiered scoring engine backed by N12 helpers.
+- `live/parity_guard.py` - post-game live-vs-cached Tier 3 drift audit.
+- `research/results/n13_stage2_scoring_verification.md` - exact lookup, model reproduction, log compatibility, and parity-guard acceptance results.
 - `research/corrections_log.md` - methodology corrections and honest interpretation record.
 
 ## Methodology Discipline Reminders
@@ -94,4 +108,4 @@ Activate later after CFBD Tier 2 subscription in late August 2026:
 
 ## Open Decisions / Next Action
 
-Current next action: review and commit N13 Stage 1 buildable-now components. After that, proceed to Stage 2 scoring against cached replays. Live activation remains pending the late-August CFBD Tier 2 subscription, current-season rankings, and successful `/scoreboard` nested-field and latency certification. Stage 4 must include the risk and variance panel defined above.
+Current next action: review and commit N13 Stage 2. After approval, proceed to Stage 3 read-only market integration without activating `ScoreboardLive`. Live activation and Tier 3 certification remain pending the late-August CFBD Tier 2 subscription, current-season rankings, successful `/scoreboard` nested-field and latency certification, and a clean first-weeks live parity window. Stage 4 must include the risk and variance panel defined above.

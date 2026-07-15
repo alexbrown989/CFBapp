@@ -1,13 +1,22 @@
 from __future__ import annotations
 
 import json
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
+import pandas as pd
+
+from .config import ensure_n12_lookup_import_path
 from .data_source import ScoreboardGameState, ScoreboardStub
-from .logger import JSONLTriggerLogger, REQUIRED_TRIGGER_FIELDS
+from .logger import JSONLTriggerLogger, REQUIRED_TRIGGER_FIELDS, SCORING_FIELDS
+from .main import LiveMonitor
+from .scoring import ScoringContext, score_trigger
 from .trigger_detect import TriggerDetector
 from .watchlist import WatchGame, build_watchlist
+
+ensure_n12_lookup_import_path()
+import _lib_lookup  # type: ignore  # noqa: E402
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -18,6 +27,8 @@ LINES_CACHE = REPO_ROOT / "research/data/cache/cfbd__lines__9d0a751d3eb65363.jso
 RANKINGS_CACHE = REPO_ROOT / "research/data/cache/cfbd__rankings__2024.json"
 LOG_PATH = REPO_ROOT / "live/logs/replay_verification.jsonl"
 REPORT_PATH = REPO_ROOT / "research/results/n13_stage1_replay_verification.md"
+N11_PATH = REPO_ROOT / "research/results/n11_ranking_stratification.parquet"
+N06_PATH = REPO_ROOT / "research/results/n06_calibrated_predictions.parquet"
 
 
 def load_json(path: Path) -> object:
@@ -25,18 +36,18 @@ def load_json(path: Path) -> object:
         return json.load(handle)
 
 
-def ap_teams_for_week(records: list[dict[str, object]], week: int) -> set[str]:
+def ap_ranks_for_week(records: list[dict[str, object]], week: int) -> dict[str, int]:
     candidates = [row for row in records if row.get("seasonType") == "regular" and int(row.get("week", -1)) == week]
     if not candidates:
         raise AssertionError(f"no 2024 regular ranking record for week {week}")
-    teams: set[str] = set()
+    ranks: dict[str, int] = {}
     for poll in candidates[0].get("polls", []):
         if poll.get("poll") == "AP Top 25":
-            teams = {str(rank["school"]) for rank in poll.get("ranks", [])}
+            ranks = {str(rank["school"]): int(rank["rank"]) for rank in poll.get("ranks", [])}
             break
-    if len(teams) != 25:
-        raise AssertionError(f"expected 25 AP teams for week {week}, got {len(teams)}")
-    return teams
+    if len(ranks) != 25:
+        raise AssertionError(f"expected 25 AP teams for week {week}, got {len(ranks)}")
+    return ranks
 
 
 def chronological_key(play: dict[str, object]) -> tuple[int, int, int, int]:
@@ -82,13 +93,15 @@ def verify_watchlist() -> WatchGame:
     games = [row for row in load_json(GAMES_CACHE) if str(row.get("id")) == GAME_ID]
     lines = [row for row in load_json(LINES_CACHE) if str(row.get("id")) == GAME_ID]
     rankings = load_json(RANKINGS_CACHE)
-    ap_teams = ap_teams_for_week(rankings, 5)
-    assert "Georgia" in ap_teams
-    watchlist = build_watchlist(games, lines, ranked_teams=ap_teams)
+    ap_ranks = ap_ranks_for_week(rankings, 5)
+    assert ap_ranks["Georgia"] == 2
+    watchlist = build_watchlist(games, lines, rank_by_team=ap_ranks)
     game = watchlist.get(GAME_ID)
     assert game is not None, "cached 2024 top-25 game did not enter watch list"
     assert game.favorite == "Georgia" and game.dog == "Alabama"
     assert game.pregame_spread == -2.0
+    assert game.spread_bucket == "small_favorite"
+    assert game.ranking_bucket == "top_5"
     return game
 
 
@@ -100,17 +113,24 @@ def verify_replay(game: WatchGame) -> tuple[list[dict[str, object]], int]:
     detector = TriggerDetector()
     logger = JSONLTriggerLogger(LOG_PATH)
     LOG_PATH.unlink(missing_ok=True)
-    events = []
-    while True:
-        states = source.poll()
-        if not states:
-            break
-        for state in states:
-            new_events = detector.process(state, game)
-            logger.append_many(new_events)
-            events.extend(new_events)
+    context_provider = _replay_context_provider()
+    monitor = LiveMonitor(
+        source=source,
+        watchlist={GAME_ID: game},
+        detector=detector,
+        logger=logger,
+        poll_interval_seconds=0,
+        scorer=score_trigger,
+        context_provider=context_provider,
+    )
+    for _ in batches:
+        monitor.poll_once()
 
-    actual = [(event.threshold_crossed, event.period, event.clock, event.fav_score, event.dog_score) for event in events]
+    records = [json.loads(line) for line in LOG_PATH.read_text(encoding="utf-8").splitlines()]
+    actual = [
+        (record["threshold_crossed"], record["period"], record["clock"], record["fav_score"], record["dog_score"])
+        for record in records
+    ]
     expected = [
         (3, 1, "10:11", 0, 7),
         (7, 1, "10:11", 0, 7),
@@ -121,10 +141,60 @@ def verify_replay(game: WatchGame) -> tuple[list[dict[str, object]], int]:
         (7, 4, "2:18", 34, 41),
     ]
     assert actual == expected, {"actual": actual, "expected": expected}
-    records = [json.loads(line) for line in LOG_PATH.read_text(encoding="utf-8").splitlines()]
     assert len(records) == 7
-    assert all(tuple(record.keys()) == tuple(sorted(REQUIRED_TRIGGER_FIELDS)) for record in records)
+    required = set(REQUIRED_TRIGGER_FIELDS) | set(SCORING_FIELDS)
+    assert all(set(record) == required for record in records)
+    assert [record["tier_used"] for record in records] == [3, 3, 3, 3, 3, 2, 2]
+    assert all(record["n06_calibrated_prob"] is not None for record in records[:5])
+    assert all(record["n06_unavailable_reason"] == "unavailable - replay re-fire has no committed feature snapshot" for record in records[5:])
     return records, len(scoring_plays)
+
+
+def _replay_context_provider():
+    n11 = pd.read_parquet(N11_PATH)
+    n11 = n11[(n11["game_id"] == int(GAME_ID)) & (n11["season"] == 2024)]
+    n06 = pd.read_parquet(N06_PATH)
+    n06 = n06[(n06["game_id"] == int(GAME_ID)) & (n06["scheme"] == "U") & (n06["fold"] == 2024)]
+    rows = n11.merge(
+        n06,
+        on=["game_id", "trigger_play_id", "trigger_sequence", "fav_deficit", "season"],
+        suffixes=("_n11", "_n06"),
+        validate="one_to_one",
+    )
+    by_deficit = {int(row["fav_deficit"]): row for row in rows.to_dict(orient="records")}
+    fit = next(
+        item
+        for item in _lib_lookup.load_scoring_spec()["n06_fitted_state"]["fits"]
+        if item["scheme"] == "U" and int(item["fold"]) == 2024
+    )
+    seen: Counter[int] = Counter()
+
+    def provider(_: WatchGame, __: ScoreboardGameState, event) -> ScoringContext:
+        seen[event.threshold_crossed] += 1
+        if seen[event.threshold_crossed] > 1:
+            return ScoringContext(
+                spread_bucket="small_favorite",
+                ranking_bucket="top_5",
+                fluke_bucket=None,
+                tier3_features=None,
+                tier3_certified=False,
+                tier3_unavailable_reason="unavailable - replay re-fire has no committed feature snapshot",
+            )
+        row = by_deficit[event.threshold_crossed]
+        return ScoringContext(
+            spread_bucket=str(row["spread_bucket"]),
+            ranking_bucket=str(row["ranking_bucket"]),
+            fluke_bucket=str(row["fluke_bucket"]),
+            time_bucket=str(row["time_bucket_n11"]),
+            tier3_features={feature: row[feature] for feature in fit["core_features"]},
+            tier3_certified=True,
+            tier3_feature_source="cached_historical",
+            tier3_scheme="U",
+            tier3_fold=2024,
+            tier3_unavailable_reason=None,
+        )
+
+    return provider
 
 
 def verify_refire() -> list[int]:
@@ -145,7 +215,7 @@ def write_report(records: list[dict[str, object]], scoring_play_count: int, refi
         f"| {row['threshold_crossed']} | Q{row['period']} {row['clock']} | {row['fav_score']}-{row['dog_score']} | {row['poll_number']} |"
         for row in records
     )
-    report = f"""# N13 Stage 1 Replay Verification
+    report = f"""# N13 Stage 1 + Stage 2 Replay Verification
 
 Date: 2026-07-14
 
@@ -165,7 +235,9 @@ CFBD applies some completed-drive score values to earlier plays in a drive. The 
 - Real-game re-fire after Georgia recovered to a 34-33 lead: D=3 and D=7 at Q4 2:18
 - Synthetic re-fire test after recovery: {refire}
 - JSONL records: {len(records)}
-- JSONL schema: PASS, all {len(REQUIRED_TRIGGER_FIELDS)} required fields present
+- JSONL schema: PASS, all {len(REQUIRED_TRIGGER_FIELDS)} Stage 1 fields plus {len(SCORING_FIELDS)} additive Stage 2 fields present
+- Scoring tiers: first five committed trigger snapshots reached Tier 3; the two Q4 re-fire events reached Tier 2 and explicitly suppressed N06 because no committed feature snapshot exists
+- Every scoring read includes both-label baseline_C, historical descriptive context where available, tier reasons, sample sizes, reliability, and conformal bounds whenever N06 is shown
 - Data source recorded as `stub`
 - Network/API calls: 0
 
