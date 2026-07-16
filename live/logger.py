@@ -47,6 +47,45 @@ SCORING_FIELDS = (
     "fluke_bucket",
 )
 
+MARKET_TRIGGER_FIELDS = (
+    "kalshi_implied_no_vig",
+    "kalshi_implied_raw",
+    "kalshi_gap",
+    "kalshi_spread",
+    "kalshi_depth",
+    "kalshi_market_id",
+    "polymarket_implied_no_vig",
+    "polymarket_implied_raw",
+    "polymarket_gap",
+    "polymarket_spread",
+    "polymarket_depth",
+    "polymarket_market_id",
+    "best_venue",
+    "market_status",
+    "market_errors",
+)
+
+MARKET_SERIES_FIELDS = (
+    "timestamp",
+    "game_id",
+    "venue",
+    "market_id",
+    "best_bid",
+    "best_ask",
+    "mid",
+    "spread",
+    "implied_prob_raw",
+    "implied_prob_no_vig",
+    "depth",
+    "volume",
+    "fav_score",
+    "dog_score",
+    "period",
+    "clock",
+    "is_triggered",
+    "is_stale",
+)
+
 
 class JSONLTriggerLogger:
     """Append-only local trigger log. No remote writes or secret values."""
@@ -55,7 +94,12 @@ class JSONLTriggerLogger:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
 
-    def append(self, event: TriggerEvent, scoring_fields: Mapping[str, object] | None = None) -> None:
+    def append(
+        self,
+        event: TriggerEvent,
+        scoring_fields: Mapping[str, object] | None = None,
+        market_fields: Mapping[str, object] | None = None,
+    ) -> None:
         record = event.as_dict()
         missing = [field for field in REQUIRED_TRIGGER_FIELDS if field not in record]
         if missing:
@@ -65,6 +109,11 @@ class JSONLTriggerLogger:
             if unknown:
                 raise ValueError(f"unknown scoring log fields: {unknown}")
             record.update({field: scoring_fields.get(field) for field in SCORING_FIELDS})
+        if market_fields is not None:
+            unknown = sorted(set(market_fields) - set(MARKET_TRIGGER_FIELDS))
+            if unknown:
+                raise ValueError(f"unknown market log fields: {unknown}")
+            record.update({field: market_fields.get(field) for field in MARKET_TRIGGER_FIELDS})
         with self.path.open("a", encoding="utf-8", newline="\n") as handle:
             handle.write(json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n")
 
@@ -88,5 +137,28 @@ def read_trigger_records(path: str | Path) -> list[dict[str, object]]:
             raise ValueError(f"trigger log line {line_number} missing Stage 1 fields: {missing}")
         for field in SCORING_FIELDS:
             record.setdefault(field, None)
+        for field in MARKET_TRIGGER_FIELDS:
+            record.setdefault(field, None)
         records.append(record)
     return records
+
+
+class JSONLRecordLogger:
+    """Append validated dictionaries to a dedicated JSONL stream."""
+
+    def __init__(self, path: str | Path, required_fields: Iterable[str]) -> None:
+        self.path = Path(path)
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.required_fields = tuple(required_fields)
+
+    def append(self, record: Mapping[str, object]) -> None:
+        missing = [field for field in self.required_fields if field not in record]
+        if missing:
+            raise ValueError(f"JSONL record missing required fields: {missing}")
+        with self.path.open("a", encoding="utf-8", newline="\n") as handle:
+            handle.write(json.dumps(dict(record), sort_keys=True, separators=(",", ":")) + "\n")
+
+
+class JSONLMarketSeriesLogger(JSONLRecordLogger):
+    def __init__(self, path: str | Path) -> None:
+        super().__init__(path, MARKET_SERIES_FIELDS)

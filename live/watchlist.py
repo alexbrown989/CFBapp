@@ -27,6 +27,7 @@ class WatchGame:
     home_team: str
     away_team: str
     spread_provider_used: str
+    kickoff: str | None = None
     spread_bucket: str = "pick_or_dog"
     favorite_ap_rank: int | None = None
     ranking_bucket: str = "unranked"
@@ -84,6 +85,7 @@ def build_watchlist(
             home_team=home,
             away_team=away,
             spread_provider_used=provider,
+            kickoff=_optional_text(game.get("startDate") or game.get("kickoff") or game.get("startTime")),
             spread_bucket=spread_bucket(float(favorite_spread)),
             favorite_ap_rank=favorite_rank,
             ranking_bucket=ranking_bucket(favorite_rank),
@@ -151,3 +153,9 @@ def _spread(line: Mapping[str, object]) -> float | None:
         return float(value)
     except (TypeError, ValueError):
         return None
+
+
+def _optional_text(value: object) -> str | None:
+    if value in (None, ""):
+        return None
+    return str(value)

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from collections import Counter
+from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -9,8 +10,17 @@ import pandas as pd
 
 from .config import ensure_n12_lookup_import_path
 from .data_source import ScoreboardGameState, ScoreboardStub
-from .logger import JSONLTriggerLogger, REQUIRED_TRIGGER_FIELDS, SCORING_FIELDS
+from .logger import (
+    JSONLMarketSeriesLogger,
+    JSONLTriggerLogger,
+    MARKET_SERIES_FIELDS,
+    MARKET_TRIGGER_FIELDS,
+    REQUIRED_TRIGGER_FIELDS,
+    SCORING_FIELDS,
+)
 from .main import LiveMonitor
+from .markets.base import MarketRef, Quote, utc_now
+from .markets.service import MarketService
 from .scoring import ScoringContext, score_trigger
 from .trigger_detect import TriggerDetector
 from .watchlist import WatchGame, build_watchlist
@@ -26,9 +36,41 @@ GAMES_CACHE = REPO_ROOT / "research/data/cache/cfbd__games__9d0a751d3eb65363.jso
 LINES_CACHE = REPO_ROOT / "research/data/cache/cfbd__lines__9d0a751d3eb65363.json"
 RANKINGS_CACHE = REPO_ROOT / "research/data/cache/cfbd__rankings__2024.json"
 LOG_PATH = REPO_ROOT / "live/logs/replay_verification.jsonl"
+MARKET_SERIES_PATH = REPO_ROOT / "live/logs/replay_market_series_verification.jsonl"
 REPORT_PATH = REPO_ROOT / "research/results/n13_stage1_replay_verification.md"
 N11_PATH = REPO_ROOT / "research/results/n11_ranking_stratification.parquet"
 N06_PATH = REPO_ROOT / "research/results/n06_calibrated_predictions.parquet"
+
+
+class RecordedKalshiClient:
+    """Deterministic read-only quote source for the end-to-end replay."""
+
+    venue = "kalshi"
+
+    def find_market(self, _):
+        return None
+
+    def get_quote(self, market_ref: MarketRef) -> Quote:
+        return Quote(
+            venue=self.venue,
+            market_id=market_ref.market_id,
+            favorite_outcome_id=market_ref.favorite_outcome_id,
+            best_bid=0.40,
+            best_ask=0.42,
+            mid=0.41,
+            spread=0.02,
+            implied_prob_raw=0.42,
+            implied_prob_no_vig=0.42 / (0.42 + 0.60),
+            depth_top_levels=(
+                {"level": 1.0, "bid_price": 0.40, "bid_size": 100.0, "ask_price": 0.42, "ask_size": 80.0},
+            ),
+            volume_since_last_poll=0.0,
+            timestamp=utc_now(),
+            source_timestamp=None,
+            is_stale=False,
+            dog_best_ask=0.60,
+            no_vig_method="two_sided_derived_ask_normalization_from_yes_no_bids",
+        )
 
 
 def load_json(path: Path) -> object:
@@ -105,14 +147,40 @@ def verify_watchlist() -> WatchGame:
     return game
 
 
-def verify_replay(game: WatchGame) -> tuple[list[dict[str, object]], int]:
+def verify_replay(game: WatchGame) -> tuple[list[dict[str, object]], int, int]:
     plays = [row for row in load_json(PLAYS_CACHE) if str(row.get("gameId")) == GAME_ID]
     scoring_plays = sorted((row for row in plays if row.get("scoring") is True), key=chronological_key)
     batches = [[score_state(play, index)] for index, play in enumerate(scoring_plays, start=1)]
+    expected_detector = TriggerDetector()
+    expected_trigger_polls: list[int] = []
+    for poll_number, batch in enumerate(batches, start=1):
+        state = replace(batch[0], poll_number=poll_number)
+        if expected_detector.process(state, game):
+            expected_trigger_polls.append(poll_number)
     source = ScoreboardStub(batches)
     detector = TriggerDetector()
     logger = JSONLTriggerLogger(LOG_PATH)
     LOG_PATH.unlink(missing_ok=True)
+    MARKET_SERIES_PATH.unlink(missing_ok=True)
+    market_client = RecordedKalshiClient()
+    market_service = MarketService(
+        [market_client],
+        market_series_logger=JSONLMarketSeriesLogger(MARKET_SERIES_PATH),
+    )
+    market_service.set_mapping(
+        GAME_ID,
+        MarketRef(
+            venue="kalshi",
+            market_id="RECORDED-GEORGIA-ALABAMA",
+            favorite_outcome_id="RECORDED-GEORGIA-ALABAMA:yes",
+            favorite_side="yes",
+            dog_outcome_id="RECORDED-GEORGIA-ALABAMA:no",
+            favorite_team="Georgia",
+            dog_team="Alabama",
+            mapping_confidence="exact",
+            mapping_reason="recorded replay fixture with explicit Georgia YES outcome",
+        ),
+    )
     context_provider = _replay_context_provider()
     monitor = LiveMonitor(
         source=source,
@@ -122,6 +190,7 @@ def verify_replay(game: WatchGame) -> tuple[list[dict[str, object]], int]:
         poll_interval_seconds=0,
         scorer=score_trigger,
         context_provider=context_provider,
+        market_service=market_service,
     )
     for _ in batches:
         monitor.poll_once()
@@ -142,12 +211,40 @@ def verify_replay(game: WatchGame) -> tuple[list[dict[str, object]], int]:
     ]
     assert actual == expected, {"actual": actual, "expected": expected}
     assert len(records) == 7
-    required = set(REQUIRED_TRIGGER_FIELDS) | set(SCORING_FIELDS)
+    actual_trigger_polls = sorted({int(record["poll_number"]) for record in records})
+    assert actual_trigger_polls == expected_trigger_polls
+    grouped_states: dict[int, tuple[object, ...]] = {}
+    for record in records:
+        poll_number = int(record["poll_number"])
+        state = (
+            record["fav_score"],
+            record["dog_score"],
+            record["period"],
+            record["clock"],
+            record["timestamp"],
+        )
+        if poll_number in grouped_states:
+            assert grouped_states[poll_number] == state, {
+                "poll_number": poll_number,
+                "first_state": grouped_states[poll_number],
+                "later_state": state,
+            }
+        else:
+            grouped_states[poll_number] = state
+    required = set(REQUIRED_TRIGGER_FIELDS) | set(SCORING_FIELDS) | set(MARKET_TRIGGER_FIELDS)
     assert all(set(record) == required for record in records)
     assert [record["tier_used"] for record in records] == [3, 3, 3, 3, 3, 2, 2]
     assert all(record["n06_calibrated_prob"] is not None for record in records[:5])
     assert all(record["n06_unavailable_reason"] == "unavailable - replay re-fire has no committed feature snapshot" for record in records[5:])
-    return records, len(scoring_plays)
+    assert all(record["market_status"] == "OK" for record in records)
+    assert all(record["kalshi_market_id"] == "RECORDED-GEORGIA-ALABAMA" for record in records)
+    assert all(record["kalshi_gap"] is not None for record in records)
+    assert all(record["polymarket_gap"] is None for record in records)
+    series = [json.loads(line) for line in MARKET_SERIES_PATH.read_text(encoding="utf-8").splitlines()]
+    assert len(series) == len(scoring_plays)
+    assert all(set(row) == set(MARKET_SERIES_FIELDS) for row in series)
+    assert sum(bool(row["is_triggered"]) for row in series) == len(expected_trigger_polls)
+    return records, len(scoring_plays), len(series)
 
 
 def _replay_context_provider():
@@ -210,14 +307,16 @@ def verify_refire() -> list[int]:
     return thresholds
 
 
-def write_report(records: list[dict[str, object]], scoring_play_count: int, refire: list[int]) -> None:
+def write_report(
+    records: list[dict[str, object]], scoring_play_count: int, market_series_count: int, refire: list[int]
+) -> None:
     table_rows = "\n".join(
         f"| {row['threshold_crossed']} | Q{row['period']} {row['clock']} | {row['fav_score']}-{row['dog_score']} | {row['poll_number']} |"
         for row in records
     )
-    report = f"""# N13 Stage 1 + Stage 2 Replay Verification
+    report = f"""# N13 Stage 1 + Stage 2 + Stage 3 Replay Verification
 
-Date: 2026-07-14
+Date: 2026-07-15
 
 ## Result
 
@@ -235,24 +334,29 @@ CFBD applies some completed-drive score values to earlier plays in a drive. The 
 - Real-game re-fire after Georgia recovered to a 34-33 lead: D=3 and D=7 at Q4 2:18
 - Synthetic re-fire test after recovery: {refire}
 - JSONL records: {len(records)}
-- JSONL schema: PASS, all {len(REQUIRED_TRIGGER_FIELDS)} Stage 1 fields plus {len(SCORING_FIELDS)} additive Stage 2 fields present
+- JSONL schema: PASS, all {len(REQUIRED_TRIGGER_FIELDS)} Stage 1 fields, {len(SCORING_FIELDS)} Stage 2 fields, and {len(MARKET_TRIGGER_FIELDS)} additive Stage 3 fields present
 - Scoring tiers: first five committed trigger snapshots reached Tier 3; the two Q4 re-fire events reached Tier 2 and explicitly suppressed N06 because no committed feature snapshot exists
 - Every scoring read includes both-label baseline_C, historical descriptive context where available, tier reasons, sample sizes, reliability, and conformal bounds whenever N06 is shown
+- Recorded Kalshi quote: favorite ask 0.42, dog ask 0.60, no-vig favorite probability {0.42 / 1.02:.6f}
+- End-to-end trigger gap: baseline_C `favorite_final_win` minus the recorded no-vig probability on all seven trigger records
+- Per-poll market-series records: {market_series_count}; 7 trigger records occurred across {len({row['poll_number'] for row in records})} polls because Stage 1 multi-threshold crossings share one observed game-state (`D=3/7`, `D=10/14`, `D=21`, Q4 re-fire `D=3/7`)
+- Every trigger record sharing a poll has identical favorite/dog score, period, clock, and timestamp
+- Market label guard: the quote is compared only to `favorite_final_win`; `deficit_erased` remains descriptive context
 - Data source recorded as `stub`
 - Network/API calls: 0
 
 ## Acceptance
 
-Trigger timing, one-fire deduplication, recovery-based re-arming, multi-threshold crossing, watch-list construction, and append-only local log schema all pass. `ScoreboardLive` was not activated.
+Trigger timing, one-fire deduplication, recovery-based re-arming, multi-threshold crossing, watch-list construction, tiered scoring, market gap computation, per-poll quote logging, and the additive local log schema all pass. `ScoreboardLive` was not activated and the replay made no network calls.
 """
     REPORT_PATH.write_text(report, encoding="utf-8", newline="\n")
 
 
 def main() -> int:
     game = verify_watchlist()
-    records, scoring_play_count = verify_replay(game)
+    records, scoring_play_count, market_series_count = verify_replay(game)
     refire = verify_refire()
-    write_report(records, scoring_play_count, refire)
+    write_report(records, scoring_play_count, market_series_count, refire)
     print(f"PASS: {REPORT_PATH.relative_to(REPO_ROOT)}")
     return 0
 

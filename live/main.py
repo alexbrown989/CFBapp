@@ -10,7 +10,9 @@ from typing import Callable
 
 from .config import Settings
 from .data_source import ScoreboardGameState, ScoreboardLive, ScoreboardSource, ScoreboardStub
-from .logger import JSONLTriggerLogger
+from .logger import JSONLMarketSeriesLogger, JSONLRecordLogger, JSONLTriggerLogger
+from .markets import GameMarket, KalshiClient, PolymarketClient
+from .markets.service import MarketPollResult, MarketService
 from .scoring import ScoringContext, ScoringResult, score_trigger
 from .trigger_detect import TriggerDetector, TriggerEvent
 from .watchlist import WatchGame
@@ -32,6 +34,7 @@ class LiveMonitor:
         poll_interval_seconds: float,
         scorer: Scorer | None = None,
         context_provider: ContextProvider | None = None,
+        market_service: MarketService | None = None,
     ) -> None:
         self.source = source
         self.watchlist = watchlist
@@ -40,6 +43,27 @@ class LiveMonitor:
         self.poll_interval_seconds = poll_interval_seconds
         self.scorer = scorer
         self.context_provider = context_provider
+        self.market_service = market_service
+
+    def configure_watchlist(self, watchlist: dict[str, WatchGame]) -> None:
+        """Install the daily watch list and cache exact market mappings once per game."""
+        self.watchlist = dict(watchlist)
+        if self.market_service is None:
+            return
+        for game in self.watchlist.values():
+            self.market_service.discover_game(
+                GameMarket(
+                    game_id=game.game_id,
+                    season=game.season,
+                    week=game.week,
+                    home_team=game.home_team,
+                    away_team=game.away_team,
+                    favorite=game.favorite,
+                    dog=game.dog,
+                    pregame_spread=game.pregame_spread,
+                    kickoff=game.kickoff,
+                )
+            )
 
     def poll_once(self) -> int:
         event_count = 0
@@ -48,6 +72,11 @@ class LiveMonitor:
             if game is None:
                 continue
             events = self.detector.process(state, game)
+            market_poll = (
+                self.market_service.poll_game(game, state, is_triggered=bool(events))
+                if self.market_service is not None
+                else MarketPollResult(str(game.game_id), {}, "NO_MARKET", {})
+            )
             for event in events:
                 scoring_result = None
                 if self.scorer is not None:
@@ -55,9 +84,15 @@ class LiveMonitor:
                         raise RuntimeError("a scoring context provider is required when scoring is enabled")
                     context = self.context_provider(game, state, event)
                     scoring_result = self.scorer(event, context)
+                market_fields = (
+                    None
+                    if scoring_result is None or self.market_service is None
+                    else self.market_service.trigger_fields(scoring_result, market_poll)
+                )
                 self.logger.append(
                     event,
                     None if scoring_result is None else scoring_result.as_log_fields(),
+                    market_fields,
                 )
                 print(
                     f"TRIGGER {event.game_id} {event.favorite} D={event.threshold_crossed} "
@@ -85,14 +120,31 @@ def create_source(settings: Settings) -> ScoreboardSource:
 
 def create_monitor(settings: Settings | None = None) -> LiveMonitor:
     settings = settings or Settings.from_env()
+    log_dir = Path(__file__).parent / "logs"
+    market_service = MarketService(
+        [KalshiClient(), PolymarketClient()],
+        market_series_logger=JSONLMarketSeriesLogger(log_dir / "market_series.jsonl"),
+        mapping_logger=JSONLRecordLogger(
+            log_dir / "market_mappings.jsonl",
+            (
+                "timestamp", "game_id", "venue", "status", "market_id", "favorite", "dog",
+                "favorite_outcome_id", "favorite_side", "mapping_reason", "inversion_guard_passed",
+            ),
+        ),
+        error_logger=JSONLRecordLogger(
+            log_dir / "market_errors.jsonl",
+            ("timestamp", "game_id", "venue", "operation", "error_type", "message"),
+        ),
+    )
     return LiveMonitor(
         source=create_source(settings),
         watchlist={},
         detector=TriggerDetector(settings.deficit_thresholds),
-        logger=JSONLTriggerLogger(Path(__file__).parent / "logs" / "triggers.jsonl"),
+        logger=JSONLTriggerLogger(log_dir / "triggers.jsonl"),
         poll_interval_seconds=settings.poll_interval_seconds,
         scorer=score_trigger,
         context_provider=default_scoring_context,
+        market_service=market_service,
     )
 
 
@@ -133,7 +185,7 @@ try:
                 except asyncio.CancelledError:
                     pass
 
-    app = FastAPI(title="N13 Stage 1 Live Monitor", version="0.1.0", lifespan=lifespan)
+    app = FastAPI(title="N13 Live Monitor", version="0.3.0", lifespan=lifespan)
 
     @app.get("/health")
     def health() -> dict[str, object]:

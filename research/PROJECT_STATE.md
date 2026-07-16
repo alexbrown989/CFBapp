@@ -1,6 +1,6 @@
 # Project State
 
-Last updated: 2026-07-14
+Last updated: 2026-07-15
 
 ## Project Summary
 
@@ -30,7 +30,7 @@ N13 is a long-running service, not a research notebook.
 - **Tier 1 scoring:** baseline_C (`fav_deficit x time_bucket`) is the primary live estimate. It needs only score, clock, and deficit.
 - **Tier 2 enrichment:** N12 historical conditional/ranking lookups add context when the live state can build matching keys.
 - **Tier 3 full N06:** full model scoring is shown only when all required features are available and live-parity-safe. N13 parity work already found attribution-heavy features are not safe for v1 without runtime guards.
-- **Posture:** alert/dashboard only; no auto-bet; read-only data and market keys only.
+- **Posture:** alert/dashboard only; no auto-bet. Kalshi and Polymarket market reads are public and require no credentials.
 - **Deployment shape:** local web app, top-25 scope, 20-30 second poll when live access is active.
 - **Stage 4 risk and variance panel:** show this beside any bet-sizing suggestion. In addition to fractional-Kelly stake, display expected bet value, probability of losing streaks of user-selected length N, season-level risk-of-ruin at the current bankroll and sizing, and stake as a fraction of bankroll. Inputs are user bankroll, suggested stake, estimated win probability, and offered odds. This is standard bankroll math, not a new research estimate; it is required because plus-money favorite strategies can lose most individual bets even when positive in expectation.
 - **Build stages:** Stage 1 data loop -> Stage 2 scoring -> Stage 3 markets -> Stage 4 dashboard -> Stage 5 logging/retraining/Tailscale.
@@ -70,9 +70,19 @@ Stage 2 tiered scoring completed on 2026-07-14:
 - [done] Georgia-Alabama replay now produces full scoring reads: five committed trigger states reach Tier 3; two recovery-based re-fires stop honestly at Tier 2.
 - Verification: `research/results/n13_stage2_scoring_verification.md`.
 
+Stage 3 public-market integration completed on 2026-07-15:
+
+- [done] Public, credential-free Kalshi and Polymarket clients behind one read-only market interface.
+- [done] Exact team/date mapping with explicit favorite-outcome inversion guards and per-game daily mapping cache.
+- [done] Executable raw price vs two-sided no-vig probability separation; probability gaps use `favorite_final_win` only.
+- [done] Per-poll market-series logging and additive trigger-market fields.
+- [done] Venue outage isolation, 429/5xx backoff, stale-quote suppression, and mandatory halt on unexpected authentication.
+- [done] Public live smoke tests, Kalshi reciprocal pricing, no-vig known inputs, inversion/label guards, resilience, and Georgia-Alabama replay integration.
+- Verification: `research/results/n13_stage3_market_verification.md`.
+- Season-start requirement: re-certify exact game-to-market mapping when real 2026 CFB contracts list.
+
 Buildable later without paid live access:
 
-- Stage 3 market adapters and price comparison using read-only credentials.
 - Stage 4 dashboard shell, including the required risk and variance panel.
 
 Activate later after CFBD Tier 2 subscription in late August 2026:
@@ -94,13 +104,15 @@ Activate later after CFBD Tier 2 subscription in late August 2026:
 - `live/scoring.py` - tiered scoring engine backed by N12 helpers.
 - `live/parity_guard.py` - post-game live-vs-cached Tier 3 drift audit.
 - `research/results/n13_stage2_scoring_verification.md` - exact lookup, model reproduction, log compatibility, and parity-guard acceptance results.
+- `live/markets/` - credential-free Kalshi/Polymarket discovery, quote normalization, inversion guards, and gap orchestration.
+- `research/results/n13_stage3_market_verification.md` - public endpoint, pricing, mapping, label, replay, and resilience acceptance results.
 - `research/corrections_log.md` - methodology corrections and honest interpretation record.
 
 ## Methodology Discipline Reminders
 
 - Halt-and-surface on state drift, schema mismatch, live access failure, or anything that changes trigger counting.
 - No auto-bet. N13 may alert, log, and display; it must not place wagers.
-- Treat market keys as read-only. Do not log secrets. Do not commit `.env` files.
+- Market data uses public endpoints and needs no credentials. Do not add signing, wallet, portfolio, order, or trading capabilities. Do not log secrets or commit `.env` files.
 - Preserve machine-precision reproduction gates for any code path that claims to score with committed N06/N12 state.
 - Report both labels where descriptive rates are shown: `favorite_final_win` and `deficit_erased`.
 - Keep predictive edge, structural edge, market edge, and betting edge terminology separate.
@@ -108,4 +120,4 @@ Activate later after CFBD Tier 2 subscription in late August 2026:
 
 ## Open Decisions / Next Action
 
-Current next action: review and commit N13 Stage 2. After approval, proceed to Stage 3 read-only market integration without activating `ScoreboardLive`. Live activation and Tier 3 certification remain pending the late-August CFBD Tier 2 subscription, current-season rankings, successful `/scoreboard` nested-field and latency certification, and a clean first-weeks live parity window. Stage 4 must include the risk and variance panel defined above.
+Current next action: review and commit N13 Stage 3, then build the Stage 4 local dashboard with the required risk and variance panel. Live activation and Tier 3 certification remain pending the late-August CFBD Tier 2 subscription, current-season rankings, successful `/scoreboard` nested-field and latency certification, 2026 CFB market-mapping re-certification, and a clean first-weeks live parity window.

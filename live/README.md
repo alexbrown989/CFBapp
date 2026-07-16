@@ -1,6 +1,6 @@
-﻿# N13 Stage 1 Live Monitor
+﻿# N13 Live Monitor
 
-N13 Stages 1-2 provide a read-only trigger and scoring foundation. The service polls a normalized scoreboard source, filters watched games, detects favorite-deficit threshold crossings, attaches the highest certified N12 scoring tier, prints alerts, and appends local JSONL records. It does not fetch live market prices, display a UI, or place bets.
+N13 Stages 1-3 provide a read-only trigger, scoring, and public-market comparison foundation. The service polls a normalized scoreboard source, filters watched games, detects favorite-deficit threshold crossings, attaches the highest certified N12 scoring tier, reads public Kalshi and Polymarket prices, computes label-matched probability gaps, prints alerts, and appends local JSONL records. It does not display a UI or place bets.
 
 ## Modes
 
@@ -33,6 +33,12 @@ Run the independent Stage 2 lookup/model/parity gate:
 C:\Users\Alexander\AppData\Local\Programs\Python\Python312\python.exe -m live.stage2_verify
 ```
 
+Run the Stage 3 public-market, inversion, label, resilience, and replay gate:
+
+```powershell
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\python.exe -m live.stage3_verify
+```
+
 Run one empty stub poll:
 
 ```powershell
@@ -49,9 +55,11 @@ Automatic interval polling is off by default. Set `N13_AUTO_POLL=1` to enable th
 
 ## Watch List
 
-`build_watchlist()` accepts current games, line records, and either AP-ranked teams or a manual team list. It prefers consensus spread, then averages real-sportsbook spreads using the locked N04 provider policy. Current-season rankings will be wired in after the 2026 preseason AP poll is available.
+`build_watchlist()` accepts current games, line records, and either AP-ranked teams or a manual team list. It prefers consensus spread, then averages real-sportsbook spreads using the locked N04 provider policy. It carries the CFBD `startDate` kickoff into market discovery so exact team/date matching is possible. Current-season rankings will be wired in after the 2026 preseason AP poll is available.
 
 The replay acceptance test proves this path with cached 2024 games, lines, and AP ranking data before feeding the game through `ScoreboardStub`.
+
+At daily setup, call `LiveMonitor.configure_watchlist()` once. It installs the watch list and asks each public venue client to discover, inversion-check, and cache one exact market mapping per game. Polls reuse that in-memory mapping and never repeat discovery.
 
 ## Trigger Rules
 
@@ -75,8 +83,18 @@ The conformal interval is always shown with an N06 point probability. Its deploy
 
 `live/parity_guard.py` compares features recorded at trigger time with post-game values recomputed from the completed cache. Drift records are append-only and mark `tier3_suspect=true` whenever a feature exceeds tolerance. The first weeks of 2026 are the live-parity certification window; Tier 1 remains the operational anchor until that window is clean.
 
+## Public Market Data
+
+- Kalshi market and orderbook reads use public GET endpoints. The client derives YES asks from NO bids and NO asks from YES bids, then checks reciprocal pricing.
+- Polymarket discovery uses Gamma and quotes use both public CLOB token books.
+- `implied_prob_raw` is the executable favorite ask and is used for EV. `implied_prob_no_vig` normalizes both outcome asks and is used for probability gaps.
+- Every mapping names the favorite outcome explicitly and must pass exact team/date and pregame-probability inversion guards. Ambiguous mappings become `NO_MARKET`.
+- Gaps are hard-locked to the `favorite_final_win` estimate. `deficit_erased` cannot be compared with a win contract.
+- Every watched-game poll appends a quote to `live/logs/market_series.jsonl`; trigger rows gain market fields additively.
+- Ordinary venue failures are isolated. If a supposedly public endpoint returns an authentication challenge, the service raises the mandatory halt condition instead of adding credentials.
+
 ## Logging And Security
 
 Trigger records append to `live/logs/*.jsonl`; runtime logs are gitignored. Stage 2 adds scoring fields without changing the original 16-field foundation. The reader accepts older Stage 1 rows and supplies nulls for absent scoring fields. Records contain game state, estimates, and provenance only. API keys are read from environment variables, `.env` is gitignored, and secrets are never logged.
 
-The service uses read-only public/paid data endpoints. It has no market credentials, no wager-placement integration, and no external write path. Local JSONL logging is the only persistent write.
+The service uses read-only public/paid data endpoints. Market reads require no credentials, and the code has no signing, portfolio, order, cancellation, wager-placement, or trading surface. Local JSONL logging is the only persistent write.
