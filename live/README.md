@@ -1,6 +1,6 @@
 ﻿# N13 Live Monitor
 
-N13 Stages 1-3 provide a read-only trigger, scoring, and public-market comparison foundation. The service polls a normalized scoreboard source, filters watched games, detects favorite-deficit threshold crossings, attaches the highest certified N12 scoring tier, reads public Kalshi and Polymarket prices, computes label-matched probability gaps, prints alerts, and appends local JSONL records. It does not display a UI or place bets.
+N13 Stages 1-4 provide a read-only trigger, scoring, public-market comparison, and localhost dashboard. The service polls a normalized scoreboard source, filters watched games, detects favorite-deficit threshold crossings, attaches the highest certified N12 scoring tier, reads public Kalshi and Polymarket prices, computes label-matched probability gaps, renders the engine and risk context, prints alerts, and appends local JSONL records. It never places bets.
 
 ## Modes
 
@@ -39,17 +39,25 @@ Run the Stage 3 public-market, inversion, label, resilience, and replay gate:
 C:\Users\Alexander\AppData\Local\Programs\Python\Python312\python.exe -m live.stage3_verify
 ```
 
+Run the Stage 4 dashboard, risk, replay, degradation, and security gate:
+
+```powershell
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\python.exe -m live.stage4_verify
+```
+
 Run one empty stub poll:
 
 ```powershell
 C:\Users\Alexander\AppData\Local\Programs\Python\Python312\python.exe -m live.main --once
 ```
 
-Run the FastAPI shell when the backend dependencies are installed:
+Run the localhost dashboard when the backend dependencies are installed:
 
 ```powershell
-uvicorn live.main:app --reload
+C:\Users\Alexander\AppData\Local\Programs\Python\Python312\python.exe -m live.main --serve
 ```
+
+Open `http://127.0.0.1:8000/`. The host is hard-locked to `127.0.0.1`; remote access is deferred to private Tailscale setup in Stage 5.
 
 Automatic interval polling is off by default. Set `N13_AUTO_POLL=1` to enable the loop; the default interval is 25 seconds.
 
@@ -79,6 +87,14 @@ At daily setup, call `LiveMonitor.configure_watchlist()` once. It installs the w
 
 The conformal interval is always shown with an N06 point probability. Its deployment q-hat is about 0.770, so wide intervals are expected and must remain visible.
 
+## Dashboard And Risk
+
+The dashboard always labels the estimator tier, sample size, reliability, and outcome. Tier 3 and its conformal interval predict `deficit_erased`; market gaps and all financial math use Tier 1 `favorite_final_win`. The dashboard therefore states plainly that no label-matched conformal interval exists for the moneyline estimate.
+
+`live/risk.py` implements label-guarded EV, full Kelly, fractional Kelly, losing-streak, and finite-season drawdown-floor calculations. The suggested fraction is full Kelly times the configurable Kelly fraction (default 0.25) times a sample-reliability factor, capped by the configured maximum stake. Quarter-Kelly is the sole parameter-estimation haircut; the reliability factor is a distinct sample-size policy. Tier factors are flat at 1.00, and the `deficit_erased` conformal width never changes moneyline sizing.
+
+Personal bankroll settings persist to gitignored `live/config.local.json`. The panel shows expected value at the executable raw offer, stake dollars and bankroll fraction, losing-streak probabilities, expected streak windows, and exact finite-season risk of touching the configured drawdown floor. It is an advisory display only. Negative EV produces `DO NOT BET`, and sub-10% offers carry an informational favorite-longshot-bias warning.
+
 ## Runtime Parity Guard
 
 `live/parity_guard.py` compares features recorded at trigger time with post-game values recomputed from the completed cache. Drift records are append-only and mark `tier3_suspect=true` whenever a feature exceeds tolerance. The first weeks of 2026 are the live-parity certification window; Tier 1 remains the operational anchor until that window is clean.
@@ -97,4 +113,4 @@ The conformal interval is always shown with an N06 point probability. Its deploy
 
 Trigger records append to `live/logs/*.jsonl`; runtime logs are gitignored. Stage 2 adds scoring fields without changing the original 16-field foundation. The reader accepts older Stage 1 rows and supplies nulls for absent scoring fields. Records contain game state, estimates, and provenance only. API keys are read from environment variables, `.env` is gitignored, and secrets are never logged.
 
-The service uses read-only public/paid data endpoints. Market reads require no credentials, and the code has no signing, portfolio, order, cancellation, wager-placement, or trading surface. Local JSONL logging is the only persistent write.
+The service uses read-only public/paid data endpoints. Market reads require no credentials, and the code has no signing, portfolio, order, cancellation, wager-placement, or trading surface. Local JSONL logging and personal dashboard configuration are the only persistent writes.

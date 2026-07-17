@@ -1,6 +1,6 @@
 # Project State
 
-Last updated: 2026-07-15
+Last updated: 2026-07-16
 
 ## Project Summary
 
@@ -32,7 +32,7 @@ N13 is a long-running service, not a research notebook.
 - **Tier 3 full N06:** full model scoring is shown only when all required features are available and live-parity-safe. N13 parity work already found attribution-heavy features are not safe for v1 without runtime guards.
 - **Posture:** alert/dashboard only; no auto-bet. Kalshi and Polymarket market reads are public and require no credentials.
 - **Deployment shape:** local web app, top-25 scope, 20-30 second poll when live access is active.
-- **Stage 4 risk and variance panel:** show this beside any bet-sizing suggestion. In addition to fractional-Kelly stake, display expected bet value, probability of losing streaks of user-selected length N, season-level risk-of-ruin at the current bankroll and sizing, and stake as a fraction of bankroll. Inputs are user bankroll, suggested stake, estimated win probability, and offered odds. This is standard bankroll math, not a new research estimate; it is required because plus-money favorite strategies can lose most individual bets even when positive in expectation.
+- **Stage 4 risk and variance panel:** completed. It shows label-safe EV, fractional-Kelly suggestion, stake as a fraction of bankroll, losing-streak probabilities, expected streak windows, and finite-season drawdown-floor risk. N06 conformal uncertainty remains attached to `deficit_erased`; moneyline risk math is hard-locked to `favorite_final_win`.
 - **Build stages:** Stage 1 data loop -> Stage 2 scoring -> Stage 3 markets -> Stage 4 dashboard -> Stage 5 logging/retraining/Tailscale.
 
 ## CFBD Access Status
@@ -81,9 +81,16 @@ Stage 3 public-market integration completed on 2026-07-15:
 - Verification: `research/results/n13_stage3_market_verification.md`.
 - Season-start requirement: re-certify exact game-to-market mapping when real 2026 CFB contracts list.
 
-Buildable later without paid live access:
+Stage 4 localhost dashboard completed on 2026-07-16:
 
-- Stage 4 dashboard shell, including the required risk and variance panel.
+- [done] Dense responsive watch list and game detail with persistent stub/live mode banner.
+- [done] Tier 1/2/3 engine rendering with sample sizes, reliability, source labels, and explicit Tier 3 unavailability reasons.
+- [done] Visible N06 `deficit_erased` conformal band and label-matched Tier 1/Tier 3 disagreement warning.
+- [done] Per-venue raw/no-vig prices, spread, depth, staleness, gap, and friction-survival rendering.
+- [done] Label-guarded EV, Kelly sizing, streak, and drawdown-floor risk panel. All seven financial functions reject `deficit_erased`.
+- [done] Gitignored personal bankroll/risk configuration and localhost-only FastAPI API.
+- [done] Georgia-Alabama replay, graceful degradation, security scan, and desktop/mobile browser verification.
+- Verification: `research/results/n13_stage4_dashboard_verification.md`.
 
 Activate later after CFBD Tier 2 subscription in late August 2026:
 
@@ -106,6 +113,9 @@ Activate later after CFBD Tier 2 subscription in late August 2026:
 - `research/results/n13_stage2_scoring_verification.md` - exact lookup, model reproduction, log compatibility, and parity-guard acceptance results.
 - `live/markets/` - credential-free Kalshi/Polymarket discovery, quote normalization, inversion guards, and gap orchestration.
 - `research/results/n13_stage3_market_verification.md` - public endpoint, pricing, mapping, label, replay, and resilience acceptance results.
+- `live/risk.py` - pure, label-guarded EV, Kelly, streak, and drawdown-floor math.
+- `live/static/dashboard.html` - no-build localhost dashboard.
+- `research/results/n13_stage4_dashboard_verification.md` - risk math, replay, degradation, security, and responsive rendering acceptance results.
 - `research/corrections_log.md` - methodology corrections and honest interpretation record.
 
 ## Methodology Discipline Reminders
@@ -120,4 +130,4 @@ Activate later after CFBD Tier 2 subscription in late August 2026:
 
 ## Open Decisions / Next Action
 
-Current next action: review and commit N13 Stage 3, then build the Stage 4 local dashboard with the required risk and variance panel. Live activation and Tier 3 certification remain pending the late-August CFBD Tier 2 subscription, current-season rankings, successful `/scoreboard` nested-field and latency certification, 2026 CFB market-mapping re-certification, and a clean first-weeks live parity window.
+Current next action: review and commit N13 Stage 4, then design Stage 5 logging/retraining operations and private Tailscale access. Live activation and Tier 3 certification remain pending the late-August CFBD Tier 2 subscription, current-season rankings, successful `/scoreboard` nested-field and latency certification, 2026 CFB market-mapping re-certification, and a clean first-weeks live parity window.

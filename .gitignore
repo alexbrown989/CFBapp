@@ -42,6 +42,8 @@ pip-wheel-metadata/
 .env
 .env.*
 !.env.example
+live/config.local.json
+live/config.local.json.tmp
 
 # --- Jupyter -----------------------------------------------------------------
 .ipynb_checkpoints/
