@@ -63,6 +63,9 @@ class TriggerDetector:
         armed = self._armed.setdefault(game.game_id, {threshold: True for threshold in self.thresholds})
         fired: list[TriggerEvent] = []
 
+        # One observed score can cross several thresholds between polls. Those
+        # events intentionally share this poll's identical game state rather
+        # than inventing intermediate states the scoreboard never reported.
         for threshold in self.thresholds:
             if trailing_margin < threshold:
                 armed[threshold] = True

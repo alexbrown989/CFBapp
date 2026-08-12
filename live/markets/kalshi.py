@@ -62,6 +62,9 @@ class KalshiClient:
         yes_bids = _book_levels(book.get("yes_dollars"))
         no_bids = _book_levels(book.get("no_dollars"))
         yes_bid, no_bid = _best_reciprocal_bids(yes_bids, no_bids, market)
+        # Kalshi publishes bids on reciprocal YES and NO claims, not asks.
+        # Buying YES is economically equivalent to selling NO, so each ask is
+        # one minus the opposing side's best bid.
         yes_ask = 1.0 - no_bid
         no_ask = 1.0 - yes_bid
         _validate_direct_prices(market, yes_bid, yes_ask, no_bid, no_ask)

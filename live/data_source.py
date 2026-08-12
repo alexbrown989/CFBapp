@@ -68,6 +68,9 @@ class ScoreboardLive:
         self._poll_number = 0
 
     def _assert_enabled(self) -> None:
+        # The live schema is still unverified behind CFBD's paid feed. Keeping
+        # activation behind all three gates prevents an August subscription
+        # change from silently turning an assumed schema into production data.
         enabled = os.getenv("N13_ENABLE_LIVE_SCOREBOARD", "0") == "1"
         tier_confirmed = os.getenv("CFBD_TIER2_CONFIRMED", "0") == "1"
         if not enabled or not tier_confirmed or not self.api_key:

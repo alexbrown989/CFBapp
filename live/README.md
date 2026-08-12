@@ -2,6 +2,8 @@
 
 N13 Stages 1-4 provide a read-only trigger, scoring, public-market comparison, and localhost dashboard. The service polls a normalized scoreboard source, filters watched games, detects favorite-deficit threshold crossings, attaches the highest certified N12 scoring tier, reads public Kalshi and Polymarket prices, computes label-matched probability gaps, renders the engine and risk context, prints alerts, and appends local JSONL records. It never places bets.
 
+Start with [`ARCHITECTURE.md`](ARCHITECTURE.md) for the two-minute service flow, file ownership map, and contracts that must not break.
+
 ## Modes
 
 `stub` is the default and works now. `ScoreboardStub` replays normalized cached score states through the same interface used by the service.

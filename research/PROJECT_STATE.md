@@ -92,6 +92,22 @@ Stage 4 localhost dashboard completed on 2026-07-16:
 - [done] Georgia-Alabama replay, graceful degradation, security scan, and desktop/mobile browser verification.
 - Verification: `research/results/n13_stage4_dashboard_verification.md`.
 
+Stage 4.5 legibility refactor completed on 2026-07-17:
+
+- [done] Split polling/state, presentation serialization, API routing, and process composition into focused modules without changing service contracts.
+- [done] Split the no-build dashboard into structural HTML, CSS, core behavior, and panel-rendering assets.
+- [done] Added `live/ARCHITECTURE.md` as the service entry point for future contributors and sessions.
+- [done] Removed the external Stage 4 staging copy and one-off browser-demo server after confirming neither belonged to the service.
+- [done] Preserved Stage 1-4 numerical, label, lookup, market, replay, logging, and API behavior under pre/post verification.
+- Verification: `research/results/n13_stage4_5_refactor_verification.md`.
+
+Planned Stage 4.6 - plain-language dashboard view:
+
+- Add a `/simple` route that renders the same `/api/state` data in plain sentences without tier badges, conformal bands, raw/no-vig terminology, or reliability chips.
+- Keep the diagnostic dashboard primary; `/simple` is additive and must not alter it.
+- Preserve identical underlying data and label discipline: only `favorite_final_win` may feed financial statements or suggestions.
+- Example framing: "Georgia is losing by 10. In 838 similar past games, teams in this spot came back and won 36% of the time. Kalshi is pricing them at 28%. Suggested bet: $45. You would lose a bet like this roughly 6 times out of 10 even when it is a good bet."
+
 Activate later after CFBD Tier 2 subscription in late August 2026:
 
 - Real `/scoreboard` poll loop.
@@ -116,6 +132,8 @@ Activate later after CFBD Tier 2 subscription in late August 2026:
 - `live/risk.py` - pure, label-guarded EV, Kelly, streak, and drawdown-floor math.
 - `live/static/dashboard.html` - no-build localhost dashboard.
 - `research/results/n13_stage4_dashboard_verification.md` - risk math, replay, degradation, security, and responsive rendering acceptance results.
+- `live/ARCHITECTURE.md` - two-minute request flow, file ownership map, and immutable service contracts.
+- `research/results/n13_stage4_5_refactor_verification.md` - pre/post zero-behavior-change evidence and verifier-amendment record.
 - `research/corrections_log.md` - methodology corrections and honest interpretation record.
 
 ## Methodology Discipline Reminders
@@ -130,4 +148,4 @@ Activate later after CFBD Tier 2 subscription in late August 2026:
 
 ## Open Decisions / Next Action
 
-Current next action: review and commit N13 Stage 4, then design Stage 5 logging/retraining operations and private Tailscale access. Live activation and Tier 3 certification remain pending the late-August CFBD Tier 2 subscription, current-season rankings, successful `/scoreboard` nested-field and latency certification, 2026 CFB market-mapping re-certification, and a clean first-weeks live parity window.
+Current next action: review and commit N13 Stage 4.5. Stage 4.6 is recorded as an additive future plain-language view; Stage 5 remains logging/retraining operations and private Tailscale access. Live activation and Tier 3 certification remain pending the late-August CFBD Tier 2 subscription, current-season rankings, successful `/scoreboard` nested-field and latency certification, 2026 CFB market-mapping re-certification, and a clean first-weeks live parity window.

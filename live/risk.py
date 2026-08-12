@@ -231,6 +231,9 @@ def comfort_stake_fraction(
 
 
 def _assert_win_label(label: str) -> None:
+    # N09 exposed the false edge created by applying a deficit-erasure model
+    # to a final-win bet. Stage 3 and Stage 4 repeat this guard at the market
+    # and bankroll boundaries so that cross-label bug cannot recur silently.
     if label != WIN_MARKET_LABEL:
         raise ValueError(
             f"risk math target is {WIN_MARKET_LABEL!r}; refusing mismatched label {label!r}"

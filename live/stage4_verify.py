@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 import tempfile
 from pathlib import Path
 
@@ -43,7 +44,19 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 REPORT_PATH = REPO_ROOT / "research/results/n13_stage4_dashboard_verification.md"
 TEST_LOG = REPO_ROOT / "live/logs/stage4_replay.jsonl"
 TEST_CONFIG = Path(tempfile.gettempdir()) / "cfbapp_stage4_config.json"
-HTML_PATH = REPO_ROOT / "live/static/dashboard.html"
+
+
+def _served_dashboard_bundle(client, html: str | None = None) -> str:
+    """Return the dashboard HTML plus every linked local static asset."""
+    page_html = client.get("/").text if html is None else html
+    asset_paths = re.findall(r'(?:href|src)="(/static/[^"]+)"', page_html)
+    assert asset_paths
+    served_assets = [page_html]
+    for asset_path in asset_paths:
+        response = client.get(asset_path)
+        assert response.status_code == 200
+        served_assets.append(response.text)
+    return "\n".join(served_assets)
 
 
 def verify_risk_math() -> dict[str, object]:
@@ -155,7 +168,7 @@ def verify_dashboard_api() -> dict[str, object]:
 
     page = client.get("/")
     assert page.status_code == 200
-    html = page.text
+    html = _served_dashboard_bundle(client, page.text)
     for required in (
         "STUB MODE",
         "Probability deficit is erased",
@@ -208,7 +221,6 @@ def verify_dashboard_api() -> dict[str, object]:
         "trigger_count": len(snapshots),
         "trigger_poll_count": len(trigger_polls),
         "tier_counts": tier_counts,
-        "html_bytes": len(page.content),
         "api_routes": ["/", "/api/state", "/api/triggers", "/api/game/{game_id}", "/api/config"],
     }
 
@@ -234,7 +246,7 @@ def verify_degradation_and_security() -> dict[str, object]:
     assert empty_client.get("/api/state").json()["games"] == []
     assert empty_app.state.bind_host == LOCALHOST
 
-    html = HTML_PATH.read_text(encoding="utf-8-sig")
+    html = _served_dashboard_bundle(empty_client)
     forbidden = (
         "CFBD_API_KEY",
         "BEGIN RSA PRIVATE KEY",
@@ -300,7 +312,6 @@ These are explicit policy choices. Quarter-Kelly is the sole parameter-estimatio
 - Tier badges: {dashboard['tier_counts'][3]} Tier 3 snapshots and {dashboard['tier_counts'][2]} honest Tier 2 fallbacks.
 - Every snapshot carries both Tier 1 labels, sample sizes, reliability, market quote/gap, and a label-safe risk panel.
 - Tier 3 snapshots carry visible conformal lower/upper bounds for `deficit_erased` only.
-- Dashboard HTML size: {dashboard['html_bytes']:,} bytes; no frontend build step.
 - API routes verified: {', '.join(f'`{route}`' for route in dashboard['api_routes'])}.
 
 ## Graceful Degradation
